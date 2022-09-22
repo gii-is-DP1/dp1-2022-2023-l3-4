@@ -51,6 +51,15 @@
             <role></role>
             </roles>
         </developer>
+        <developer>
+            <id>frabenrui1</id>
+            <name>Francisco Sebastián Benítez Ruis Díaz</name>
+            <email>fsbrd10@gmail.com</email>
+            <url></url>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
         <!-- More developers ...-->
     </developers>
 

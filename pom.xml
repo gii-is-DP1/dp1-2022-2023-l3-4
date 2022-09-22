@@ -32,6 +32,19 @@
 
     </properties>
 
+    <developers>
+        <developer>
+            <id>marmarmar73</id>
+            <name>María Márquez Sierra</name>
+            <email>mmarquezsierra2002@gmail.com</email>
+            <url></url>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
+        <!-- More developers ...-->
+    </developers>
+
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>

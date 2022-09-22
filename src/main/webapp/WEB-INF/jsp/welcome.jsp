@@ -16,8 +16,8 @@
     </c:forEach>
   </ul></p>
     <div class="col-md-12">
-      <spring:url value="/resources/images/pets.png" htmlEscape="true" var="petsImage"/>
-      <img class="img-responsive" src="${petsImage}"/>
+      <spring:url value="/resources/images/logo_US.png" htmlEscape="true" var="logoUS"/>
+      <img class="img-responsive" src="${logoUS}"/>
     </div>
   </div>
 </petclinic:layout>

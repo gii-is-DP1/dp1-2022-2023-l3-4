@@ -69,6 +69,14 @@
             <role></role>
             </roles>
         </developer>
+        <developer>
+            <id>josgarber6</id>
+            <name>José María García Berdejo</name>
+            <email>drkenobi27@gmail.com</email>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
         <!-- More developers ...-->
     </developers>
 

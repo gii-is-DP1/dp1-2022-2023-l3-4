@@ -43,6 +43,7 @@
             </roles>
         </developer>
         <!-- More developers ...-->
+<<<<<<< HEAD
         <developer>
           <id>josgarber6</id>
           <name>Jose Maria</name>
@@ -52,6 +53,8 @@
           </roles>
         </developer>
         <!-- More developers ...-->
+=======
+>>>>>>> f13bd9e (Inscripción POM marmarmar73)
     </developers>
 
     <dependencies>

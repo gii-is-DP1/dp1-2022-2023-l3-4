@@ -60,6 +60,15 @@
             <role></role>
             </roles>
         </developer>
+        <developer>
+            <id>juajimdel2</id>
+            <name>Juan Antonio Jiménez del Villar </name>
+            <email>jajimenezdelvillar@gmail.com</email>
+            <url></url>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
         <!-- More developers ...-->
     </developers>
 

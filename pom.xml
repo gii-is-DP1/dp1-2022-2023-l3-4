@@ -42,6 +42,15 @@
             <role></role>
             </roles>
         </developer>
+        <developer>
+            <id>lucperrom1</id>
+            <name>Lucía Pérez Romero</name>
+            <email>luciaperezromero07@gmail.com</email>
+            <url></url>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
         <!-- More developers ...-->
     </developers>
 

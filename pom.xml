@@ -77,6 +77,14 @@
             <role></role>
             </roles>
         </developer>
+                <developer>
+            <id>joaresbar</id>
+            <name>Joaquín Restoy Barrero</name>
+            <email>a.joaresbar@gmail.com</email>
+            <roles>
+            <role></role>
+            </roles>
+        </developer>
         <!-- More developers ...-->
     </developers>
 

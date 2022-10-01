@@ -17,10 +17,32 @@ public class WelcomeController {
 	  public String welcome(Map<String, Object> model) {	  
 			
 			List<Person> persons = new ArrayList<Person>();
-			Person person = new Person();
-			person.setFirstName("José María");
-			person.setLastName("García Berdejo");
-			persons.add(person);
+			Person person6 = new Person();
+			Person person1 = new Person();
+			Person person2 = new Person();
+			Person person3 = new Person();
+			Person person4 = new Person();
+			Person person5= new Person();
+
+			person1.setFirstName("José María");
+			person1.setLastName(" García Berdejo");
+			persons.add(person1);
+			person2.setFirstName("María");
+			person2.setLastName(" Marquez Sierra");
+			persons.add(person2);
+			person3.setFirstName("Lucia");
+			person3.setLastName(" Perez Romero");
+			persons.add(person3);
+			person4.setFirstName("Francisco Sebastián");
+			person4.setLastName(" Benítez Ruis Díaz");
+			persons.add(person4);
+			person5.setFirstName("Joaquín");
+			person5.setLastName(" Restoy Barrero");
+			persons.add(person5);
+			person6.setFirstName("Juan Antonio");
+			person6.setLastName(" Jiménez del Villar");
+			persons.add(person6);
+			
 			model.put("persons", persons);
 			model.put("title", "My Project");
 			model.put("group", "L3-4");

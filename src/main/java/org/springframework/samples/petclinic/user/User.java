@@ -30,8 +30,8 @@ public class User{
 		OFFLINE
 	}
 
-	@OneToOne
-	private String code;
+	// @OneToOne
+	// private String code;
 
 	String description;
 	

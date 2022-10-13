@@ -12,6 +12,4 @@ public class Admin extends Person {
   @NotEmpty
   private String fistName;
 
-  @Column(name = "")
-  
 }

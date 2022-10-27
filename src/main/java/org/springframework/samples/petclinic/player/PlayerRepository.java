@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.owner;
+package org.springframework.samples.petclinic.player;
 
 import java.util.Collection;
 
@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.model.BaseEntity;
-import org.springframework.samples.petclinic.owner.OwnerRepository;
+import org.springframework.samples.petclinic.player.PlayerRepository;
 
 /**
  * Spring Data JPA OwnerRepository interface
@@ -30,14 +30,14 @@ import org.springframework.samples.petclinic.owner.OwnerRepository;
  * @author Michael Isvy
  * @since 15.1.2013
  */
-public interface OwnerRepository extends Repository<Owner, Integer> {
+public interface PlayerRepository extends Repository<Player, Integer> {
 
 	/**
 	 * Save an <code>Owner</code> to the data store, either inserting or updating it.
 	 * @param owner the <code>Owner</code> to save
 	 * @see BaseEntity#isNew
 	 */
-	void save(Owner owner) throws DataAccessException;
+	void save(Player owner) throws DataAccessException;
 
 	/**
 	 * Retrieve <code>Owner</code>s from the data store by last name, returning all owners
@@ -47,7 +47,7 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
 	 * <code>Collection</code> if none found)
 	 */	
 	@Query("SELECT DISTINCT owner FROM Owner owner left join fetch owner.pets WHERE owner.lastName LIKE :lastName%")
-	public Collection<Owner> findByLastName(@Param("lastName") String lastName);
+	public Collection<Player> findByLastName(@Param("lastName") String lastName);
 
 
 	/**
@@ -57,6 +57,6 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
 	 * @throws org.springframework.dao.DataRetrievalFailureException if not found
 	 */	
 	@Query("SELECT owner FROM Owner owner left join fetch owner.pets WHERE owner.id =:id")
-	public Owner findById(@Param("id") int id);
+	public Player findById(@Param("id") int id);
 
 }

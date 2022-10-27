@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.owner;
+package org.springframework.samples.petclinic.player;
 
 import java.util.Collection;
 import java.util.Map;
@@ -40,14 +40,14 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Michael Isvy
  */
 @Controller
-public class OwnerController {
+public class PlayerController {
 
 	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
-	private final OwnerService ownerService;
+	private final PlayerService ownerService;
 
 	@Autowired
-	public OwnerController(OwnerService ownerService, UserService userService, AuthoritiesService authoritiesService) {
+	public PlayerController(PlayerService ownerService, UserService userService, AuthoritiesService authoritiesService) {
 		this.ownerService = ownerService;
 	}
 
@@ -58,13 +58,13 @@ public class OwnerController {
 
 	@GetMapping(value = "/owners/new")
 	public String initCreationForm(Map<String, Object> model) {
-		Owner owner = new Owner();
+		Player owner = new Player();
 		model.put("owner", owner);
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping(value = "/owners/new")
-	public String processCreationForm(@Valid Owner owner, BindingResult result) {
+	public String processCreationForm(@Valid Player owner, BindingResult result) {
 		if (result.hasErrors()) {
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 		}
@@ -78,12 +78,12 @@ public class OwnerController {
 
 	@GetMapping(value = "/owners/find")
 	public String initFindForm(Map<String, Object> model) {
-		model.put("owner", new Owner());
+		model.put("owner", new Player());
 		return "owners/findOwners";
 	}
 
 	@GetMapping(value = "/owners")
-	public String processFindForm(Owner owner, BindingResult result, Map<String, Object> model) {
+	public String processFindForm(Player owner, BindingResult result, Map<String, Object> model) {
 
 		// allow parameterless GET request for /owners to return all records
 		if (owner.getLastName() == null) {
@@ -91,7 +91,7 @@ public class OwnerController {
 		}
 
 		// find owners by last name
-		Collection<Owner> results = this.ownerService.findOwnerByLastName(owner.getLastName());
+		Collection<Player> results = this.ownerService.findOwnerByLastName(owner.getLastName());
 		if (results.isEmpty()) {
 			// no owners found
 			result.rejectValue("lastName", "notFound", "not found");
@@ -111,13 +111,13 @@ public class OwnerController {
 
 	@GetMapping(value = "/owners/{ownerId}/edit")
 	public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
-		Owner owner = this.ownerService.findOwnerById(ownerId);
+		Player owner = this.ownerService.findOwnerById(ownerId);
 		model.addAttribute(owner);
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping(value = "/owners/{ownerId}/edit")
-	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result,
+	public String processUpdateOwnerForm(@Valid Player owner, BindingResult result,
 			@PathVariable("ownerId") int ownerId) {
 		if (result.hasErrors()) {
 			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;

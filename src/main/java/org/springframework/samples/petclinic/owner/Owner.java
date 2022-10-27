@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.owner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +25,11 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -36,6 +41,7 @@ import org.springframework.beans.support.PropertyComparator;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.samples.petclinic.model.Person;
 import org.springframework.samples.petclinic.pet.Pet;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.user.User;
 
 /**
@@ -71,6 +77,11 @@ public class Owner extends Person {
     @JoinColumn(name = "username", referencedColumnName = "username")
 	private User user;
 	//
+
+	@ManyToMany(cascade = CascadeType.ALL,mappedBy = "owners")
+	private Collection<Room> rooms;
+
+	
 	
 	public String getAddress() {
 		return this.address;
@@ -129,6 +140,8 @@ public class Owner extends Person {
 	public boolean removePet(Pet pet) {
 		return getPetsInternal().remove(pet);
 	}
+
+	
 
 	/**
 	 * Return the Pet with the given name, or null if none found for this Owner.

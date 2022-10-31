@@ -19,16 +19,16 @@ import lombok.Setter;
 @Entity
 public class Room extends BaseEntity{
 
-    @NotEmpty
+    // @NotEmpty
     Integer totalGamesPlayer;
 
-    @NotEmpty
+    // @NotEmpty
     Integer numMaxPlayers;
 
     @NotEmpty
     String roomName;
 
-    @NotEmpty
+    // @NotEmpty
     Boolean isPrivate;
 
     @OneToMany(mappedBy="room")

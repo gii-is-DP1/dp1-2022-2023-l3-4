@@ -15,8 +15,6 @@
  */
 package org.springframework.samples.petclinic.player;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.user.AuthoritiesService;
@@ -33,37 +31,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PlayerService {
 
-	private PlayerRepository ownerRepository;	
-	
-	@Autowired
-	private UserService userService;
-	
-	@Autowired
-	private AuthoritiesService authoritiesService;
+    private PlayerRepository playerRepository;
+    
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	public PlayerService(PlayerRepository ownerRepository) {
-		this.ownerRepository = ownerRepository;
-	}	
+    @Autowired
+    private AuthoritiesService authoritiesService;
 
-	@Transactional(readOnly = true)
-	public Player findOwnerById(int id) throws DataAccessException {
-		return ownerRepository.findById(id);
-	}
+    @Autowired
+    public PlayerService(PlayerRepository playerRepository){
+        this.playerRepository = playerRepository;
+    }
 
-	@Transactional(readOnly = true)
-	public Collection<Player> findOwnerByLastName(String lastName) throws DataAccessException {
-		return ownerRepository.findByLastName(lastName);
-	}
-
-	@Transactional
-	public void saveOwner(Player owner) throws DataAccessException {
-		//creating owner
-		ownerRepository.save(owner);		
-		//creating user
-		userService.saveUser(owner.getUser());
-		//creating authorities
-		authoritiesService.saveAuthorities(owner.getUser().getUsername(), "owner");
-	}		
-
+    @Transactional
+    public void savePlayer(Player player) throws DataAccessException {
+        player.setStatus(false);
+        //creating player
+        playerRepository.save(player);
+        //creating user
+        userService.saveUser(player.getUser());
+        //creating authorities
+        authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+    }
 }

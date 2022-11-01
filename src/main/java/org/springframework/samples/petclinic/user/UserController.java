@@ -38,35 +38,35 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class UserController {
 
-	private static final String VIEWS_OWNER_CREATE_FORM = "users/createOwnerForm";
+	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 
-	private final PlayerService ownerService;
+	private final PlayerService playerService;
 
 	@Autowired
 	public UserController(PlayerService clinicService) {
-		this.ownerService = clinicService;
+		this.playerService = clinicService;
 	}
 
 	@InitBinder
 	public void setAllowedFields(WebDataBinder dataBinder) {
-		dataBinder.setDisallowedFields("id");
+		dataBinder.setDisallowedFields("id", "status");
 	}
 
 	@GetMapping(value = "/users/new")
 	public String initCreationForm(Map<String, Object> model) {
-		Player owner = new Player();
-		model.put("owner", owner);
-		return VIEWS_OWNER_CREATE_FORM;
+		Player player = new Player();
+		model.put("player", player);
+		return VIEWS_PLAYER_CREATE_FORM;
 	}
 
 	@PostMapping(value = "/users/new")
-	public String processCreationForm(@Valid Player owner, BindingResult result) {
+	public String processCreationForm(@Valid Player player, BindingResult result) {
 		if (result.hasErrors()) {
-			return VIEWS_OWNER_CREATE_FORM;
+			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
-			//creating owner, user, and authority
-			this.ownerService.saveOwner(owner);
+			//creating player, user, and authority
+			this.playerService.savePlayer(player);
 			return "redirect:/";
 		}
 	}

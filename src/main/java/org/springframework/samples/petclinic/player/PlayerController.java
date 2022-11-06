@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.pet;
+package org.springframework.samples.petclinic.player;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.stereotype.Controller;
 
 /**
- * @author Juergen Hoeller Can be Cat, Dog, Hamster...
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ * @author Michael Isvy
  */
-@Entity
-@Table(name = "types")
-public class PetType extends NamedEntity {
+@Controller
+public class PlayerController {
 
+	
 }

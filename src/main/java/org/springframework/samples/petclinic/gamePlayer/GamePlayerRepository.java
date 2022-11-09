@@ -21,8 +21,6 @@ import org.springframework.data.repository.CrudRepository;
 
 
 public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-
     List<GamePlayer> findAll();
-    
-    
+
 }

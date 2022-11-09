@@ -46,6 +46,28 @@
 					<span>Error</span>
 				</petclinic:menuItem>
 
+				<petclinic:menuItem active="${name eq 'error'}" url="/statistics"
+					title="statistics" dropdown = "${true}">
+
+					<ul class="dropdown-menu">
+						<li>
+							<a href="<c:url value="/statistics/achievements/"/>">
+								<span class="glyphicon glyphicon-certificate">
+									Achievements listing
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="<c:url value="/statistics/achievements/me"/>">
+								<span class="glyphicon glyphicon-user icon-size">
+									My Achievements
+								</span>
+							</a>
+						</li>
+					</ul>
+					
+				</petclinic:menuItem>
+
 			</ul>
 
 
@@ -58,7 +80,7 @@
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> <span class="glyphicon glyphicon-user"></span> 
+						data-toggle="dropdown"> <span class="glyphicon glyphicon-user"></span>ï¿½
 							<strong><sec:authentication property="name" /></strong> <span
 							class="glyphicon glyphicon-chevron-down"></span>
 					</a>

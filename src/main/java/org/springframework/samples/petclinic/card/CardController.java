@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.samples.petclinic.card;
-
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +44,6 @@ public class CardController {
 		this.cardService = cardService;
 		this.gameService=gameService;
 	}
-
 	//barajamos al iniciar el juego
 	@GetMapping("/cards")
 	public void shuffle(@Valid Game game, BindingResult result,
@@ -66,6 +62,16 @@ public class CardController {
 		List<Card> playedCards = cardService.findPlayed();
 		Game currentGame = gameService.findGames(gameId);
 		currentGame.setCards(playedCards);
+		gameService.save(currentGame);
+	}
+  
+//cuando no quedan más cartas en la baraja del juego, se recogen todas las jugadas y pasan a ser la nueva baraja
+	@GetMapping("/cards")
+	public void Shuffle(@Valid Game game, BindingResult result,
+	@PathVariable("gameId") int gameId){
+		List<Card> playedcards = cardService.findPlayed();
+		Game currentGame = gameService.findGames(gameId);
+		currentGame.setCards(playedcards);
 		gameService.save(currentGame);
 	}
 }

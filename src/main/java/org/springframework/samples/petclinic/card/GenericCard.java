@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.gamePlayer;
+package org.springframework.samples.petclinic.card;
 
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import org.springframework.samples.petclinic.model.BaseEntity;
 
-import org.springframework.data.repository.CrudRepository;
+import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * Simple JavaBean domain object representing a visit.
+ *
+ * @author Ken Krebs
+ */
+@Getter
+@Setter
+@Entity
+@Table(name = "GenericCard")
+public class GenericCard extends BaseEntity {
 
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
+	private CardType type;
+	private Colour colour;
 
 }

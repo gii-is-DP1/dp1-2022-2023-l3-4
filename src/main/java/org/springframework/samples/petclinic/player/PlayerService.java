@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.card;
+package org.springframework.samples.petclinic.player;
 
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.user.AuthoritiesService;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * Mostly used as a facade for all Petclinic controllers Also a placeholder
@@ -32,24 +28,30 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Michael Isvy
  */
-@Service 
-public class CardService {
+@Service
+public class PlayerService {
 
-	private CardRepository cardRepository;
+    private PlayerRepository playerRepository;
+    
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	public CardService(CardRepository cardRepository) {
-		this.cardRepository = cardRepository;
-	}
+    @Autowired
+    private AuthoritiesService authoritiesService;
 
-	@Transactional(readOnly = true)	
-	public List<Card> findCards() throws DataAccessException {
-		return cardRepository.findAll();
-	}	
+    @Autowired
+    public PlayerService(PlayerRepository playerRepository){
+        this.playerRepository = playerRepository;
+    }
 
-	@Transactional(readOnly = true)
-	public List<Card> findPlayed(){
-		return cardRepository.findAll().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
-
-	}
+    @Transactional
+    public void savePlayer(Player player) throws DataAccessException {
+        player.setStatus(false);
+        //creating player
+        playerRepository.save(player);
+        //creating user
+        userService.saveUser(player.getUser());
+        //creating authorities
+        authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+    }
 }

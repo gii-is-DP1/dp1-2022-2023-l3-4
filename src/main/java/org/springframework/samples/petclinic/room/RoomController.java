@@ -1,11 +1,15 @@
 package org.springframework.samples.petclinic.room;
 
+import java.util.Collection;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.owner.OwnerService;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
 import org.springframework.stereotype.Controller;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,14 +18,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+
 @Controller
 @RequestMapping("/room")
 public class RoomController {
 
     private static final String VIEWS_ROOM_CREATE_OR_UPDATE_FORM = "rooms/createOrUpdateRoomForm";
+	private static final String VIEWS_ROOM_SEARCH = "rooms/createOrSearch";
+	private static final String VIEWS_WAITING_ROOM = "rooms/waitingRoom";
 
     
 	private final RoomService roomService;
+
+
+
+	@Autowired
+    private AuthenticationService authService;
+
+	@Autowired
+    private OwnerService ownerService;
 
     @Autowired
 	public RoomController(RoomService roomService) {
@@ -38,10 +53,10 @@ public class RoomController {
 	}
 
 	@PostMapping(value = "/new")
-	public String processCreationForm(Owner owner, @Valid Room room, BindingResult result, ModelMap model) {		
+	public String processCreationForm(@Valid Room room, BindingResult result, ModelMap model) {	
+		Owner owner = authService.getOwner();
 		if (result.hasErrors()) {
 			model.put("room", room);
-			model.put("owner", owner);
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 		}
 		else {
@@ -49,20 +64,30 @@ public class RoomController {
 						if(room.isPrivate==null){
 							room.setIsPrivate(false);
 						}
-                    	// owner.addRoom(room);
 						room.setTotalGamesPlayer(0);
-                    	this.roomService.saveRoom(room);
+						this.roomService.saveRoom(room);
+                    	owner.setRoom(room);
+						ownerService.saveOwner(owner);
                     }catch(DuplicatedNameRoomException ex){
                         result.rejectValue("roomName", "duplicate", "already exists");
                         return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
                     }
-                    return "redirect:/owners/1";
+                    return "redirect:/";
 		}
 	}
 
-	@GetMapping("/room/{roomId}")
-	public String showOwner(@PathVariable("roomId") int roomId) {
+	@GetMapping("/createSearch")
+	public String createSearch() {
 
-		return "redirect:/owners/1";
+		return VIEWS_ROOM_SEARCH;
+	}
+
+	@GetMapping("/{roomId}")
+	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
+		Collection<Owner> owners=this.ownerService.findOwnerByRoomId(roomId);
+		model.put("room", this.roomService.findRoomById(roomId));
+		model.put("owners",owners);
+		model.put("countPlayer",owners.size());
+		return VIEWS_WAITING_ROOM;
 	}
 }

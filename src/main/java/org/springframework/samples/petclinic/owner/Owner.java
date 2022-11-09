@@ -44,6 +44,9 @@ import org.springframework.samples.petclinic.pet.Pet;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.user.User;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Simple JavaBean domain object representing an owner.
  *
@@ -52,6 +55,8 @@ import org.springframework.samples.petclinic.user.User;
  * @author Sam Brannen
  * @author Michael Isvy
  */
+@Setter
+@Getter
 @Entity
 @Table(name = "owners")
 public class Owner extends Person {

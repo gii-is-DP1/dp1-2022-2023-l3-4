@@ -56,13 +56,16 @@ public class RoomController {
                         result.rejectValue("roomName", "duplicate", "already exists");
                         return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
                     }
-                    return "redirect:/owners/1";
+                    return "redirect:/room/" + room.getId();
 		}
 	}
 
 	@GetMapping("/room/{roomId}")
-	public String showOwner(@PathVariable("roomId") int roomId) {
+	public ModelAndView showRoom(@PathVariable("roomId") int roomId) {
+		ModelAndView mav = new ModelAndView("rooms/roomDetails");
+		mav.addObject(this.roomService.findRoomById(roomId));
 
-		return "redirect:/owners/1";
+		return mav;
 	}
+
 }

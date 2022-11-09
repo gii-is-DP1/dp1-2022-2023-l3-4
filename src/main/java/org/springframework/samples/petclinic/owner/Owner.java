@@ -78,11 +78,14 @@ public class Owner extends Person {
 	private User user;
 	//
 
-	@ManyToMany(cascade = CascadeType.ALL,mappedBy = "owners")
-	private Collection<Room> rooms;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="room_id",referencedColumnName = "id")
+	private Room room;
+	
+	public void addRoom(Room room) {
+		this.room=room;
+    }
 
-	
-	
 	public String getAddress() {
 		return this.address;
 	}
@@ -191,5 +194,7 @@ public class Owner extends Person {
 				.append("firstName", this.getFirstName()).append("address", this.address).append("city", this.city)
 				.append("telephone", this.telephone).toString();
 	}
+
+
 
 }

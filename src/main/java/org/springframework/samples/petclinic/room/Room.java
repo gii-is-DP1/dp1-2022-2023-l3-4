@@ -1,20 +1,14 @@
 package org.springframework.samples.petclinic.room;
 
-
 import java.util.Collection;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
-import org.apache.catalina.User;
-import org.hibernate.validator.constraints.Range;
-import org.springframework.samples.petclinic.pet.Pet;
+import org.hibernate.annotations.CascadeType;
+import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.owner.Owner;
 
 import lombok.Getter;
@@ -23,28 +17,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "room")
-public class Room {
-    
-	@NotEmpty
-	Integer totalGamesPlayed;
+public class Room extends BaseEntity{
+
+    // @NotEmpty
+    Integer totalGamesPlayer;
+
+    // @NotEmpty
+    Integer numMaxPlayers;
 
     @NotEmpty
-    Integer maxNumbersPlayed;
+    String roomName;
 
-    @NotEmpty
+    // @NotEmpty
     Boolean isPrivate;
 
-    @Id
-    @Range(min=0,max=999999)
-    //Generar automaticamente
-    Integer code;
-
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="room")
     private Collection<Owner> owners;
 
-
-	
-
-
+    
 }

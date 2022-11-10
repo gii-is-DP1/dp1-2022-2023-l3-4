@@ -22,7 +22,17 @@
   </div>
   <tr>
     <td>
-        <a href="<spring:url value="/room/2" htmlEscape="true" />">new room</a>
-    </td>            
+        <a href="<spring:url value="/room/new" htmlEscape="true" />">New room</a>
+    </td>
+    <br>
+    <td>
+      <a href="<spring:url value="/room/createSearch" htmlEscape="true" />">Searc room </a>
+  </td>          
+  <br>
+  <td>
+    <a href="<spring:url value="/room/find" htmlEscape="true" />">Rooms listing </a>
+</td>
+
+
 </tr>
 </petclinic:layout>

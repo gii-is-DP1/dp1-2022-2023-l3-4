@@ -3,7 +3,9 @@ package org.springframework.samples.petclinic.room;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -38,6 +40,9 @@ public class Room extends BaseEntity{
 
     @OneToMany(mappedBy="room")
     private Collection<Owner> owners;
+
+    @OneToOne(optional = false)
+    private Owner host;
 
     
 }

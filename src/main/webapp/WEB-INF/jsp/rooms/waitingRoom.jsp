@@ -11,6 +11,7 @@
       <tr >
         <h2>Room Name:  <b><c:out value="${room.roomName}"/></b></h2>
         <h2>Num Players:  <b><c:out value="${countPlayer}"/></b><b>/</b><b><c:out value="${room.numMaxPlayers}"/></b></h2>
+        <h2>Host:  <b><c:out value="${room.host.lastName}"/></b></h2>
       </tr>
 
     </div>

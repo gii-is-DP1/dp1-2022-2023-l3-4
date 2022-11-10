@@ -65,6 +65,7 @@ public class RoomController {
 							room.setIsPrivate(false);
 						}
 						room.setTotalGamesPlayer(0);
+						room.setHost(owner);
 						this.roomService.saveRoom(room);
                     	owner.setRoom(room);
 						ownerService.saveOwner(owner);

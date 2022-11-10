@@ -75,6 +75,6 @@ INSERT INTO visits(id,pet_id,visit_date,description) VALUES (3, 8, '2013-01-03',
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (4, 7, '2013-01-04', 'spayed');
 
 
-INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER) VALUES(1,True,3,'sala1',0);
+INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,HOST_ID) VALUES(1,True,3,'sala1',0,1);
 
 

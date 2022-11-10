@@ -3,7 +3,9 @@ package org.springframework.samples.petclinic.statistics;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StatisticsService {
@@ -15,8 +17,9 @@ public class StatisticsService {
     this.statisticsRepository = statisticsRepository;
   }
 
-  public List<Statistics> getAllStatistics() {
-    return statisticsRepository.findAll();
+  @Transactional(readOnly = true)
+  public List<Statistics> findPlayerStatistics(Player player) {
+    return statisticsRepository.findByPlayer(player);
   }
 
   public void save(Statistics s) throws WonPlayedGamesException {

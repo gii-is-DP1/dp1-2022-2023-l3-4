@@ -54,4 +54,8 @@ public class PlayerService {
         //creating authorities
         authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
     }
+
+    public Player getPlayerByUsername(String username) {
+        return playerRepository.findPlayerByUsername(username);
+    }
 }

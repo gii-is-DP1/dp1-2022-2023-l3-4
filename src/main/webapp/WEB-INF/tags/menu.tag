@@ -46,28 +46,6 @@
 					<span>Error</span>
 				</petclinic:menuItem>
 
-				<petclinic:menuItem active="${name eq 'error'}" url="/statistics"
-					title="statistics" dropdown = "${true}">
-
-					<ul class="dropdown-menu">
-						<li>
-							<a href="<c:url value="/statistics/achievements/"/>">
-								<span class="glyphicon glyphicon-certificate">
-									Achievements listing
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="<c:url value="/statistics/achievements/me"/>">
-								<span class="glyphicon glyphicon-user icon-size">
-									My Achievements
-								</span>
-							</a>
-						</li>
-					</ul>
-					
-				</petclinic:menuItem>
-
 			</ul>
 
 
@@ -90,7 +68,9 @@
 									<div class="row">
 										<div class="col-lg-4">
 											<p class="text-center">
+												<a href="<c:url value="/me" />">
 												<span class="glyphicon glyphicon-user icon-size"></span>
+												</a>
 											</p>
 										</div>
 										<div class="col-lg-8">

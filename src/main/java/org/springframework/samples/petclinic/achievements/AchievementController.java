@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.achievements;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -39,7 +40,7 @@ public class AchievementController {
   }
 
   @GetMapping("/me")
-  public String getMyAchiements(ModelMap model) {
+  public String getMyAchiements(ModelMap model, Principal principal) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     List<Achievement> myAchievements = achievementService.getMyAchievements(auth.getPrincipal().toString());
     model.put("achievements", myAchievements);

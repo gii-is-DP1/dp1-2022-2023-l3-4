@@ -18,12 +18,7 @@ package org.springframework.samples.petclinic.card;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -69,7 +64,7 @@ public class Card extends BaseEntity implements Serializable {
 
 	@Size(min=0, max=2)
 	@OneToMany(mappedBy="cardVaccine", cascade=CascadeType.ALL)
-	private Set<Card> vaccines;
+	private List<Card> vaccines;
 
 	@ManyToOne
 	@JoinColumn(name="cardVirus_id")

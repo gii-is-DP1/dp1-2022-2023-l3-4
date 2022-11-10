@@ -44,8 +44,6 @@ public class GamePlayer extends BaseEntity {
     @OneToMany
     private List<Card> cards;
 
-    @OneToOne
-    private Player player;
 
 
 }

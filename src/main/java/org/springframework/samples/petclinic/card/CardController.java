@@ -35,5 +35,9 @@ public class CardController {
 	public CardController(CardService cardService) {
 		this.cardService=cardService;
 	}
+	public void imprimir(){
+		Card card = cardService.findCard(1).get();
+		System.out.println(card.getVirus());
+	}
 
 }

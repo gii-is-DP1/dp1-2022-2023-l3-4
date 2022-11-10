@@ -121,6 +121,7 @@ public class RoomController {
 		model.put("room", this.roomService.findRoomById(roomId));
 		model.put("owners",owners);
 		model.put("countPlayer",owners.size());
+		
 		return VIEWS_WAITING_ROOM;
 	}
 }

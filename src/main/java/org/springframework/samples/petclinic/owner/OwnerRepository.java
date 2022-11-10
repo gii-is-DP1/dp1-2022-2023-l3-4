@@ -59,4 +59,10 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
 	@Query("SELECT owner FROM Owner owner left join fetch owner.pets WHERE owner.id =:id")
 	public Owner findById(@Param("id") int id);
 
+	@Query("SELECT owner From Owner owner WHERE owner.user.username LIKE %?1")  //Necesario para obtener el owner autentificado
+	public Collection<Owner> findByUsername(@Param("username") String username);
+	
+	@Query("SELECT owner From Owner owner WHERE owner.room.id =:id")  //Necesario para obtener Los owner de una sala
+	public Collection<Owner> findByRoomId(@Param("id") int id);
+
 }

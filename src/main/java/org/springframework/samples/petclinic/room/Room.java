@@ -5,6 +5,8 @@ import java.util.Collection;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.CascadeType;
@@ -19,16 +21,17 @@ import lombok.Setter;
 @Entity
 public class Room extends BaseEntity{
 
-    // @NotEmpty
+    
     Integer totalGamesPlayer;
 
-    // @NotEmpty
+    @Min(2)
+    @Max(6)
     Integer numMaxPlayers;
 
     @NotEmpty
     String roomName;
 
-    // @NotEmpty
+
     Boolean isPrivate;
 
     @OneToMany(mappedBy="room")

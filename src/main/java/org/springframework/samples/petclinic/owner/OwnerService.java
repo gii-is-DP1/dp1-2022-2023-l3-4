@@ -66,4 +66,12 @@ public class OwnerService {
 		authoritiesService.saveAuthorities(owner.getUser().getUsername(), "owner");
 	}		
 
+	public Collection<Owner> findOwnerByUsername(String username) {
+		return ownerRepository.findByUsername(username);
+	}
+
+	public Collection<Owner> findOwnerByRoomId(Integer id) {
+		return ownerRepository.findByRoomId(id);
+	}
+
 }

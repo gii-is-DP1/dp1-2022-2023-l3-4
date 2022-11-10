@@ -15,11 +15,19 @@
  */
 package org.springframework.samples.petclinic.game;
 
+import java.util.Collections;
 import java.util.List;
-
+import java.util.Random;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -31,17 +39,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/games")
 public class GameController {
 
+	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
+	private final GamePlayerService gamePlayerService;
 
 	@Autowired
-	public GameController(GameService gameService) {
+	public GameController(GameService gameService,GamePlayerService gamePlayerService) {
 		this.gameService = gameService;
+		this.gamePlayerService= gamePlayerService;
 	}
 	
 	@GetMapping
 	public List<Game> ListGames(){
 		return gameService.ListGames();
 	}
+	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 
+	public void rellenaBaraja(@PathVariable("gameId") int gameId){
+		Game currentGame = gameService.findGames(gameId);
+		List<Card> playedcards = currentGame.getCards().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
+		Collections.shuffle(playedcards);
+		currentGame.setCards(playedcards);
+		gameService.save(currentGame);
+	}
+	@RequestMapping("/{gameId}")
+	public String reparteCartas(@PathVariable("gameId") int gameId) {
+		Game currentGame = gameService.findGames(gameId); 
+		List<Card> baraja = currentGame.getCards();
+		if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a shuffle
+			log.info("Rellenando baraja");
+			rellenaBaraja(gameId);
+		}
+		log.info("Repartiendo cartas");
+		for(GamePlayer jugador: currentGame.getGamePlayer()) {
+			List<Card> cartasJugador = jugador.getCards();
+			while(cartasJugador.size()<3){
+				Card card = baraja.get(0);
+				cartasJugador.add(card); //Se la añadimos al jugador
+				baraja.remove(0);	//La quitamos del mazo
+			}
+			jugador.setCards(cartasJugador);//Cuando ya tenga 3 cargas se guarda en el jugador
+				gamePlayerService.save(jugador);
+
+			}
+			currentGame.setCards(baraja); //Cuando ya se han repartido a todos los jugadores guardamos el mazo resultante
+			currentGame.setRound(currentGame.getRound()+1); //Añadimos una ronda al juego y guardamos
+			gameService.save(currentGame);	
+			log.info("Cartas repartidas correctamente");
+			return "redirect:/games/{gameId}/play";
+		}
+
+	
 
 }

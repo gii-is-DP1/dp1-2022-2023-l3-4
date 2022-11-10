@@ -18,9 +18,14 @@ package org.springframework.samples.petclinic.gamePlayer;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Juergen Hoeller
@@ -33,16 +38,35 @@ public class GamePlayerController {
 
 
 	private final GamePlayerService gamePlayerService;
+	private final CardService cardService;
 
 	@Autowired
-	public GamePlayerController(GamePlayerService gamePlayerService) {
+	public GamePlayerController(GamePlayerService gamePlayerService, CardService cardService) {
 		this.gamePlayerService = gamePlayerService;
+		this.cardService=cardService;
 	}
 
 	@GetMapping
 	public List<GamePlayer> listGamePlayers(){
 		return gamePlayerService.findAll();
 	}
+// Método para descartar cartas
+	@DeleteMapping(value = "/gamePlayer/{gamePlayerId}/cards/{cards}")
+    public @ResponseBody String discardCards(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId) {
+        if(gamePlayerService.findById(gamePlayerId).isPresent()){
+			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
+			if(gamePlayer.getCards().containsAll(cards)){
+				for(Card card: cards){					
+						gamePlayer.getCards().remove(card);
+						card.setPlayed(true);
+						gamePlayerService.save(gamePlayer);
+						cardService.save(card);		
+			} return "correct move";
+			}else{
+				return "you can't discard those cards";}		
+		}else{
+			return "this player is not available";} 		
+    }
 
 
 }

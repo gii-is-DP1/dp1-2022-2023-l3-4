@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.gamePlayer;
+package org.springframework.samples.petclinic.game;
 
 import java.util.List;
-
 import org.springframework.data.repository.CrudRepository;
 
 
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
+public interface GameRepository extends CrudRepository<Game, Integer> {
 
+    List<Game> findAll(); 
+    Game save(Game game);
+	Game findById(int id);
+
+    
+    
 }

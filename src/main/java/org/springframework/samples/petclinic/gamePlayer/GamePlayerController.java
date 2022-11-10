@@ -17,10 +17,32 @@ package org.springframework.samples.petclinic.gamePlayer;
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ */
+@Controller
+@RequestMapping("/games/{gameId}/players")
+public class GamePlayerController {
 
 
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
+	private final GamePlayerService gamePlayerService;
+
+	@Autowired
+	public GamePlayerController(GamePlayerService gamePlayerService) {
+		this.gamePlayerService = gamePlayerService;
+	}
+
+	@GetMapping
+	public List<GamePlayer> listGamePlayers(){
+		return gamePlayerService.findAll();
+	}
+
 
 }

@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.gamePlayer;
-
-import java.util.List;
+package org.springframework.samples.petclinic.player;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.petclinic.player.PlayerRepository;
 
+/**
+ * Spring Data JPA OwnerRepository interface
+ *
+ * @author Michael Isvy
+ * @since 15.1.2013
+ */
+public interface PlayerRepository extends CrudRepository<Player, Integer> {
 
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
-
+	
 }

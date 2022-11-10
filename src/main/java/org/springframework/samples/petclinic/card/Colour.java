@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.gamePlayer;
+package org.springframework.samples.petclinic.card;
 
-import java.util.List;
+/**
+ * Simple business object representing a pet.
+ *
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ */
 
-import org.springframework.data.repository.CrudRepository;
-
-
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
-
+public enum Colour {
+	RED,GREEN,YELLOW,BLUE,RAINBOW
 }

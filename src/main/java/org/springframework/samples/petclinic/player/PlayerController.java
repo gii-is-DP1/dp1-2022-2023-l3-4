@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.gamePlayer;
+package org.springframework.samples.petclinic.player;
 
-import java.util.List;
+import org.springframework.stereotype.Controller;
 
-import org.springframework.data.repository.CrudRepository;
+/**
+ * @author Juergen Hoeller
+ * @author Ken Krebs
+ * @author Arjen Poutsma
+ * @author Michael Isvy
+ */
+@Controller
+public class PlayerController {
 
-
-public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
-    List<GamePlayer> findAll();
-
+	
 }

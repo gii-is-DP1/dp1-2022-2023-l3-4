@@ -76,10 +76,51 @@ public class RoomController {
 		}
 	}
 
-	@GetMapping("/room/{roomId}")
-	public String showOwner(@PathVariable("roomId") int roomId) {
-
-		return "redirect:/owners/1";
+	@GetMapping("/createSearch")
+	public String createSearch(ModelMap model) {
+		model.put("room", new Room());
+		return VIEWS_ROOM_SEARCH;
 	}
 
+	@GetMapping(value = "/find")
+	public String processFindRoomForm(Room room, BindingResult result, ModelMap model) {
+		Owner owner = authService.getOwner();
+		// allow parameterless GET request for /find to return all records
+		if (room.getRoomName() == null) {
+			room.setRoomName(""); // empty string signifies broadest possible search
+		}
+
+		// find owners by last name
+		Collection<Room> results = roomService.findRoomsByRoomName(room.getRoomName());
+		if (results.isEmpty()) {
+			// no rooms found
+			result.rejectValue("roomName", "notFound", "not found");
+			return "rooms/createOrSearch";
+		}
+		else if (results.size() == 1) {
+			// 1 room found
+			room = results.iterator().next();
+			owner.setRoom(room);
+			ownerService.saveOwner(owner);
+			return "redirect:/room/" + room.getId();
+		}
+		else {
+			// multiple roomss found
+			model.put("rooms", results);
+			return "rooms/roomsList";
+		}
+	}
+
+	@GetMapping("/{roomId}")
+	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
+		Owner owner = authService.getOwner();
+		Room room=this.roomService.findRoomById(roomId);
+		owner.setRoom(room);
+		ownerService.saveOwner(owner);
+		Collection<Owner> owners=this.ownerService.findOwnerByRoomId(roomId);
+		model.put("room", this.roomService.findRoomById(roomId));
+		model.put("owners",owners);
+		model.put("countPlayer",owners.size());
+		return VIEWS_WAITING_ROOM;
+	}
 }

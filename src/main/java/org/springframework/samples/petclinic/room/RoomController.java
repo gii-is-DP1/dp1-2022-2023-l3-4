@@ -9,14 +9,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/room")
 public class RoomController {
 
-    private static final String VIEWS_ROOM_CREATE_OR_UPDATE_FORM = "createOrUpdateRoomForm";
+    private static final String VIEWS_ROOM_CREATE_OR_UPDATE_FORM = "rooms/createOrUpdateRoomForm";
 
     
 	private final RoomService roomService;
@@ -29,8 +31,9 @@ public class RoomController {
 	@GetMapping(value = "/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Room room = new Room();
-		owner.addRoom(room);
+		
 		model.put("room", room);
+		model.put("owner", owner);
 		return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 	}
 
@@ -38,17 +41,31 @@ public class RoomController {
 	public String processCreationForm(Owner owner, @Valid Room room, BindingResult result, ModelMap model) {		
 		if (result.hasErrors()) {
 			model.put("room", room);
+			model.put("owner", owner);
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 		}
 		else {
                     try{
-                    	owner.addRoom(room);;
-                    	this.roomService.saveRoom(room);;
+						if(room.isPrivate==null){
+							room.setIsPrivate(false);
+						}
+                    	// owner.addRoom(room);
+						room.setTotalGamesPlayer(0);
+                    	this.roomService.saveRoom(room);
                     }catch(DuplicatedNameRoomException ex){
-                        result.rejectValue("name", "duplicate", "already exists");
+                        result.rejectValue("roomName", "duplicate", "already exists");
                         return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
                     }
-                    return "redirect:/welcome";
+                    return "redirect:/room/" + room.getId();
 		}
 	}
+
+	@GetMapping("/room/{roomId}")
+	public ModelAndView showRoom(@PathVariable("roomId") int roomId) {
+		ModelAndView mav = new ModelAndView("rooms/roomDetails");
+		mav.addObject(this.roomService.findRoomById(roomId));
+
+		return mav;
+	}
+
 }

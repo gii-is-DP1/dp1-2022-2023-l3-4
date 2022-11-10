@@ -10,6 +10,9 @@ public interface RoomRepository extends CrudRepository<Room,Integer>{
 
     
     @Query("SELECT room FROM Room room WHERE room.roomName like :roomName%")
+	public Collection<Room> findRoomsByRoomName(@Param("roomName") String roomName);
+
+    @Query("SELECT room FROM Room room WHERE room.roomName =:roomName")
 	public Room findByRoomName(@Param("roomName") String roomName);
     
 

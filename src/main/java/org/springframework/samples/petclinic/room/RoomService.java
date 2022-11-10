@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.room;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
@@ -16,6 +18,11 @@ public class RoomService {
 	public RoomService(RoomRepository roomRepository) {
 		this.roomRepository = roomRepository;
 	}	
+
+	@Transactional
+	public Collection<Room> findRoomsByRoomName(String roomName) throws DataAccessException{
+		return roomRepository.findRoomsByRoomName(roomName);
+	}
 
     @Transactional(readOnly = true)
 	public Room findRoomById(int id) throws DataAccessException {

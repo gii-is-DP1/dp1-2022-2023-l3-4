@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CascadeType;
 import org.springframework.samples.petclinic.model.BaseEntity;
@@ -29,6 +30,7 @@ public class Room extends BaseEntity{
     Integer numMaxPlayers;
 
     @NotEmpty
+    @Size(min=1,max=20)
     String roomName;
 
 

@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.gamePlayer;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
@@ -67,6 +68,4 @@ public class GamePlayerController {
 		}else{
 			return "this player is not available";} 		
     }
-
-
 }

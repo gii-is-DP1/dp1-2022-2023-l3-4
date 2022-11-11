@@ -6,12 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
-
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.player.Player;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,8 @@ public class GamePlayer extends BaseEntity {
 	private Boolean host;
 	private Integer turn;
 
+    @OneToOne
+    private Player player;
     
     @ManyToOne
     @JoinColumn(name = "game_id")
@@ -40,5 +43,8 @@ public class GamePlayer extends BaseEntity {
 
     @Size(min=0, max=3)
     @OneToMany
-    private List<Card> card;
+    private List<Card> cards;
+
+
+
 }

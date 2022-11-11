@@ -16,13 +16,15 @@
 package org.springframework.samples.petclinic.gamePlayer;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
 
 public interface GamePlayerRepository extends CrudRepository<GamePlayer, Integer> {
 
+    Optional<GamePlayer> findById(Integer i);
     List<GamePlayer> findAll();
-    
-    
+    GamePlayer save(GamePlayer gamePlayer);
+
 }

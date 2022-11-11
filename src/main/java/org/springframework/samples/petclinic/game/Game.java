@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.game;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -35,6 +36,7 @@ public class Game extends BaseEntity {
 	private LocalDateTime initialHour;
 	private Boolean isRunning;
 	private Integer round;
+	private Map<Integer,List<GamePlayer>> classification;
 
 	@OneToMany
 	private List<Card> cards;

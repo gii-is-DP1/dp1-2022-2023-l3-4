@@ -11,27 +11,28 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardRepository;
+import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.stereotype.Service;
 
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class CardTests {
     @Autowired
-    CardRepository cr;
+    CardService cr;
     
     @Test
-    public void test3(){
+    public void test1(){
         testInitialCards();
         
     }
     
     public void testInitialCards(){
-        List<Card> cards=cr.findAll();
-        assertTrue(cards.size()==1, "Exactly two products should be present in the DB");
+        List<Card> cards=cr.findCards();
+        assertTrue(cards.size()==1, "Exactly one product should be present in the DB");
 
-        Optional<Card> c1=cr.findById(1);
+        Optional<Card> c1=cr.findCard(1);
         assertTrue(c1.isPresent(),"There should exist a product with id:1");
-        assertEquals(c1.get().getVaccines().size(), 0);
+        assertEquals(c1.get().getVaccines(), 1);
        
         
     }

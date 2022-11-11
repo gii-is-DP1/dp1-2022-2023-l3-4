@@ -17,6 +17,9 @@ package org.springframework.samples.petclinic.game;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,6 +92,44 @@ public class GameController {
 			return "redirect:/games/{gameId}/play";
 		}
 
+		@GetMapping(value= "/games/{gameId}/clasificacion")
+		public String clasificacion(@PathVariable("gameId") int gameId,Map<String, Map<Integer, List<GamePlayer>>> model) {
+			
+			Game game = this.gameService.findGames(gameId);
+			game.setIsRunning(false);
+			this.gameService.save(game);
+			Map<Integer,List<GamePlayer>> classification = new TreeMap<>();
+			log.info("Clasificando");
+			List<GamePlayer> gamePlayers = game.getGamePlayer();
+			for(GamePlayer gamePlayer : gamePlayers){
+				List<Card> body = gamePlayer.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList());
+					if(body.size()==4 && body.stream().allMatch(x->x.getVirus().size()==0)){
+						gamePlayer.setWinner(true);
+						classification.put(1, List.of(gamePlayer));
+					} else if(body.size()==3 && body.stream().allMatch(x->x.getVirus().size()==0) || 
+					body.size()==4 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==3){
+						if(classification.containsKey(2)){
+							classification.get(2).add(gamePlayer);
+						}else{
+							classification.put(2, List.of(gamePlayer));
+						}
+					} else if(body.size()==2 && body.stream().allMatch(x->x.getVirus().size()==0) || 
+					body.size()==4 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==2 ||
+					body.size()==3 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==2){
+						if(classification.containsKey(3)){
+							classification.get(3).add(gamePlayer);
+						}else{
+							classification.put(3, List.of(gamePlayer));
+						}
+					}
+				}
+				game.setClassification(classification);
+				gameService.save(game);
+				model.put("clasificacion", classification);
+				return "rondas/clasificacion";
+				}
 	
+			
+	
+	}
 
-}

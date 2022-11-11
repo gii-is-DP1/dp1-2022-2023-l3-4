@@ -2,15 +2,14 @@
 package org.springframework.samples.petclinic.game;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.Size;
+
+import javax.persistence.Transient;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
@@ -33,6 +32,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "games")
 public class Game extends BaseEntity {
+
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime initialHour;
 	private Boolean isRunning;

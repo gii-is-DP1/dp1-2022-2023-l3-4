@@ -18,7 +18,7 @@ public class StatisticsService {
   }
 
   @Transactional(readOnly = true)
-  public List<Statistics> findPlayerStatistics(Player player) {
+  public Statistics findPlayerStatistics(Player player) {
     return statisticsRepository.findByPlayer(player);
   }
 
@@ -28,6 +28,24 @@ public class StatisticsService {
     } else {
       statisticsRepository.save(s);
     }
+  }
+
+  @Transactional
+  public void saveStatisticsForNewPlayer(Player player) {
+    Statistics playerStatistics = new Statistics();
+    playerStatistics.setPlayer(player);
+    playerStatistics.setNumPlayedGames(0);
+    playerStatistics.setNumWonGames(null);
+
+    statisticsRepository.save(playerStatistics);
+  }
+
+  @Transactional
+  public void sumPointsToPlayer(Integer points, Player player) {
+    Statistics playerStats = findPlayerStatistics(player);
+    Integer currentPoints = playerStats.getPoints();
+    playerStats.setPoints(currentPoints + points);
+    statisticsRepository.save(playerStats); 
   }
 
 }

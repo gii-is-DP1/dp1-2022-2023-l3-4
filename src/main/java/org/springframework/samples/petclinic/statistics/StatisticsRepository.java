@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StatisticsRepository extends CrudRepository<Statistics, Integer> {
   public List<Statistics> findAll();
-  @Query("SELECT s FROM Statistics s WHERE s == :player")
+  @Query("SELECT s FROM Statistics s WHERE s.player = :player")
   public Statistics findByPlayer(Player player);
 }

@@ -32,7 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "GenericCard")
+@Table(name = "generic_cards")
 public class GenericCard extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)

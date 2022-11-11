@@ -26,6 +26,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -53,6 +55,15 @@ public class CardController {
 		Game currentGame = gameService.findGames(gameId);
 		currentGame.setCards(playedcards);
 		gameService.save(currentGame);
+	
+
+	@Autowired
+	public CardController(CardService cardService) {
+		this.cardService=cardService;
+	}
+	public void imprimir(){
+		Card card = cardService.findCard(1).get();
+		System.out.println(card.getVirus());
 	}
 
 }

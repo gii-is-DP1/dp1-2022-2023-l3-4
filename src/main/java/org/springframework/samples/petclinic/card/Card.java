@@ -15,7 +15,8 @@
  */
 package org.springframework.samples.petclinic.card;
 
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -42,22 +43,36 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "cards")
-public class Card extends BaseEntity {
+public class Card extends BaseEntity implements Serializable {
  
 	private Boolean played;
 	private Boolean body;
+
+	// @ManyToOne
+    // @JoinColumn(name="card_id")
+    // private Card cards;
+
+	// @ElementCollection
+	// @Size(min=0, max=2)
+    // @CollectionTable(name = "vaccines", joinColumns = @JoinColumn(name = "card_id")) // 2
+    // @Column(name = "vaccine_set") // 3
+    // private Set<Card> vaccineSet;	
 	
 	@ManyToOne
-	@JoinColumn(name="card_id")
-	private Card cards;
-	
-	@Size(min=0, max=2)
-	@OneToMany(mappedBy="cards", cascade=CascadeType.ALL)
-	private Set<Card> vaccines;
+	@JoinColumn(name="cardVaccine_id")
+	private Card cardVaccine;
 
 	@Size(min=0, max=2)
-	@OneToMany(mappedBy="cards", cascade=CascadeType.ALL)
-	private Set<Card> virus;
+	@OneToMany(mappedBy="cardVaccine", cascade=CascadeType.ALL)
+	private List<Card> vaccines;
+
+	@ManyToOne
+	@JoinColumn(name="cardVirus_id")
+	private Card cardVirus;
+
+	@Size(min=0, max=2)
+	@OneToMany(mappedBy="cardVirus", cascade=CascadeType.ALL)
+	private List<Card> virus = new ArrayList<>();
 
 	@ManyToOne
 	@JoinColumn(name = "type_id")

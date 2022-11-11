@@ -16,6 +16,8 @@
 package org.springframework.samples.petclinic.card;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
@@ -34,6 +36,11 @@ import lombok.Setter;
 public class GenericCard extends BaseEntity {
 
 	private CardType type;
+@Table(name = "genericCards")
+public class GenericCard extends BaseEntity {
+	@Enumerated(EnumType.STRING)
+	private CardType type;
+	@Enumerated(EnumType.STRING)
 	private Colour colour;
 
 }

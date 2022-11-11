@@ -35,9 +35,6 @@ import lombok.Setter;
 @Table(name = "GenericCard")
 public class GenericCard extends BaseEntity {
 
-	private CardType type;
-@Table(name = "genericCards")
-public class GenericCard extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private CardType type;
 	@Enumerated(EnumType.STRING)

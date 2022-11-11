@@ -21,14 +21,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -55,7 +51,6 @@ public class GamePlayerController {
 		return gamePlayerService.findAll();
 	}
 
-}
 // Método para descartar cartas
 	@DeleteMapping(value = "/gamePlayer/{gamePlayerId}/cards/{cards}")
     public @ResponseBody String discardCards(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId) {

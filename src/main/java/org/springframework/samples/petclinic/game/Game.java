@@ -10,7 +10,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import javax.persistence.Transient;
-import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
@@ -34,9 +33,6 @@ import lombok.Setter;
 @Table(name = "games")
 public class Game extends BaseEntity {
 
-	private LocalDateTime initialHour;
-	private Boolean isRunning;
-	private Integer round;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime initialHour;
 	private Boolean isRunning;

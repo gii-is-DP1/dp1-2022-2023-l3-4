@@ -16,10 +16,9 @@
 package org.springframework.samples.petclinic.game;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
-import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,7 +63,6 @@ public class GameController {
 		currentGame.setCards(playedcards);
 		gameService.save(currentGame);
 	}
-	@RequestMapping("/{gameId}")
 	public String reparteCartas(@PathVariable("gameId") int gameId) {
 		Game currentGame = gameService.findGames(gameId); 
 		List<Card> baraja = currentGame.getCards();
@@ -98,7 +95,7 @@ public class GameController {
 			Game game = this.gameService.findGames(gameId);
 			game.setIsRunning(false);
 			this.gameService.save(game);
-			Map<Integer,List<GamePlayer>> classification = new TreeMap<>();
+			Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 			log.info("Clasificando");
 			List<GamePlayer> gamePlayers = game.getGamePlayer();
 			for(GamePlayer gamePlayer : gamePlayers){
@@ -129,7 +126,21 @@ public class GameController {
 				return "rondas/clasificacion";
 				}
 	
-			
+		
+		@GetMapping(value="/games/{gameId}/play")
+		public String play(@PathVariable("gameId") int gameId){
+			Game game = gameService.findGames(gameId);
+			List<GamePlayer> gamePlayers = game.getGamePlayer();
+			Integer currentPlayer = game.getRound();
+			for(Integer i=0; i<gamePlayers.size();i++){
+				if(i==currentPlayer){
+					return "redirect:/game/{gameId}/gamePlayer/{currentPlayer}";
+				}
+			}
+
+			return "ha surgido un error";
+
+		}
 	
 	}
 

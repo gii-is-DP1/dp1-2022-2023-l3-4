@@ -26,8 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -49,18 +47,13 @@ public class CardController {
 	}
 //cuando no quedan más cartas en la baraja del juego, se recogen todas las jugadas y pasan a ser la nueva baraja
 	@GetMapping("/cards")
-	public void Shuffle(@Valid Game game, BindingResult result,
-	@PathVariable("gameId") int gameId){
+	public void Shuffle(@Valid Game game, BindingResult result,	@PathVariable("gameId") int gameId){
 		List<Card> playedcards = cardService.findPlayed();
 		Game currentGame = gameService.findGames(gameId);
 		currentGame.setCards(playedcards);
 		gameService.save(currentGame);
-	
-
-	@Autowired
-	public CardController(CardService cardService) {
-		this.cardService=cardService;
 	}
+	
 	public void imprimir(){
 		Card card = cardService.findCard(1).get();
 		System.out.println(card.getVirus());

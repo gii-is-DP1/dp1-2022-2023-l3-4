@@ -24,12 +24,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -41,14 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/games")
 public class GameController {
-
-	private final GameService gameService;
-
-	@Autowired
-	public GameController(GameService gameService) {
-		this.gameService = gameService;
-  }
-  private static final Logger log = LoggerFactory.getLogger(GameController.class);
+	
+	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final GamePlayerService gamePlayerService;
 
@@ -62,9 +53,8 @@ public class GameController {
 	public List<Game> ListGames(){
 		return gameService.ListGames();
 	}
-}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
-
+	
 	public void rellenaBaraja(@PathVariable("gameId") int gameId){
 		Game currentGame = gameService.findGames(gameId);
 		List<Card> playedcards = currentGame.getCards().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
@@ -97,7 +87,7 @@ public class GameController {
 			log.info("Cartas repartidas correctamente");
 			return "redirect:/games/{gameId}/play";
 		}
-
+		
 		@GetMapping(value= "/games/{gameId}/clasificacion")
 		public String clasificacion(@PathVariable("gameId") int gameId,Map<String, Map<Integer, List<GamePlayer>>> model) {
 			
@@ -109,8 +99,8 @@ public class GameController {
 			List<GamePlayer> gamePlayers = game.getGamePlayer();
 			for(GamePlayer gamePlayer : gamePlayers){
 				List<Card> body = gamePlayer.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList());
-					if(body.size()==4 && body.stream().allMatch(x->x.getVirus().size()==0)){
-						gamePlayer.setWinner(true);
+				if(body.size()==4 && body.stream().allMatch(x->x.getVirus().size()==0)){
+					gamePlayer.setWinner(true);
 						classification.put(1, List.of(gamePlayer));
 					} else if(body.size()==3 && body.stream().allMatch(x->x.getVirus().size()==0) || 
 					body.size()==4 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==3){
@@ -133,8 +123,8 @@ public class GameController {
 				gameService.save(game);
 				model.put("clasificacion", classification);
 				return "rondas/clasificacion";
-				}
-	
+			}
+			
 		
 		@GetMapping(value="/games/{gameId}/play")
 		public String play(@PathVariable("gameId") int gameId){
@@ -150,5 +140,5 @@ public class GameController {
 			return "ha surgido un error";
 
 		}
-	
+		
 	}

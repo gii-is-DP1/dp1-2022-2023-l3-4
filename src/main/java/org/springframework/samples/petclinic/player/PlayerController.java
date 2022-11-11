@@ -51,9 +51,9 @@ public class PlayerController {
     }
 
 
-    @GetMapping("/{username}")
-        public String listPlayerStatistics(@PathVariable("username") String username, ModelMap model) {
-        Player player = playerService.getPlayerByUsername(username);
+    @GetMapping("/me")
+        public String listPlayerStatistics(ModelMap model) {
+        Player player = authenticationService.getPlayer();
         List<Statistics> playerStatistics = statisticsService.findPlayerStatistics(player);
         model.put("statistics", playerStatistics);
         model.put("player", player);

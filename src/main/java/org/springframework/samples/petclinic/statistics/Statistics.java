@@ -26,6 +26,9 @@ public class Statistics extends BaseEntity {
   @Min(0)
   @Column(name = "num_won_games")
   private Integer numWonGames;
+
+  @Min(0)
+  private Integer points;
   
   @OneToOne
   @JoinColumn(name = "username")

@@ -40,14 +40,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
 				.antMatchers("/owners/**").hasAnyAuthority("owner","admin")				
 				.antMatchers("/vets/**").authenticated()
-				.antMatchers("/statistics/all").hasAnyAuthority("admin")
-				.antMatchers("/statistics/achievements/new").hasAnyAuthority("admin")
-				.antMatchers("/statistics/**").hasAnyAuthority("admin")
+				.antMatchers("/player/**").authenticated()
 				.anyRequest().denyAll()
 				.and()
 				 	.formLogin()
 				 	/*.loginPage("/login")*/
 				 	.failureUrl("/login-error")
+					.defaultSuccessUrl("/", true)
 				.and()
 					.logout()
 						.logoutSuccessUrl("/"); 

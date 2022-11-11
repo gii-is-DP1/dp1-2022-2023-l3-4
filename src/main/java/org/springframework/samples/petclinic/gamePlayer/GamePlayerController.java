@@ -15,8 +15,11 @@
  */
 package org.springframework.samples.petclinic.gamePlayer;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
@@ -39,7 +42,7 @@ public class GamePlayerController {
 
 
 	private final GamePlayerService gamePlayerService;
-	private final CardService cardService;
+  private final CardService cardService;
 
 	@Autowired
 	public GamePlayerController(GamePlayerService gamePlayerService, CardService cardService) {
@@ -51,6 +54,8 @@ public class GamePlayerController {
 	public List<GamePlayer> listGamePlayers(){
 		return gamePlayerService.findAll();
 	}
+
+}
 // Método para descartar cartas
 	@DeleteMapping(value = "/gamePlayer/{gamePlayerId}/cards/{cards}")
     public @ResponseBody String discardCards(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId) {

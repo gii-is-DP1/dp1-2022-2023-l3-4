@@ -15,6 +15,17 @@
  */
 package org.springframework.samples.petclinic.card;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.game.GameService;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +40,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class CardController {
 
 	private final CardService cardService;
+	private final GameService gameService;
+
+	@Autowired
+	public CardController(CardService cardService, GameService gameService) {
+		this.cardService = cardService;
+		this.gameService=gameService;
+	}
+//cuando no quedan más cartas en la baraja del juego, se recogen todas las jugadas y pasan a ser la nueva baraja
+	@GetMapping("/cards")
+	public void Shuffle(@Valid Game game, BindingResult result,
+	@PathVariable("gameId") int gameId){
+		List<Card> playedcards = cardService.findPlayed();
+		Game currentGame = gameService.findGames(gameId);
+		currentGame.setCards(playedcards);
+		gameService.save(currentGame);
 	
 
 	@Autowired

@@ -1,10 +1,8 @@
 package org.springframework.samples.petclinic.statistics;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -13,19 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class StatisticsController {
 
   private StatisticsService statisticsService;
-  public static final String STATISTICS_LISTING = "statisctics/StatisticsListing";
+  private PlayerService playerService;
+  public static final String STATISTICS_LISTING = "player/playerProfile";
 
   @Autowired
-  public StatisticsController(StatisticsService statisticsService) {
+  public StatisticsController(StatisticsService statisticsService, PlayerService playerService) {
     this.statisticsService = statisticsService;
+    this.playerService = playerService;
   }
 
-  @GetMapping("/")
-  public String listAllStatistics(ModelMap model) {
-    List<Statistics> allStatistics = statisticsService.getAllStatistics();
-    model.put("statistics", allStatistics);
-    return STATISTICS_LISTING;
-  }
+
+  
 
   
   

@@ -15,10 +15,12 @@
  */
 package org.springframework.samples.petclinic.game;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/games")
 public class GameController {
 
-	private static final Logger log = LoggerFactory.getLogger(GameController.class);
+	private final GameService gameService;
+
+	@Autowired
+	public GameController(GameService gameService) {
+		this.gameService = gameService;
+  }
+  private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final GamePlayerService gamePlayerService;
 
@@ -54,6 +62,7 @@ public class GameController {
 	public List<Game> ListGames(){
 		return gameService.ListGames();
 	}
+}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 
 	public void rellenaBaraja(@PathVariable("gameId") int gameId){
@@ -143,4 +152,3 @@ public class GameController {
 		}
 	
 	}
-

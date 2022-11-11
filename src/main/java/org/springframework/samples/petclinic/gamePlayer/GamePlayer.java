@@ -6,6 +6,12 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
+import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
@@ -44,7 +50,5 @@ public class GamePlayer extends BaseEntity {
     @Size(min=0, max=3)
     @OneToMany
     private List<Card> cards;
-
-
 
 }

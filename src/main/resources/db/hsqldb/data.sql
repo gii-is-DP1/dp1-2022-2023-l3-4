@@ -43,6 +43,7 @@ INSERT INTO achievements(id,name,threshold,description,badge_image,achievement_t
 -- Player
 
 INSERT INTO players(id,username,description,status) VALUES (1,'frabenrui1','Me encanta este juego',TRUE);
+INSERT INTO players(id,username,description,status) VALUES (2,'josgarber6','Lets gooo',TRUE);
 
 -- PlayerAchievements
 

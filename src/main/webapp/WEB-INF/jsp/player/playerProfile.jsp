@@ -9,7 +9,22 @@
     <table>
         <tr>
             <td>
-                <h2><img src="/resources/images/user.png" width="50"><c:out value="${player.user.username}"/></h2>
+                <h2>
+                    <img src="/resources/images/user.png" width="50"><strong style="padding-left: 20px; "><c:out value="${player.user.username}"/></strong>                
+                </h2>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Description: </strong><c:out value="${player.description}"/></td>
+        </tr>
+        <tr>
+            <th>
+                Historial de partidas
+            </th>
+        </tr>
+        <tr>
+            <td>
+
             </td>
         </tr>
     </table>

@@ -20,7 +20,7 @@
 			</tr>
 			<tr>
 				<td><mvc:label path="status">Select status:</mvc:label>
-        <td style="padding-left: 20px"><mvc:checkbox path="status"/></td>
+        <td style="padding-left: 20px"><mvc:checkbox path="status"/> Online</td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value="Save" /></td>

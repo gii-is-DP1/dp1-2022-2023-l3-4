@@ -61,7 +61,7 @@ public class PlayerController {
     @GetMapping("/me")
         public String listPlayerStatistics(ModelMap model) {
         Player player = authenticationService.getPlayer();
-        Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
+        List<Statistics> playerStatistics = statisticsService.findPlayerStatistics(player);
         model.put("statistics", playerStatistics);
         model.put("player", player);
         return USER_PROFILE;

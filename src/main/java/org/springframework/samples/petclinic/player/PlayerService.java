@@ -33,15 +33,22 @@ public class PlayerService {
 
     private PlayerRepository playerRepository;
     
-    @Autowired
+    
     private UserService userService;
 
-    @Autowired
+    
     private AuthoritiesService authoritiesService;
 
+    
+    private StatisticsService statisticsService;
+
     @Autowired
-    public PlayerService(PlayerRepository playerRepository){
+    public PlayerService(PlayerRepository playerRepository, UserService userService, AuthoritiesService authoritiesService, StatisticsService statisticsService){
         this.playerRepository = playerRepository;
+        this.userService = userService;
+        this.authoritiesService = authoritiesService;
+        this.statisticsService = statisticsService;
+
     }
 
     @Transactional

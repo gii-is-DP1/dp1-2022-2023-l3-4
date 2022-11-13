@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import net.bytebuddy.description.type.TypeDescription.Generic;
 
 /**
  * @author Juergen Hoeller
@@ -45,6 +48,7 @@ public class GameController {
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final GamePlayerService gamePlayerService;
+	private int cardsInDeck;
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService) {
@@ -56,6 +60,52 @@ public class GameController {
 	public List<Game> ListGames(){
 		return gameService.ListGames();
 	}
+
+
+	GenericCard[] cards = new GenericCard[68];
+
+	public void reset() {
+		GenericCard.Colour[] colours = GenericCard.Colour.values();
+		cardsInDeck = 0;
+
+		for(int i = 0; i< colours.length-1; i++) {
+			GenericCard.Colour colour = colours[i];
+			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
+			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
+			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
+			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
+			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
+
+			for(int j = 1; j<3; j++) {
+				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
+				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
+				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
+				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
+			}
+		}
+
+		GenericCard.Type[] types = new GenericCard.Type[]{GenericCard.Type.TRANSPLANT, 
+			GenericCard.Type.THIEF, GenericCard.Type.INFECTION, GenericCard.Type.GLOVES, GenericCard.Type.ERROR};
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.ORGAN);
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.VIRUS);
+		for(int i = 0; i < 5; i++) {
+			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.VACCINE);
+		}
+		
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.GLOVES);
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.ERROR);
+		
+		for(int i = 0; i < 4; i++) {
+			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.THIEF);
+			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.TRANSPLANT);
+		}
+		
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION);
+		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION);
+	}
+
+
+
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 
 	public void rellenaBaraja(@PathVariable("gameId") int gameId){

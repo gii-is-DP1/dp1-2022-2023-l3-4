@@ -59,7 +59,7 @@ public class Card extends BaseEntity implements Serializable {
     // private Set<Card> vaccineSet;	
 	
 	@ManyToOne
-	@JoinColumn(name="num_Vaccine")
+	@JoinColumn(name="cardVaccine_id")
 	private Card cardVaccine;
 
 	@Size(min=0, max=2)
@@ -67,7 +67,7 @@ public class Card extends BaseEntity implements Serializable {
 	private List<Card> vaccines;
 
 	@ManyToOne
-	@JoinColumn(name="num_Virus")
+	@JoinColumn(name="cardVirus_id")
 	private Card cardVirus;
 
 	@Size(min=0, max=2)

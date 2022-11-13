@@ -2,19 +2,26 @@
 package org.springframework.samples.petclinic.game;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +43,10 @@ public class Game extends BaseEntity {
 	private LocalDateTime initialHour;
 	private Boolean isRunning;
 	private Integer round;
-	private Map<Integer,List<GamePlayer>> classification;
+	
+	@JsonIgnore
+	@Transient
+	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 
 	@OneToMany
 	private List<Card> cards;

@@ -34,9 +34,32 @@ import lombok.Setter;
 @Entity
 @Table(name = "genericCards")
 public class GenericCard extends BaseEntity {
+	
+	public enum Colour {
+			RED, BLUE, GREEN, YELLOW, RAINBOW;
+
+			private static final Colour[] colours = Colour.values();
+			public static Colour getColour(int i){
+				return Colour.colours[i];
+			}
+	}
+
+	public enum Type {
+			ORGAN, VIRUS, VACCINE, TRANSPLANT, THIEF, INFECTION, GLOVES, ERROR;
+
+		private static final Type[] types = Type.values();
+		public static Type getType(int i){
+			return Type.types[i];
+		}
+}
 	@Enumerated(EnumType.STRING)
-	private CardType type;
+	private final Colour colour;
 	@Enumerated(EnumType.STRING)
-	private Colour colour;
+	private final Type type;
+
+	public GenericCard(final Colour colour, final Type type) {
+		this.colour = colour;
+		this.type = type;
+	}
 
 }

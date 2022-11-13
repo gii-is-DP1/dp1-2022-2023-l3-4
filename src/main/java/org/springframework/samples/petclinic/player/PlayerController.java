@@ -17,15 +17,19 @@ package org.springframework.samples.petclinic.player;
 
 import java.util.List;
 
+import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -44,6 +48,7 @@ public class PlayerController {
     private AuthenticationService authenticationService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
+    private static final String EDIT_PROFILE ="player/createOrUpdateProfileForm"; 
 
 
     @Autowired
@@ -61,6 +66,34 @@ public class PlayerController {
         model.put("statistics", playerStatistics);
         model.put("player", player);
         return USER_PROFILE;
+  }
+
+    @GetMapping("/me/edit")
+    public String getPlayer(ModelMap model) {
+        Player player = authenticationService.getPlayer();
+        if (player != null) {
+            model.put("player", player);
+        }
+        return EDIT_PROFILE;
     }
+
+    @PostMapping(value="/me/edit")
+    public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
+
+        if (bindingResult.hasErrors()) {
+            model.put("message", "The name cannot be empty");
+            model.put("messageType", "info");
+        } else {
+            Player playerToUpdate = authenticationService.getPlayer();
+            if (playerToUpdate != null) {
+                BeanUtils.copyProperties(player, playerToUpdate, "id");
+                playerService.savePlayer(playerToUpdate);
+                model.put("message", "Your player information has been updated successfully");
+                return "redirect:/player/me";
+            }
+        }
+        return "redirect:/player/me";
+    }
+
 	
 }

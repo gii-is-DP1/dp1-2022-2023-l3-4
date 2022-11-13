@@ -43,11 +43,14 @@ INSERT INTO achievements(id,name,threshold,description,badge_image,achievement_t
 -- Player
 
 INSERT INTO players(id,username,description,status) VALUES (1,'frabenrui1','Me encanta este juego',TRUE);
+INSERT INTO players(id,username,description,status) VALUES (2,'josgarber6','Lets gooo',TRUE);
 
 -- PlayerAchievements
 
 INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
 
+-- Statitics
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (1, 1, 10, 5, 30);
 
 
 INSERT INTO generic_cards(id,colour,type) VALUES (1, 'RED', 'ORGAN');

@@ -32,7 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "genericCards")
+@Table(name = "generic_cards")
 public class GenericCard extends BaseEntity {
 	
 	public enum Colour {

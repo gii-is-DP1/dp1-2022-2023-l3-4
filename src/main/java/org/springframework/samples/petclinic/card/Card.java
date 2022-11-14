@@ -16,8 +16,7 @@
 package org.springframework.samples.petclinic.card;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,7 +27,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,7 +73,7 @@ public class Card extends BaseEntity implements Serializable {
 	@OneToMany(mappedBy="cardVirus", cascade=CascadeType.ALL)
 	private List<Card> virus = new ArrayList<>();
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "type_id")
 	private GenericCard type;
 
@@ -83,4 +81,15 @@ public class Card extends BaseEntity implements Serializable {
 	@JoinColumn(name = "gamePlayer_id")
 	private GamePlayer gamePlayer;
 
+	public Card(int id, boolean body, boolean played, List<Card> vaccines, List<Card> virus, GamePlayer game_player_id, GenericCard type) {
+		this.id = id;
+		this.body = body;
+		this.played = played;
+		this.vaccines = vaccines;
+		this.virus = virus;
+		this.gamePlayer = game_player_id;
+		this.type = type;
+	}
+
+	public Card() {}
 }

@@ -14,8 +14,6 @@ public class GameService {
 
 	private GameRepository gameRepository;
 
-	
-
 	@Autowired
 	public GameService(GameRepository gameRepository) {
 		this.gameRepository = gameRepository;
@@ -35,6 +33,4 @@ public class GameService {
 		gameRepository.save(game);
 
 	}
-
-	
 }

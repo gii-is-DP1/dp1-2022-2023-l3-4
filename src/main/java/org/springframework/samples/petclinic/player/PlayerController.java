@@ -15,7 +15,18 @@
  */
 package org.springframework.samples.petclinic.player;
 
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.statistics.Statistics;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Juergen Hoeller
@@ -24,7 +35,32 @@ import org.springframework.stereotype.Controller;
  * @author Michael Isvy
  */
 @Controller
+@RequestMapping("/player")
 public class PlayerController {
 
+
+    private PlayerService playerService;
+    private StatisticsService statisticsService;
+    private AuthenticationService authenticationService;
+
+    private static final String USER_PROFILE ="player/playerProfile"; 
+
+
+    @Autowired
+    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as) {
+        this.playerService = ps;
+        this.statisticsService = ss;
+        this.authenticationService = as;
+    }
+
+
+    @GetMapping("/me")
+        public String listPlayerStatistics(ModelMap model) {
+        Player player = authenticationService.getPlayer();
+        Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
+        model.put("statistics", playerStatistics);
+        model.put("player", player);
+        return USER_PROFILE;
+    }
 	
 }

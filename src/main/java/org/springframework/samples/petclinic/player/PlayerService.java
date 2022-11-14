@@ -34,36 +34,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayerService {
 
     private PlayerRepository playerRepository;
-    
-    
     private UserService userService;
-
-    
     private AuthoritiesService authoritiesService;
-
     
-    private StatisticsService statisticsService;
 
     @Autowired
-    public PlayerService(PlayerRepository playerRepository, UserService userService, AuthoritiesService authoritiesService, StatisticsService statisticsService){
+    public PlayerService(PlayerRepository playerRepository, UserService userService, AuthoritiesService authoritiesService){
         this.playerRepository = playerRepository;
         this.userService = userService;
         this.authoritiesService = authoritiesService;
-        this.statisticsService = statisticsService;
-
     }
 
     @Transactional
     public void savePlayer(Player player) throws DataAccessException {
-        player.setStatus(false);
+        if(player.getStatus() == null) {
+            player.setStatus(false);
+        }
         //creating player
         playerRepository.save(player);
         //creating user
         userService.saveUser(player.getUser());
         //creating authorities
         authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
-        //creating statistics for new user
-        statisticsService.saveStatisticsForNewPlayer(player);
 
 
     }

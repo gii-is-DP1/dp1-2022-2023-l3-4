@@ -28,7 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -48,7 +47,7 @@ public class PlayerController {
     private AuthenticationService authenticationService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
-    private static final String EDIT_PROFILE ="player/createOrUpdateProfileForm"; 
+    private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
 
 
     @Autowired
@@ -86,10 +85,10 @@ public class PlayerController {
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
-                BeanUtils.copyProperties(player, playerToUpdate, "id");
+                BeanUtils.copyProperties(player, playerToUpdate, "id", "user");
                 playerService.savePlayer(playerToUpdate);
                 model.put("message", "Your player information has been updated successfully");
-                return "redirect:/player/me";
+                return listPlayerStatistics(model);
             }
         }
         return "redirect:/player/me";

@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import javax.persistence.Transient;
@@ -15,6 +17,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;

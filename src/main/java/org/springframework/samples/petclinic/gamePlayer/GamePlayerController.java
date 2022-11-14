@@ -37,35 +37,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/games/{gameId}/players")
 public class GamePlayerController {
 
-
 	private final GamePlayerService gamePlayerService;
-	private final CardService cardService;
 
 	@Autowired
-	public GamePlayerController(GamePlayerService gamePlayerService, CardService cardService) {
+	public GamePlayerController(GamePlayerService gamePlayerService) {
 		this.gamePlayerService = gamePlayerService;
-		this.cardService=cardService;
+		
 	}
 
 	@GetMapping
 	public List<GamePlayer> listGamePlayers(){
 		return gamePlayerService.findAll();
 	}
-// Método para descartar cartas
-	@DeleteMapping(value = "/gamePlayer/{gamePlayerId}/cards/{cards}")
-    public @ResponseBody String discardCards(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId) {
-        if(gamePlayerService.findById(gamePlayerId).isPresent()){
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			if(gamePlayer.getCards().containsAll(cards)){
-				for(Card card: cards){					
-						gamePlayer.getCards().remove(card);
-						card.setPlayed(true);
-						gamePlayerService.save(gamePlayer);
-						cardService.save(card);		
-			} return "correct move";
-			}else{
-				return "you can't discard those cards";}		
-		}else{
-			return "this player is not available";} 		
-    }
+
 }

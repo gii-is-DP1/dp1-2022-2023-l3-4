@@ -11,8 +11,12 @@
 	<mvc:form modelAttribute="player">
     <table>
 			<tr>
-				<td><mvc:label path="user.username">Username:</mvc:label></td>
-				<td style="padding-left: 20px"><mvc:input path="user.username"/></td>
+				<td><mvc:label path="firstName">First Name:</mvc:label></td>
+				<td style="padding-left: 20px"><mvc:input path="firstName"/></td>
+			</tr>
+			<tr>
+				<td><mvc:label path="lastName">Last Name:</mvc:label></td>
+				<td style="padding-left: 20px"><mvc:input path="lastName"/></td>
 			</tr>
 			<tr>
 				<td><mvc:label path="description">Description:</mvc:label></td>

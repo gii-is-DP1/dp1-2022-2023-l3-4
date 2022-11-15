@@ -21,6 +21,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.PlayerService;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -41,10 +42,12 @@ public class UserController {
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 
 	private final PlayerService playerService;
+	private StatisticsService statisticsService;
 
 	@Autowired
-	public UserController(PlayerService playerService) {
+	public UserController(PlayerService playerService, StatisticsService statisticsService) {
 		this.playerService = playerService;
+		this.statisticsService = statisticsService;
 	}
 
 	@InitBinder
@@ -67,6 +70,7 @@ public class UserController {
 		else {
 			//creating player, user, and authority
 			this.playerService.savePlayer(player);
+			this.statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}
 	}

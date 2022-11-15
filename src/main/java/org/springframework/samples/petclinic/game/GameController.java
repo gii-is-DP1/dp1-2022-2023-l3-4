@@ -15,21 +15,16 @@
  */
 package org.springframework.samples.petclinic.game;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
-import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
@@ -41,19 +36,18 @@ import org.springframework.web.bind.annotation.PathVariable;
  * @author Arjen Poutsma
  */
 @Controller
+@RequestMapping("/games")
 public class GameController {
 	
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final GamePlayerService gamePlayerService;
 	private int cardsInDeck;
-	private final CardService cardService;
 
 	@Autowired
-	public GameController(GameService gameService,GamePlayerService gamePlayerService, CardService cardService) {
+	public GameController(GameService gameService,GamePlayerService gamePlayerService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
-		this.cardService=cardService;
 	}
 
 	//Listar juegos
@@ -62,6 +56,7 @@ public class GameController {
 		List<Game> allGames=  gameService.ListGames();
 		model.put("games", allGames);
 		return "games/listing";
+
 	}
 
 	GenericCard[] cards = new GenericCard[68];
@@ -112,6 +107,7 @@ public class GameController {
 		currentGame.setCards(playedcards);
 		gameService.save(currentGame);
 	}
+
 	
 	//Barajar
 	public void reparteCartas(@PathVariable("gameId") int gameId) {
@@ -134,8 +130,10 @@ public class GameController {
 
 			}
 			currentGame.setCards(baraja); //Cuando ya se han repartido a todos los jugadores guardamos el mazo resultante
+			currentGame.setRound(currentGame.getRound()+1); //Añadimos una ronda al juego y guardamos
 			gameService.save(currentGame);	
 			log.info("Cartas repartidas correctamente");
+			return "redirect:/games/{gameId}/play";
 		}
 
 	//Muestra vista Individual de cada jugador
@@ -405,27 +403,44 @@ public class GameController {
 			Integer numNoVirus = body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size();
 				if(numNoVirus==4){
 					gamePlayer.setWinner(true);
-					classification.put(1, List.of(gamePlayer));
-				} else if(numNoVirus==3){
-					if(classification.containsKey(2)){
-						classification.get(2).add(gamePlayer);
-					}else{
-						classification.put(2, List.of(gamePlayer));
-					}
-				} else if(numNoVirus==2){
-					if(classification.containsKey(3)){
-						classification.get(3).add(gamePlayer);
-					}else{
-						classification.put(3, List.of(gamePlayer));
+						classification.put(1, List.of(gamePlayer));
+					} else if(body.size()==3 && body.stream().allMatch(x->x.getVirus().size()==0) || 
+					body.size()==4 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==3){
+						if(classification.containsKey(2)){
+							classification.get(2).add(gamePlayer);
+						}else{
+							classification.put(2, List.of(gamePlayer));
+						}
+					} else if(body.size()==2 && body.stream().allMatch(x->x.getVirus().size()==0) || 
+					body.size()==4 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==2 ||
+					body.size()==3 && body.stream().filter(x->x.getVirus().size()==0).collect(Collectors.toList()).size()==2){
+						if(classification.containsKey(3)){
+							classification.get(3).add(gamePlayer);
+						}else{
+							classification.put(3, List.of(gamePlayer));
+						}
 					}
 				}
-			}
 				game.setClassification(classification);
 				gameService.save(game);
 				model.put("clasificacion", classification);
 				return "rondas/clasificacion";
-				
-	
+			}
+			
+		
+		@GetMapping(value="/games/{gameId}/play")
+		public String play(@PathVariable("gameId") int gameId){
+			Game game = gameService.findGames(gameId);
+			List<GamePlayer> gamePlayers = game.getGamePlayer();
+			Integer currentPlayer = game.getRound();
+			for(Integer i=0; i<gamePlayers.size();i++){
+				if(i==currentPlayer){
+					return "redirect:/game/{gameId}/gamePlayer/{currentPlayer}";
+				}
 			}
 
-}
+			return "ha surgido un error";
+
+		}
+		
+	}

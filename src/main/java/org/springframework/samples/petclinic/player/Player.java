@@ -48,7 +48,7 @@ public class Player extends Person {
 	private Boolean status;
 	
 	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "username", referencedColumnName = "username")
+  @JoinColumn(name = "username", referencedColumnName = "username")
 	private User user;
 
 	@ManyToMany

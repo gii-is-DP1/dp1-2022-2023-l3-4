@@ -30,8 +30,8 @@ public class Statistics extends BaseEntity {
   @Min(0)
   private Integer points;
   
-  @OneToOne
-  @JoinColumn(name = "username")
+  @OneToOne(optional = false)
+  @JoinColumn(name = "player_id", referencedColumnName = "id")
   private Player player;
   
 }

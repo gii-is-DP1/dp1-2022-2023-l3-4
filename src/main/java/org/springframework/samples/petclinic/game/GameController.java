@@ -138,7 +138,7 @@ public class GameController {
 			log.info("Cartas repartidas correctamente");
 		}
 
-	//Muestra vita Individual de cada jugador
+	//Muestra vista Individual de cada jugador
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
 	public void muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
@@ -367,6 +367,7 @@ public class GameController {
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 	}
 	}
+	
 	// Método para descartar cartas
     public String discard(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId, @PathVariable Integer gameId) {
         if(gamePlayerService.findById(gamePlayerId).isPresent()){

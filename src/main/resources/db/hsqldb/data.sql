@@ -54,9 +54,11 @@ INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, p
 
 
 INSERT INTO generic_cards(id,colour,type) VALUES (1, 'RED', 'ORGAN');
+INSERT INTO generic_cards(id,colour,type) VALUES (2, 'RED', 'VIRUS');
 INSERT INTO games(id,initial_hour,is_running,round,turn) VALUES(1,'2022-11-10 17:00:00',TRUE,0,0);
 INSERT INTO game_players(id, host, turn, winner, game_id, game_player_id ) VALUES (1,FALSE,1,FALSE,1,1);
 INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (1,TRUE,FALSE,1,1,1,1);
+INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (2,TRUE,FALSE,2,2,1,2);
 
 
 

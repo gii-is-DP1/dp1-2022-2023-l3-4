@@ -16,6 +16,8 @@
 package org.springframework.samples.petclinic.game;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +26,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findAll(); 
     Game save(Game game);
-	Game findById(int id);
+	Optional<Game> findById(int id);
 
     
     

@@ -60,4 +60,4 @@ INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_
 
 
 
-
+º   

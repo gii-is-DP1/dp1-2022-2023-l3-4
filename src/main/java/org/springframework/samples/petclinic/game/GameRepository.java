@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findAll(); 
+    Game save(Game game);
 	Optional<Game> findById(int id);
 
     

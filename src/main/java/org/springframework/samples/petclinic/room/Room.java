@@ -3,18 +3,15 @@ package org.springframework.samples.petclinic.room;
 import java.util.Collection;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.CascadeType;
 import org.springframework.samples.petclinic.model.BaseEntity;
-import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.player.Player;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -39,10 +36,10 @@ public class Room extends BaseEntity{
     Boolean isPrivate;
 
     @OneToMany(mappedBy="room")
-    private Collection<Owner> owners;
+    private Collection<Player> players;
 
     @OneToOne(optional = false)
-    private Owner host;
+    private Player host;
 
     
 }

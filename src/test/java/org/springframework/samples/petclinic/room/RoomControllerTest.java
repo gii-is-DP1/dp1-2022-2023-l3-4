@@ -20,8 +20,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
-import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.OwnerService;
+import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -39,7 +39,7 @@ public class RoomControllerTest {
     private RoomService roomService;
 
     @MockBean
-    private OwnerService ownerService;
+    private PlayerService playerService;
 
     @MockBean 
     private AuthenticationService authenticationService;
@@ -53,24 +53,24 @@ public class RoomControllerTest {
         room.setRoomName("sala5");
         room.setIsPrivate(true);
         room.setNumMaxPlayers(5);
-        Owner owner = new Owner();
-            owner.setFirstName("Jefferson");
-            owner.setLastName("Nunez");
-            room.setHost(owner);
+        Player player = new Player();
+            player.setFirstName("Jefferson");
+            player.setLastName("Nunez");
+            room.setHost(player);
             
-            Owner owner2 = new Owner();
-            owner2.setFirstName("Avery");
-            owner2.setLastName("Pruitt");
+            Player player2 = new Player();
+            player2.setFirstName("Avery");
+            player2.setLastName("Pruitt");
 
-            Owner owner3 = new Owner();
-            owner3.setFirstName("Kimberly");
-            owner3.setLastName("McMahan");
+            Player player3 = new Player();
+            player3.setFirstName("Kimberly");
+            player3.setLastName("McMahan");
             
-            Collection<Owner> owners = new ArrayList<Owner>();
-            owners.add(owner2);
-            owners.add(owner3);
+            Collection<Player> players = new ArrayList<Player>();
+            players.add(player2);
+            players.add(player3);
             
-            room.setOwners(owners);
+            room.setPlayers(players);
             
             given(this.roomService.findRoomById(TEST_ROOM_ID)).willReturn(room);
     }

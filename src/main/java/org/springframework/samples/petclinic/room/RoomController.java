@@ -5,8 +5,8 @@ import java.util.Collection;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.OwnerService;
+import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
 import org.springframework.stereotype.Controller;
 import org.springframework.samples.petclinic.util.AuthenticationService;
@@ -36,7 +36,7 @@ public class RoomController {
     private AuthenticationService authService;
 
 	@Autowired
-    private OwnerService ownerService;
+    private PlayerService playerService;
 
     @Autowired
 	public RoomController(RoomService roomService) {
@@ -44,17 +44,17 @@ public class RoomController {
 	}
 
 	@GetMapping(value = "/new")
-	public String initCreationForm(Owner owner, ModelMap model) {
+	public String initCreationForm(Player player, ModelMap model) {
 		Room room = new Room();
 		
 		model.put("room", room);
-		model.put("owner", owner);
+		model.put("player", player);
 		return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 	}
 
 	@PostMapping(value = "/new")
 	public String processCreationForm(@Valid Room room, BindingResult result, ModelMap model) {	
-		Owner owner = authService.getOwner();
+		Player player = authService.getPlayer();
 		if (result.hasErrors()) {
 			model.put("room", room);
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
@@ -65,15 +65,15 @@ public class RoomController {
 							room.setIsPrivate(false);
 						}
 						room.setTotalGamesPlayer(0);
-						room.setHost(owner);
+						room.setHost(player);
 						this.roomService.saveRoom(room);
-                    	owner.setRoom(room);
-						ownerService.saveOwner(owner);
+                    	//player.setRoom(room);
+						playerService.savePlayer(player);
                     }catch(DuplicatedNameRoomException ex){
                         result.rejectValue("roomName", "duplicate", "already exists");
                         return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
                     }
-                    return "redirect:/owners/1";
+                    return "redirect:/room/" + room.getId();
 		}
 	}
 
@@ -85,7 +85,7 @@ public class RoomController {
 
 	@GetMapping(value = "/find")
 	public String processFindRoomForm(Room room, BindingResult result, ModelMap model) {
-		Owner owner = authService.getOwner();
+		Player player = authService.getPlayer();
 		// allow parameterless GET request for /find to return all records
 		if (room.getRoomName() == null) {
 			room.setRoomName(""); // empty string signifies broadest possible search
@@ -101,8 +101,8 @@ public class RoomController {
 		else if (results.size() == 1) {
 			// 1 room found
 			room = results.iterator().next();
-			owner.setRoom(room);
-			ownerService.saveOwner(owner);
+			//player.setRoom(room);
+			playerService.savePlayer(player);
 			return "redirect:/room/" + room.getId();
 		}
 		else {
@@ -114,14 +114,14 @@ public class RoomController {
 
 	@GetMapping("/{roomId}")
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
-		Owner owner = authService.getOwner();
+		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
-		owner.setRoom(room);
-		ownerService.saveOwner(owner);
-		Collection<Owner> owners=this.ownerService.findOwnerByRoomId(roomId);
+		//player.setRoom(room);
+		playerService.savePlayer(player);
+		Collection<Player> players = room.getPlayers();
 		model.put("room", this.roomService.findRoomById(roomId));
-		model.put("owners",owners);
-		model.put("countPlayer",owners.size());
+		model.put("players",players);
+		model.put("countPlayer",players.size());
 		
 		return VIEWS_WAITING_ROOM;
 	}

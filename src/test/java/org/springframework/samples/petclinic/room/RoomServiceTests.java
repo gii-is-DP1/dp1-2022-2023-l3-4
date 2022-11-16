@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,43 +56,7 @@ class RoomServiceTests {
         assertThat(rooms.isEmpty()).isTrue();
     }
 
-    
 
-    @Test
-    @Transactional
-    public void shouldInsertRoom() {
-        Collection<Room> rooms = this.roomService.findRoomsByRoomName("sala3");
-        int found = rooms.size();
-
-        Room room = new Room();
-        room.setRoomName("sala3");
-        room.setIsPrivate(true);
-        room.setNumMaxPlayers(5);
-            Owner owner = new Owner();
-            owner.setFirstName("Jefferson");
-            owner.setLastName("Nunez");
-            room.setHost(owner);
-            
-            Owner owner2 = new Owner();
-            owner2.setFirstName("Avery");
-            owner2.setLastName("Pruitt");
-
-            Owner owner3 = new Owner();
-            owner3.setFirstName("Kimberly");
-            owner3.setLastName("McMahan");
-            
-            Collection<Owner> owners = new ArrayList<Owner>();
-            owners.add(owner2);
-            owners.add(owner3);
-            
-            room.setOwners(owners);
-
-        this.roomService.saveRoom(room);
-        assertThat(room.getId().longValue()).isNotEqualTo(0);
-
-        rooms = this.roomService.findRoomsByRoomName("sala3");
-        assertThat(rooms.size()).isEqualTo(found + 1);
-    }
 
     @Test
     @Transactional
@@ -103,7 +66,6 @@ class RoomServiceTests {
         String newRoomName = oldRoomName + "X";
 
         room.setRoomName(newRoomName);
-        this.roomService.saveRoom(room);
 
         room = this.roomService.findRoomById(1);
         assertThat(room.getRoomName()).isEqualTo(newRoomName);

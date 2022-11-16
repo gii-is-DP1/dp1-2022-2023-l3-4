@@ -28,10 +28,10 @@
             </tr>
           </thead>
         <tbody>
-          <c:forEach items="${owners}" var="owner">
+          <c:forEach items="${players}" var="player">
             <tr>
               <td>
-                <c:out value="${owner.firstName}"/>
+                <c:out value="${player.firstName}"/>
               </td>
             </tr>
         </c:forEach>

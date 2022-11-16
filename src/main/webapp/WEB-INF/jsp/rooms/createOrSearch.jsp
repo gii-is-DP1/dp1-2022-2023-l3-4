@@ -16,7 +16,7 @@
             </div>
             <div>
                 <form:form modelAttribute="room" action="/room/find" method="get" class="form-horizontal"
-                id="search-owner-form">
+                id="search-player-form">
          <div class="form-group">
              <div class="control-group" id="roomName">
                  <label class="col-sm-2 control-label">Room Name </label>

@@ -67,7 +67,7 @@ public class RoomController {
 						room.setTotalGamesPlayer(0);
 						room.setHost(player);
 						this.roomService.saveRoom(room);
-                    	//player.setRoom(room);
+                    	player.setRoom(room);
 						playerService.savePlayer(player);
                     }catch(DuplicatedNameRoomException ex){
                         result.rejectValue("roomName", "duplicate", "already exists");
@@ -101,7 +101,7 @@ public class RoomController {
 		else if (results.size() == 1) {
 			// 1 room found
 			room = results.iterator().next();
-			//player.setRoom(room);
+			player.setRoom(room);
 			playerService.savePlayer(player);
 			return "redirect:/room/" + room.getId();
 		}
@@ -116,7 +116,7 @@ public class RoomController {
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
-		//player.setRoom(room);
+		player.setRoom(room);
 		playerService.savePlayer(player);
 		Collection<Player> players = room.getPlayers();
 		model.put("room", this.roomService.findRoomById(roomId));

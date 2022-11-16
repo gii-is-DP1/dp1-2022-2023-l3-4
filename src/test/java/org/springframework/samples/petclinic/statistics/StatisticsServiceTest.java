@@ -1,7 +1,6 @@
 package org.springframework.samples.petclinic.statistics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
@@ -36,16 +35,6 @@ public class StatisticsServiceTest {
     statistics.setPoints(points);
     statistics.setPlayer(player);
     return statistics;
-  }
-
-  @Test
-  public void shouldFindPlayerStatistics() {
-
-    Player player = new Player();
-    player.setId(ID_PLAYER);
-
-    Statistics statistics = this.statisticsRepository.findByPlayer(player);
-    assertNotNull(statistics);
   }
 
   @Test
@@ -96,19 +85,6 @@ public class StatisticsServiceTest {
     } catch (Exception e) {
       fail("No exception should be thrown");
     }
-
-  }
-
-  @Test
-  public void testSumPointsToPlayer() {
-
-    Integer points = 100;
-    Player player = new Player();
-    player.setId(ID_PLAYER);
-
-    Statistics statistics = statisticsRepository.findByPlayer(player);
-    Integer currentPoints = statistics.getPoints();
-    assertEquals(currentPoints + points, 130);
 
   }
 

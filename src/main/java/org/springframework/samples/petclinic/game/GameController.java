@@ -315,7 +315,7 @@ public class GameController {
 					virus.setPlayed(true);
 					virus.setCardVirus(null);
 					c_vaccine.setPlayed(true);
-					c_organ.getVirus().clear();
+					c_organ.setVirus(new ArrayList<>());;
 					cardService.save(c_vaccine);
 					cardService.save(c_organ);
 					cardService.save(virus);
@@ -323,7 +323,7 @@ public class GameController {
 
 				}
 				}else{
-					log.error("No puedes vacunar un ógano que no sea ni arcoirís ni de tu color");
+					log.error("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");
 					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 				}
 			

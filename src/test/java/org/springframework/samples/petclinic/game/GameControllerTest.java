@@ -164,6 +164,41 @@ public class GameControllerTest {
         boneVN2.setColour(Colour.YELLOW);
         boneVN2.setType(Type.ORGAN);
 
+        GenericCard brainVXP1 = new GenericCard();
+        brainVXP1.setId(14);
+        brainVXP1.setColour(Colour.BLUE);
+        brainVXP1.setType(Type.ORGAN);
+
+        GenericCard vaxVXP1 = new GenericCard();
+        vaxVXP1.setId(15);
+        vaxVXP1.setColour(Colour.BLUE);
+        vaxVXP1.setType(Type.VACCINE);
+
+        GenericCard virusVXP2 = new GenericCard();
+        virusVXP2.setId(16);
+        virusVXP2.setColour(Colour.BLUE);
+        virusVXP2.setType(Type.VIRUS);
+
+        GenericCard brainVXP2 = new GenericCard();
+        brainVXP2.setId(17);
+        brainVXP2.setColour(Colour.BLUE);
+        brainVXP2.setType(Type.ORGAN);
+
+        GenericCard vaxVXN2 = new GenericCard();
+        vaxVXN2.setId(18);
+        vaxVXN2.setColour(Colour.BLUE);
+        vaxVXN2.setType(Type.VACCINE);
+
+        GenericCard vax2VXN2 = new GenericCard();
+        vax2VXN2.setId(19);
+        vax2VXN2.setColour(Colour.BLUE);
+        vax2VXN2.setType(Type.VACCINE);
+
+        GenericCard brainVXN2 = new GenericCard();
+        brainVXN2.setId(20);
+        brainVXN2.setColour(Colour.BLUE);
+        brainVXN2.setType(Type.ORGAN);
+
         Card c_heart = new Card();
         c_heart.setId(0);
         c_heart.setBody(false);
@@ -323,6 +358,86 @@ public class GameControllerTest {
         c_vaxVN21.setCardVaccine(c_boneVN2);
         c_vaxVN22.setCardVaccine(c_boneVN2);
 
+        Card c_brainVXP1 = new Card();
+        c_brainVXP1.setId(14);
+        c_brainVXP1.setBody(true);
+        c_brainVXP1.setPlayed(false);
+        c_brainVXP1.setCardVaccine(null);
+        c_brainVXP1.setCardVirus(null);
+        c_brainVXP1.setVaccines(new ArrayList<>());
+        c_brainVXP1.setVirus(new ArrayList<>());
+        c_brainVXP1.setType(brainVXP1);
+        Optional<Card> c_brainVXP1O = Optional.of(c_brainVXP1);
+
+        Card c_vaxVXP1 = new Card();
+        c_vaxVXP1.setId(15);
+        c_vaxVXP1.setBody(false);
+        c_vaxVXP1.setPlayed(false);
+        c_vaxVXP1.setCardVaccine(null);
+        c_vaxVXP1.setCardVirus(null);
+        c_vaxVXP1.setVaccines(new ArrayList<>());
+        c_vaxVXP1.setVirus(new ArrayList<>());
+        c_vaxVXP1.setType(vaxVXP1);
+        Optional<Card> c_vaxVXP1O = Optional.of(c_vaxVXP1);
+
+        Card c_virusVXP2 = new Card();
+        c_virusVXP2.setId(16);
+        c_virusVXP2.setBody(false);
+        c_virusVXP2.setPlayed(false);
+        c_virusVXP2.setCardVaccine(null);
+        c_virusVXP2.setCardVirus(null);
+        c_virusVXP2.setVaccines(new ArrayList<>());
+        c_virusVXP2.setVirus(new ArrayList<>());
+        c_virusVXP2.setType(virusVXP2);
+        Optional<Card> c_virusVXP2O = Optional.of(c_virusVXP2);
+
+        Card c_brainVXP2 = new Card();
+        c_brainVXP2.setId(17);
+        c_brainVXP2.setBody(true);
+        c_brainVXP2.setPlayed(false);
+        c_brainVXP2.setCardVaccine(null);
+        c_brainVXP2.setCardVirus(null);
+        c_brainVXP2.setVaccines(new ArrayList<>());
+        c_brainVXP2.setVirus(List.of(c_virusVXP2));
+        c_brainVXP2.setType(brainVXP2);
+        Optional<Card> c_brainVXP2O = Optional.of(c_brainVXP2);
+        c_virusVXP2.setCardVirus(c_brainVXP2);
+
+        Card c_vaxVXN2 = new Card();
+        c_vaxVXN2.setId(18);
+        c_vaxVXN2.setBody(false);
+        c_vaxVXN2.setPlayed(false);
+        c_vaxVXN2.setCardVaccine(null);
+        c_vaxVXN2.setCardVirus(null);
+        c_vaxVXN2.setVaccines(new ArrayList<>());
+        c_vaxVXN2.setVirus(new ArrayList<>());
+        c_vaxVXN2.setType(vaxVXN2);
+        Optional<Card> c_vaxVXN2O = Optional.of(c_vaxVXN2);
+
+        Card c_vax2VXN2 = new Card();
+        c_vax2VXN2.setId(19);
+        c_vax2VXN2.setBody(false);
+        c_vax2VXN2.setPlayed(false);
+        c_vax2VXN2.setCardVaccine(null);
+        c_vax2VXN2.setCardVirus(null);
+        c_vax2VXN2.setVaccines(new ArrayList<>());
+        c_vax2VXN2.setVirus(new ArrayList<>());
+        c_vax2VXN2.setType(vax2VXN2);
+        Optional<Card> c_vax2VXN2O = Optional.of(c_vax2VXN2);
+
+        Card c_brainVXN2 = new Card();
+        c_brainVXN2.setId(20);
+        c_brainVXN2.setBody(true);
+        c_brainVXN2.setPlayed(false);
+        c_brainVXN2.setCardVaccine(null);
+        c_brainVXN2.setCardVirus(null);
+        c_brainVXN2.setVaccines(List.of(c_vaxVXN2, c_vax2VXN2));
+        c_brainVXN2.setVirus(new ArrayList<>());
+        c_brainVXN2.setType(brainVXN2);
+        Optional<Card> c_brainVXN2O = Optional.of(c_brainVXN2);
+        c_vaxVXN2.setCardVaccine(c_brainVXN2);
+        c_vax2VXN2.setCardVaccine(c_brainVXN2);
+
         Game g = new Game();
         g.setCards(new ArrayList<>());
         g.setClassification(new HashMap<>());
@@ -341,6 +456,14 @@ public class GameControllerTest {
         g2.setRound(0);
         g2.setInitialHour(LocalDateTime.now());
 
+        Game g3 = new Game();
+        g3.setCards(new ArrayList<>());
+        g3.setClassification(new HashMap<>());
+        g3.setIsRunning(true);
+        g3.setId(2);
+        g3.setTurn(0);
+        g3.setRound(0);
+        g3.setInitialHour(LocalDateTime.now());
 
         GamePlayer gp1 = new GamePlayer();
         gp1.setId(0);
@@ -412,11 +535,34 @@ public class GameControllerTest {
         c_vaxVN21.setGamePlayer(gp9);
         c_vaxVN22.setGamePlayer(gp9);
 
+        GamePlayer gp10 = new GamePlayer();
+        gp10.setId(9);
+        gp10.setHost(true);
+        gp10.setCards(List.of(c_brainVXP1, c_vaxVXP1));
+        gp10.setWinner(false);
+        Optional<GamePlayer> gp10_o = Optional.of(gp10);
+
+        GamePlayer gp11 = new GamePlayer();
+        gp11.setId(10);
+        gp11.setHost(true);
+        gp11.setCards(List.of(c_brainVXP2, c_virusVXP2));
+        gp11.setWinner(false);
+        Optional<GamePlayer> gp11_o = Optional.of(gp11);
+
+        GamePlayer gp12 = new GamePlayer();
+        gp12.setId(11);
+        gp12.setHost(true);
+        gp12.setCards(List.of(c_brainVXN2, c_vax2VXN2, c_vaxVXN2));
+        gp12.setWinner(false);
+        Optional<GamePlayer> gp12_o = Optional.of(gp12);
+
         g.setGamePlayer(List.of(gp1,gp2,gp3,gp4));
         g2.setGamePlayer(List.of(gp5,gp6,gp7,gp3,gp8,gp9));
+        g3.setGamePlayer(List.of(gp10,gp1,gp11,gp12));
 
         when(gameServ.findGames(0)).thenReturn(g);
         when(gameServ.findGames(1)).thenReturn(g2);
+        when(gameServ.findGames(2)).thenReturn(g3);
         when(cardService.findCard(0)).thenReturn(c_heart1);
         when(cardService.findCard(1)).thenReturn(c_heart22);
         when(cardService.findCard(4)).thenReturn(c_heartN1);
@@ -431,6 +577,13 @@ public class GameControllerTest {
         when(cardService.findCard(11)).thenReturn(c_vaxVN21O);
         when(cardService.findCard(12)).thenReturn(c_vaxVN22O);
         when(cardService.findCard(13)).thenReturn(c_boneVN2O);
+        when(cardService.findCard(14)).thenReturn(c_brainVXP1O);
+        when(cardService.findCard(15)).thenReturn(c_vaxVXP1O);
+        when(cardService.findCard(16)).thenReturn(c_virusVXP2O);
+        when(cardService.findCard(17)).thenReturn(c_brainVXP2O);
+        when(cardService.findCard(18)).thenReturn(c_vaxVXN2O);
+        when(cardService.findCard(19)).thenReturn(c_vax2VXN2O);
+        when(cardService.findCard(20)).thenReturn(c_brainVXN2O);
         when(gamePlayerServ.findById(0)).thenReturn(gp1_o);
         when(gamePlayerServ.findById(1)).thenReturn(gp2_o);
         when(gamePlayerServ.findById(2)).thenReturn(gp3_o);
@@ -440,6 +593,9 @@ public class GameControllerTest {
         when(gamePlayerServ.findById(6)).thenReturn(gp7_o);
         when(gamePlayerServ.findById(7)).thenReturn(gp8_o);
         when(gamePlayerServ.findById(8)).thenReturn(gp9_o);
+        when(gamePlayerServ.findById(9)).thenReturn(gp10_o);
+        when(gamePlayerServ.findById(10)).thenReturn(gp11_o);
+        when(gamePlayerServ.findById(11)).thenReturn(gp12_o);
         when(cardService.getBodyFromAGamePlayer(0)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(1)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(2)).thenReturn(List.of(c_stomach));
@@ -505,8 +661,6 @@ public class GameControllerTest {
         assertEquals("/games/"+1+"/gamePlayer/"+5+"/decision", gc.playVirus(1, 4, 5, 10));
     }
 
-    
-
     @Test
     public void testPlayVirusNegative1(){
         GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
@@ -519,6 +673,29 @@ public class GameControllerTest {
         assertEquals("/games/"+1+"/gamePlayer/"+4+"/decision", gc.playVirus(1, 4, 5, 13));
     }
 
+    @Test
+    public void testPlayVaccinePositive1(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+2+"/gamePlayer/"+0+"/decision", gc.playVaccine(2, 9, 15, 14));
+    }
+
+    @Test
+    public void testPlayVaccinePositive2(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+2+"/gamePlayer/"+0+"/decision", gc.playVaccine(2, 9, 15, 17));
+    }
+
+    @Test
+    public void testPlayVaccineNegative1(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+2+"/gamePlayer/"+9+"/decision", gc.playVaccine(2, 9, 15, 0));
+    }
+
+    @Test
+    public void testPlayVaccineNegative2(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+2+"/gamePlayer/"+9+"/decision", gc.playVaccine(2, 9, 15, 20));
+    }
 
     /* 
     @WithMockUser

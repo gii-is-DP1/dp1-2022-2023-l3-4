@@ -33,7 +33,6 @@ import lombok.Setter;
 public class GamePlayer extends BaseEntity {
 	private Boolean winner;
 	private Boolean host;
-	private Integer turn;
 
     @OneToOne
     private Player player;

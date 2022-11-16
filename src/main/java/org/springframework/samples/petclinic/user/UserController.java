@@ -41,13 +41,17 @@ public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 
-	private final PlayerService playerService;
+	private UserService userService;
+	private PlayerService playerService;
 	private StatisticsService statisticsService;
+	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(PlayerService playerService, StatisticsService statisticsService) {
+	public UserController(UserService userService, PlayerService playerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
+		this.userService = userService;
 		this.playerService = playerService;
 		this.statisticsService = statisticsService;
+		this.authoritiesService = authoritiesService;
 	}
 
 	@InitBinder
@@ -70,6 +74,8 @@ public class UserController {
 		else {
 			//creating player, user, and authority
 			this.playerService.savePlayer(player);
+			this.userService.saveUser(player.getUser());
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
 			this.statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}

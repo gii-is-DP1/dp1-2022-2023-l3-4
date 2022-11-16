@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,20 +218,44 @@ public class GameController {
 	//Jugar un órgano
 	public String playOrgan(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id){
 		Optional<Card> c = cardService.findCard(c_id);
-		Optional<GamePlayer> gp = gamePlayerService.findById(g_id);
+		Optional<GamePlayer> gp1 = gamePlayerService.findById(gameId);
+		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
+		Set<Card> sc = new HashSet<>();
 		Set<String> cards = new HashSet<>();
-		if(c.isPresent() && gp.isPresent()){
-				cards.addAll(cardService.getBodyFromAGamePlayer(gp.get().getId()).stream().map(x->x.getType().getColour().name()).collect(Collectors.toSet()));
-				cards.add(c.get().getType().getColour().name());
-				if(cards.size()!=gp.get().getCards().size()){
-					gp.get().getCards().add(c.get());
+		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
+				Card organ = c.get();
+				GamePlayer gplayer1 = gp1.get();
+				GamePlayer gplayer2 = gp2.get();
+				if(organ.getType().getType().toString()=="ORGAN"){
+					cards.addAll(cardService.getBodyFromAGamePlayer(gplayer2.getId()).stream().map(x->x.getType().getColour().name()).collect(Collectors.toSet()));
+					cards.add(organ.getType().getColour().name());
+					if(cards.size()!=cardService.getBodyFromAGamePlayer(gplayer2.getId()).size()){
+						sc = gplayer1.getCards().stream().collect(Collectors.toSet());
+						sc.remove(organ);
+						gplayer1.setCards(sc.stream().collect(Collectors.toList()));
+						gamePlayerService.save(gplayer1);
+						organ.setGamePlayer(gplayer2);
+						organ.setBody(true);
+						cardService.save(organ);
+						sc = gplayer2.getCards().stream().collect(Collectors.toSet());
+						sc.add(organ);
+						gplayer2.setCards(sc.stream().collect(Collectors.toList()));
+						gamePlayerService.save(gplayer2);
+						return turn(gameId,gamePlayerId);
+					}else{
+						log.error("No puede poner dos órganos del mismo color en un cuerpo");
+						return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+					}	
 				}else{
-					log.error("No puede poner dos órganos del mismo color en un cuerpo");
-				}		
+					log.error("Esta carta no es un órgano");
+					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+				}
+					
 		}else{
 			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 		}
-		return turn(gameId,gamePlayerId);
+		
 	}	
 
 	//Jugar un virus

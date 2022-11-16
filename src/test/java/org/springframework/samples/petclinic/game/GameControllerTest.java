@@ -1,10 +1,11 @@
 package org.springframework.samples.petclinic.game;
 
+
 import org.junit.Before;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,9 +31,21 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
+
+import org.springframework.samples.petclinic.card.CardService;
+import org.springframework.samples.petclinic.card.GenericCardRepository;
+import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -40,6 +53,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -59,7 +73,6 @@ public class GameControllerTest {
     private GamePlayerService gamePlayerServ;
 
     @MockBean
-    private CardService cardServ;
 
     // @MockBean
     // private GameRepository gameRepo;
@@ -70,6 +83,36 @@ public class GameControllerTest {
     // @MockBean
     // private GamePlayerRepository gamePlayerRepo;
 
+    private GameService gameService;
+
+    @MockBean
+    private GamePlayerService gamePlayerService;
+
+    @MockBean
+    private CardService cardService;
+
+    @MockBean
+    private GenericCardService gCardService;
+
+    @Autowired
+    private GameController gc;
+
+    @MockBean
+    private GameRepository gameRepo;
+
+    @MockBean
+    private GenericCardRepository gCardRepo;
+
+/*
+    Game game;
+    @BeforeEach
+    public void setUp() throws Exception {
+        Game game = new Game();
+        game.setId(70);
+        Optional<Game> theGame = Optional.of(game);
+        when(gameRepo.findById(any(Integer.class))).thenReturn(theGame);
+    }
+*/
     @WithMockUser
     @Test
     public void testGameListing() throws Exception {
@@ -77,6 +120,7 @@ public class GameControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("games/listing"))
             .andExpect(model().attributeExists("games"));
+
     }
 
     @BeforeEach
@@ -232,3 +276,16 @@ public class GameControllerTest {
 
     
 }
+
+    }
+    /* 
+    @WithMockUser
+    @Test
+    public void testReset() throws Exception {
+        gc.reset();
+        assertTrue(gCardRepo.findAll().size()==68);
+    }
+    */
+
+}
+

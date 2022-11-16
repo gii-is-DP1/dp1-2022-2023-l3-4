@@ -19,32 +19,20 @@ public class GameRepositoryTest {
 
     @Test
     @Transactional
-    public void test1(){
-        testFindAll();
-    }
-
-    @Test
-    @Transactional
-    public void test2(){
-        testFindById();
-    }
-
-    @Test
-    @Transactional
-    public void test3(){
-        testSave();
-    }
-    
     public void testFindAll(){
         List<Game> gs = gr.findAll();
         assertNotNull(gs.size()==1, "There should be cards in the database.");
     }
 
+    @Test
+    @Transactional
     public void testFindById(){
         Optional<Game> g = gr.findById(1);
         assertTrue(g.get().getId() == 1, "There should be a Gameplayer with an id of 1.");
     }
 
+    @Test
+    @Transactional
     public void testSave(){
         g75.setId(75);
         gr.save(g75);

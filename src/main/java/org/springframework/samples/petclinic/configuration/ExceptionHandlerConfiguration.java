@@ -1,11 +1,5 @@
 package org.springframework.samples.petclinic.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
-import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ExceptionHandlerConfiguration 
 {
-	@Autowired
-	private BasicErrorController errorController;
     // add any exceptions/validations/binding problems
 
    @ExceptionHandler(Exception.class)

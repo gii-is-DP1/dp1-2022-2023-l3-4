@@ -15,12 +15,16 @@
  */
 package org.springframework.samples.petclinic.card;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerRepository;
+
 import java.util.Optional;
 
 
@@ -36,6 +40,7 @@ import java.util.Optional;
 public class CardService {
 
 	private CardRepository cardRepository;
+	private GamePlayerRepository gamePlayerRepository;
 
 	@Autowired
 	public CardService(CardRepository cardRepository) {
@@ -63,4 +68,13 @@ public class CardService {
 			return cardRepository.save(card);	
 		}
 	
+	@Transactional(readOnly = true)
+	public List<Card> getBodyFromAGamePlayer(Integer gamePlayerId){
+		List<Card> result = new ArrayList<>();
+		Optional<GamePlayer> gp = gamePlayerRepository.findById(gamePlayerId);
+		if(gp.isPresent()){
+			result = gp.get().getCards().stream().filter(x->x.getBody()).collect(Collectors.toList());
+		}
+		return result;
+	}
 }

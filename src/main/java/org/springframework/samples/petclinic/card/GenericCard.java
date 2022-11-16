@@ -57,7 +57,8 @@ public class GenericCard extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private Type type;
 
-	public GenericCard(final Colour colour, final Type type) {
+	public GenericCard(int id, final Colour colour, final Type type) {
+		this.id = id;
 		this.colour = colour;
 		this.type = type;
 	}

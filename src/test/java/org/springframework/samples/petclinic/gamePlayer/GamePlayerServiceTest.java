@@ -19,35 +19,23 @@ public class GamePlayerServiceTest {
     @Autowired
     GamePlayerService gs;
     GamePlayer g75 = new GamePlayer();
-
-    @Test
-    @Transactional
-    public void test1(){
-        testFindAll();
-    }
-
-    @Test
-    @Transactional
-    public void test2(){
-        testFindById();
-    }
-
-    @Test
-    @Transactional
-    public void test3(){
-        testSave();
-    }
     
+    @Test
+    @Transactional
     public void testFindAll(){
         List<GamePlayer> gps = gs.findAll();
         assertNotNull(gps.size()==1, "There should be cards in the database.");
     }
 
+    @Test
+    @Transactional
     public void testFindById(){
         Optional<GamePlayer> gps = gs.findById(1);
         assertTrue(gps.get().getId() == 1, "There should be a Gameplayer with an id of 1.");
     }
 
+    @Test
+    @Transactional
     public void testSave(){
         g75.setId(75);
         gs.save(g75);

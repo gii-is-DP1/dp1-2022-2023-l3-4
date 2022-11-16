@@ -111,32 +111,36 @@ public class GameController {
 		Game currentGame = gameService.findGames(gameId);
 		List<Card> playedcards = currentGame.getCards().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
 		Collections.shuffle(playedcards);
-		currentGame.setCards(playedcards);
+		for(Card c: playedcards){
+			c.setPlayed(false);
+			cardService.save(c);
+		}
+		currentGame.setCards(cardService.findCards());
 		gameService.save(currentGame);
 	}
 	
 	//Barajar
 	public void reparteCartas(@PathVariable("gameId") int gameId) {
 		Game currentGame = gameService.findGames(gameId); 
-		List<Card> baraja = currentGame.getCards();
+		List<Card> baraja = currentGame.getCards().stream().filter(x->!x.getBody() && !x.getPlayed() && x.getGamePlayer()==null).collect(Collectors.toList());
 		if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a shuffle
 			log.info("Rellenando baraja");
 			rellenaBaraja(gameId);
 		}
 		log.info("Repartiendo cartas");
 		for(GamePlayer jugador: currentGame.getGamePlayer()) {
-			List<Card> cartasJugador = jugador.getCards();
+			List<Card> cartasJugador = jugador.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList());
 			while(cartasJugador.size()<3){
 				Card card = baraja.get(0);
 				cartasJugador.add(card); //Se la añadimos al jugador
+				card.setGamePlayer(jugador);
 				baraja.remove(0);	//La quitamos del mazo
+				cardService.save(card);
 			}
 			jugador.setCards(cartasJugador);//Cuando ya tenga 3 cargas se guarda en el jugador
 				gamePlayerService.save(jugador);
-
 			}
-			currentGame.setCards(baraja); //Cuando ya se han repartido a todos los jugadores guardamos el mazo resultante
-			gameService.save(currentGame);	
+
 			log.info("Cartas repartidas correctamente");
 		}
 
@@ -218,7 +222,7 @@ public class GameController {
 	//Jugar un órgano
 	public String playOrgan(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id){
 		Optional<Card> c = cardService.findCard(c_id);
-		Optional<GamePlayer> gp1 = gamePlayerService.findById(gameId);
+		Optional<GamePlayer> gp1 = gamePlayerService.findById(gamePlayerId);
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		Set<Card> sc = new HashSet<>();
 		Set<String> cards = new HashSet<>();

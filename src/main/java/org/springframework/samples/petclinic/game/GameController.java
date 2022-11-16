@@ -15,10 +15,12 @@
  */
 package org.springframework.samples.petclinic.game;
 
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
+import org.springframework.samples.petclinic.card.GenericCardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,14 +51,18 @@ public class GameController {
 	private final GameService gameService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
-	private int cardsInDeck;
+
+	private final GenericCardService gCardService;
 	
 
 	@Autowired
-	public GameController(GameService gameService,GamePlayerService gamePlayerService, CardService cardService) {
+	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
+	CardService cardService, GenericCardService gCardService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
+		this.gCardService=gCardService;
+
 	}
 
 	//Listar juegos
@@ -66,44 +73,66 @@ public class GameController {
 		return "games/listing";
 	}
 
-	GenericCard[] cards = new GenericCard[68];
+	List<GenericCard> cards = new ArrayList<GenericCard>(68);
 	//Generar baraja
 	public void reset() {
 		GenericCard.Colour[] colours = GenericCard.Colour.values();
-		cardsInDeck = 0;
 
-		for(int i = 0; i< colours.length-1; i++) {
+		for(int i = 0; i < 4; i++) {
 			GenericCard.Colour colour = colours[i];
-			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
-			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
-			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
-			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
-			cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(0));
-
+			//ORGANOS
+			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
+			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
+			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
+			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
+			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
+			//VIRUS Y VACUNAS
 			for(int j = 1; j<3; j++) {
-				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
-				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
-				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
-				cards[cardsInDeck++] = new GenericCard(colour, GenericCard.Type.getType(j));
+				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
+				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
+				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
+				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
 			}
 		}
-
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.ORGAN);
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.VIRUS);
-		for(int i = 0; i < 5; i++) {
-			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.VACCINE);
-		}
-		
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.GLOVES);
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.ERROR);
-		
+		//ORGANOS Y VIRUS ARCOIRIS
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.ORGAN));
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.VIRUS));
 		for(int i = 0; i < 4; i++) {
-			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.THIEF);
-			cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.TRANSPLANT);
+			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.VACCINE));
+		}
+		//ESPECIALES(1)
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.GLOVES));
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.ERROR));
+		
+		//ESPECIALES(3)
+		for(int i = 0; i < 3; i++) {
+			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.THIEF));
+			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.TRANSPLANT));
 		}
 		
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION);
-		cards[cardsInDeck++] = new GenericCard(GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION);
+		//ESPECIAL(2)
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION));
+		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION));
+
+		for(GenericCard c : cards) {
+			gCardService.save(c);
+		}
+	}
+
+	public void init(Integer gameId) {
+		Game game = new Game();
+		game.setRound(0);
+		game.setTurn(0);
+		reset();
+		List<Card> deck = new ArrayList<Card>(68);
+		Game currentGame = gameService.findGames(gameId);
+			int i = 0;
+		for(Card c: deck){
+			c.setId(i + gameId*100);
+			c.setType(cards.get(i));
+			i++;
+		}
+		currentGame.setCards(deck);
 	}
 
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas

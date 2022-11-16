@@ -27,14 +27,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
-import org.springframework.samples.petclinic.card.GenericCard;
-import org.springframework.samples.petclinic.card.GenericCardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,16 +49,13 @@ public class GameController {
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
 
-	private final GenericCardService gCardService;
-	
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService, GenericCardService gCardService) {
+	CardService cardService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
-		this.gCardService=gCardService;
 
 	}
 
@@ -73,52 +67,7 @@ public class GameController {
 		return "games/listing";
 	}
 
-	List<GenericCard> cards = new ArrayList<GenericCard>(68);
-	//Generar baraja
-	public void reset() {
-		GenericCard.Colour[] colours = GenericCard.Colour.values();
-
-		for(int i = 0; i < 4; i++) {
-			GenericCard.Colour colour = colours[i];
-			//ORGANOS
-			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
-			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
-			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
-			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
-			cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(0)));
-			//VIRUS Y VACUNAS
-			for(int j = 1; j<3; j++) {
-				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
-				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
-				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
-				cards.add(new GenericCard(cards.size(), colour, GenericCard.Type.getType(j)));
-			}
-		}
-		//ORGANOS Y VIRUS ARCOIRIS
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.ORGAN));
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.VIRUS));
-		for(int i = 0; i < 4; i++) {
-			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.VACCINE));
-		}
-		//ESPECIALES(1)
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.GLOVES));
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.ERROR));
-		
-		//ESPECIALES(3)
-		for(int i = 0; i < 3; i++) {
-			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.THIEF));
-			cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.TRANSPLANT));
-		}
-		
-		//ESPECIAL(2)
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION));
-		cards.add(new GenericCard(cards.size(), GenericCard.Colour.RAINBOW, GenericCard.Type.INFECTION));
-
-		for(GenericCard c : cards) {
-			gCardService.save(c);
-		}
-	}
-
+	/* 
 	public void init(Integer gameId) {
 		Game game = new Game();
 		game.setRound(0);
@@ -134,6 +83,7 @@ public class GameController {
 		}
 		currentGame.setCards(deck);
 	}
+	*/
 
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(@PathVariable("gameId") int gameId){
@@ -247,7 +197,7 @@ public class GameController {
 	//Jugar un órgano
 	public String playOrgan(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id){
 		Optional<Card> c = cardService.findCard(c_id);
-		Optional<GamePlayer> gp1 = gamePlayerService.findById(gameId);
+		Optional<GamePlayer> gp1 = gamePlayerService.findById(gamePlayerId);
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		Set<Card> sc = new HashSet<>();
 		Set<String> cards = new HashSet<>();
@@ -256,7 +206,7 @@ public class GameController {
 				GamePlayer gplayer1 = gp1.get();
 				GamePlayer gplayer2 = gp2.get();
 				if(organ.getType().getType().toString()=="ORGAN"){
-					cards.addAll(cardService.getBodyFromAGamePlayer(gplayer2.getId()).stream().map(x->x.getType().getColour().name()).collect(Collectors.toSet()));
+					cards.addAll(cardService.getBodyFromAGamePlayer(gplayer2.getId()).stream().map(x->x.getType().getColour().toString()).collect(Collectors.toSet()));
 					cards.add(organ.getType().getColour().name());
 					if(cards.size()!=cardService.getBodyFromAGamePlayer(gplayer2.getId()).size()){
 						sc = gplayer1.getCards().stream().collect(Collectors.toSet());
@@ -278,13 +228,11 @@ public class GameController {
 				}else{
 					log.error("Esta carta no es un órgano");
 					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-				}
-					
+				}			
 		}else{
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 		}
-		
 	}	
 
 	//Jugar un virus

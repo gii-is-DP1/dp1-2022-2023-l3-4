@@ -18,6 +18,11 @@ public class GenericCardService {
 		this.gCardRepository = gCardRepository;
 	}
 
+	@Transactional(readOnly = true)
+	public List<GenericCard> listGCards(){
+		return gCardRepository.findAll();
+	}
+
     @Transactional
 	public GenericCard save(GenericCard gcard){
 		return gCardRepository.save(gcard);	

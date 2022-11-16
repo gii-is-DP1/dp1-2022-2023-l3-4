@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,31 +23,22 @@ public class CardRepositoryTest {
     GenericCard c = new GenericCard();
 
     @Test
-    public void test1(){
-        testFindAll();
-    }
-
-    @Test
-    public void test2(){
-        testFindById();
-    }
-
-    @Test
-    public void test3(){
-        testSave();
-    }
-
+    @Transactional
     public void testFindAll(){
         List<Card> cards = cr.findAll();
         assertNotNull(cards, "There should be cards in the database.");
     }
 
+    @Test
+    @Transactional
     public void testFindById(){
         Optional<Card> card = this.cr.findById(1);
         assertTrue(card.isPresent(), "There should be a card with an id of 1.");
         assertTrue(card.get().getId() == 1);
     }
 
+    @Test
+    @Transactional
     public void testSave(){
         c75.setId(75);
         c75.setBody(true);

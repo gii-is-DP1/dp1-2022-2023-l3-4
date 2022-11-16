@@ -17,24 +17,16 @@ import org.springframework.stereotype.Service;
 public class CardServiceTest {
     @Autowired
     CardService cs;
-
-    @Test
-    @Transactional
-    public void test1(){
-        testFindCards();
-    }
-
-    @Test
-    @Transactional
-    public void test2(){
-        testFindPlayed();
-    }
     
+    @Test
+    @Transactional
     public void testFindCards(){
         List<Card> cards = cs.findCards();
         assertNotNull(cards.size()==1, "There should be cards in the database.");
     }
 
+    @Test
+    @Transactional
     public void testFindPlayed(){
         List<Card> cards = cs.findPlayed();
         assertEquals(cards.size(), 0, "There should be x played cards in the database.");

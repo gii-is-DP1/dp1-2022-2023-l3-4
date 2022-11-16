@@ -230,7 +230,7 @@ public class GameControllerTest {
         when(cardService.getBodyFromAGamePlayer(3)).thenReturn(List.of(c_heart3));
     }
 
-    GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+   
 
     //Jugar un órgano corazón sin tener ningún organo
     @Test

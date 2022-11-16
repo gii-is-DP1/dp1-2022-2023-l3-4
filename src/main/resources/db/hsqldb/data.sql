@@ -58,3 +58,8 @@ INSERT INTO games(id,initial_hour,is_running,round,turn) VALUES(1,'2022-11-10 17
 INSERT INTO game_players(id, host, winner, game_id, game_player_id ) VALUES (1,FALSE,FALSE,1,1);
 INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (1,TRUE,FALSE,1,1,1,1);
 INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (2,TRUE,FALSE,2,2,1,2);
+
+-- Rooms
+
+INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,HOST_ID) VALUES(1,True,3,'sala1',0,1);
+INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,HOST_ID) VALUES(2,False,6,'sala2',0,2);

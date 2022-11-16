@@ -3,9 +3,7 @@ package org.springframework.samples.petclinic.configuration;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Converter;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 
 import org.slf4j.Logger;
@@ -15,6 +13,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.lang.Nullable;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +40,7 @@ public final class GenericIdToEntityConverter implements ConditionalGenericConve
         && this.conversionService.canConvert(sourceType, TypeDescriptor.valueOf(Integer.class));
     }
 
-    public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+    public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
         if (source == null || entityManager==null) {
             return null;
         }

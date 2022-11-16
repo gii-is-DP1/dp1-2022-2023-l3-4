@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,31 +21,22 @@ public class GamePlayerRepositoryTest {
     GamePlayer g75 = new GamePlayer();
 
     @Test
-    public void test1(){
-        testFindAll();
-    }
-
-    @Test
-    public void test2(){
-        testFindById();
-    }
-
-    @Test
-    public void test3(){
-        testSave();
-    }
-
+    @Transactional
     public void testFindAll(){
         List<GamePlayer> gps = gr.findAll();
         assertNotNull(gps, "There should be GamePlayers in the database.");
     }
 
+    @Test
+    @Transactional
     public void testFindById(){
         Optional<GamePlayer> gp = this.gr.findById(1);
         assertTrue(gp.isPresent(), "There should be a GamePlayer with an id of 1.");
         assertTrue(gp.get().getId() == 1);
     }
 
+    @Test
+    @Transactional
     public void testSave(){
         g75.setId(75);
         gr.save(g75);

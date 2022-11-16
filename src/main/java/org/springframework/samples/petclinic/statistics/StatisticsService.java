@@ -1,7 +1,5 @@
 package org.springframework.samples.petclinic.statistics;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;

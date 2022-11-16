@@ -15,8 +15,6 @@
  */
 package org.springframework.samples.petclinic.player;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;

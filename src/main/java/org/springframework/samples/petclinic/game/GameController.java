@@ -16,12 +16,6 @@
 package org.springframework.samples.petclinic.game;
 
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -243,7 +237,7 @@ public class GameController {
 			Card c_virus = c1.get();
 			Card c_organ = c2.get();
 			if(c_organ.getType().getType().name()=="ORGAN" && 
-			(c_virus.getType().getColour()==c_organ.getType().getColour() || c_organ.getType().getColour().name()=="RAINBOW")){
+			(c_virus.getType().getColour()==c_organ.getType().getColour() || c_organ.getType().getColour().name()=="RAINBOW" || c_virus.getType().getColour().name()=="RAINBOW")){
 				
 				if(c_organ.getVaccines().size()==0){
 					if(c_organ.getVirus().size()==0){
@@ -253,7 +247,7 @@ public class GameController {
 
 					}else{
 						Card virus1 = c_organ.getVirus().get(0);
-						c_organ.getVirus().clear();
+						c_organ.setVirus(new ArrayList<>());
 						virus1.setBody(false);
 						virus1.setPlayed(true);
 						virus1.setCardVirus(null);
@@ -270,7 +264,7 @@ public class GameController {
 					vaccine.setPlayed(true);
 					vaccine.setCardVaccine(null);
 					c_virus.setPlayed(true);
-					c_organ.getVaccines().clear();
+					c_organ.setVaccines(new ArrayList<>());
 					cardService.save(c_virus);
 					cardService.save(c_organ);
 					cardService.save(vaccine);

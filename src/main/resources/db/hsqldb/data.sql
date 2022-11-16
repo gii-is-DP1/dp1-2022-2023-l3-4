@@ -5,6 +5,8 @@ INSERT INTO authorities(id,username,authority) VALUES (1,'admin1','admin');
 INSERT INTO users(username,password,enabled) VALUES ('owner1','0wn3r',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('josgarber6','276591',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('frabenrui1','z3bas',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('lucperrom','laquesea',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('juaanjimdel','laquesea2',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
 INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
 INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');
@@ -44,6 +46,8 @@ INSERT INTO achievements(id,name,threshold,description,badge_image,achievement_t
 
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (1,'Francisco Sebastian','Benitez Ruis Diaz','frabenrui1','Me encanta este juego',TRUE);
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (2,'Jose Maria','Garcia Berdejo','josgarber6','Lets gooo',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE);
 
 -- PlayerAchievements
 

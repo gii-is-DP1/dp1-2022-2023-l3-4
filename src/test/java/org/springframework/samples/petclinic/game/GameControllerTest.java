@@ -109,10 +109,10 @@ public class GameControllerTest {
         heart2.setColour(Colour.RED);
         heart2.setType(Type.ORGAN);
 
-        GenericCard heart3 = new GenericCard();
-        heart3.setId(4);
-        heart3.setColour(Colour.RED);
-        heart3.setType(Type.ORGAN);
+        GenericCard heart_N1 = new GenericCard();
+        heart_N1.setId(4);
+        heart_N1.setColour(Colour.RED);
+        heart_N1.setType(Type.ORGAN);
 
         GenericCard stomach = new GenericCard();
         stomach.setId(2);
@@ -152,16 +152,16 @@ public class GameControllerTest {
         c_heart3.setType(heart2);
         Optional<Card> c_heart33 = Optional.of(c_heart3);
 
-        Card c_heart4 = new Card();
-        c_heart2.setId(4);
-        c_heart2.setBody(false);
-        c_heart2.setPlayed(false);
-        c_heart2.setCardVaccine(null);
-        c_heart2.setCardVirus(null);
-        c_heart2.setVaccines(new ArrayList<>());
-        c_heart2.setVirus(new ArrayList<>());
-        c_heart2.setType(heart3);
-        Optional<Card> c_heart44 = Optional.of(c_heart4);
+        Card c_heart_N1 = new Card();
+        c_heart_N1.setId(4);
+        c_heart_N1.setBody(false);
+        c_heart_N1.setPlayed(false);
+        c_heart_N1.setCardVaccine(null);
+        c_heart_N1.setCardVirus(null);
+        c_heart_N1.setVaccines(new ArrayList<>());
+        c_heart_N1.setVirus(new ArrayList<>());
+        c_heart_N1.setType(heart_N1);
+        Optional<Card> c_heartN1 = Optional.of(c_heart_N1);
 
         
         Card c_stomach = new Card();
@@ -208,23 +208,23 @@ public class GameControllerTest {
         GamePlayer gp4 = new GamePlayer();
         gp4.setId(3);
         gp4.setHost(true);
-        gp4.setCards(List.of(c_heart3, c_heart4));
+        gp4.setCards(List.of(c_heart3, c_heart_N1));
         gp4.setWinner(false);
         Optional<GamePlayer> gp4_o = Optional.of(gp4);
 
-        g.setGamePlayer(List.of(gp1,gp2,gp3));
+        g.setGamePlayer(List.of(gp1,gp2,gp3,gp4));
 
         when(gameServ.findGames(0)).thenReturn(g);
         when(cardService.findCard(0)).thenReturn(c_heart1);
         when(cardService.findCard(1)).thenReturn(c_heart22);
-        when(cardService.findCard(1)).thenReturn(c_heart44);
+        when(cardService.findCard(4)).thenReturn(c_heartN1);
         when(cardService.findCard(2)).thenReturn(c_stomach1);
         when(cardService.findCard(3)).thenReturn(c_heart33);
         when(gamePlayerServ.findById(0)).thenReturn(gp1_o);
         when(gamePlayerServ.findById(1)).thenReturn(gp2_o);
         when(gamePlayerServ.findById(2)).thenReturn(gp3_o);
         when(gamePlayerServ.findById(3)).thenReturn(gp4_o);
-        when(cardService.getBodyFromAGamePlayer(0)).thenReturn(List.of(c_heart));
+        when(cardService.getBodyFromAGamePlayer(0)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(1)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(2)).thenReturn(List.of(c_stomach));
         when(cardService.getBodyFromAGamePlayer(3)).thenReturn(List.of(c_heart3));
@@ -241,7 +241,7 @@ public class GameControllerTest {
     }
 
 
-    //Jugar un órgano corazón teniendo un cerebro
+    //Jugar un órgano corazón teniendo un estómago
     @Test
     public void testPlayOrganPositive2() {
         GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
@@ -280,4 +280,3 @@ public class GameControllerTest {
     */
 
 }
-

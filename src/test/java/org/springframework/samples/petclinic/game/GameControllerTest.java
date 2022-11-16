@@ -1,8 +1,5 @@
 package org.springframework.samples.petclinic.game;
 
-
-import org.junit.Before;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,39 +8,20 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.petclinic.card.Card;
-import org.springframework.samples.petclinic.card.CardRepository;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.gamePlayer.GamePlayerRepository;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-
-import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCardRepository;
 import org.springframework.samples.petclinic.card.GenericCardService;
-import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
-import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,8 +50,6 @@ public class GameControllerTest {
     @MockBean
     private GamePlayerService gamePlayerServ;
 
-    @MockBean
-
     // @MockBean
     // private GameRepository gameRepo;
     
@@ -83,19 +59,11 @@ public class GameControllerTest {
     // @MockBean
     // private GamePlayerRepository gamePlayerRepo;
 
-    private GameService gameService;
-
-    @MockBean
-    private GamePlayerService gamePlayerService;
-
     @MockBean
     private CardService cardService;
 
     @MockBean
     private GenericCardService gCardService;
-
-    @Autowired
-    private GameController gc;
 
     @MockBean
     private GameRepository gameRepo;
@@ -113,6 +81,7 @@ public class GameControllerTest {
         when(gameRepo.findById(any(Integer.class))).thenReturn(theGame);
     }
 */
+
     @WithMockUser
     @Test
     public void testGameListing() throws Exception {
@@ -130,10 +99,20 @@ public class GameControllerTest {
         heart.setColour(Colour.RED);
         heart.setType(Type.ORGAN);
 
+        GenericCard heart1 = new GenericCard();
+        heart1.setId(1);
+        heart1.setColour(Colour.RED);
+        heart1.setType(Type.ORGAN);
+
         GenericCard heart2 = new GenericCard();
-        heart2.setId(1);
+        heart2.setId(3);
         heart2.setColour(Colour.RED);
         heart2.setType(Type.ORGAN);
+
+        GenericCard heart3 = new GenericCard();
+        heart3.setId(4);
+        heart3.setColour(Colour.RED);
+        heart3.setType(Type.ORGAN);
 
         GenericCard stomach = new GenericCard();
         stomach.setId(2);
@@ -168,14 +147,15 @@ public class GameControllerTest {
 
         Card c_heart2 = new Card();
         c_heart2.setId(1);
-        c_heart2.setBody(true);
+        c_heart2.setBody(false);
         c_heart2.setPlayed(false);
         c_heart2.setCardVaccine(null);
         c_heart2.setCardVirus(null);
         c_heart2.setVaccines(new ArrayList<>());
         c_heart2.setVirus(new ArrayList<>());
-        c_heart2.setType(heart2);
-        Optional<Card> c_heart2o = Optional.of(c_heart2);
+        c_heart2.setType(heart1);
+        Optional<Card> c_heart22 = Optional.of(c_heart2);
+
 
         Card c_heart3 = new Card();
         c_heart3.setId(3);
@@ -185,9 +165,19 @@ public class GameControllerTest {
         c_heart3.setCardVirus(null);
         c_heart3.setVaccines(new ArrayList<>());
         c_heart3.setVirus(new ArrayList<>());
-        c_heart3.setType(heart3);
-        Optional<Card> c_heart3o = Optional.of(c_heart3);
+        c_heart3.setType(heart2);
+        Optional<Card> c_heart33 = Optional.of(c_heart3);
 
+        Card c_heart4 = new Card();
+        c_heart2.setId(4);
+        c_heart2.setBody(false);
+        c_heart2.setPlayed(false);
+        c_heart2.setCardVaccine(null);
+        c_heart2.setCardVirus(null);
+        c_heart2.setVaccines(new ArrayList<>());
+        c_heart2.setVirus(new ArrayList<>());
+        c_heart2.setType(heart3);
+        Optional<Card> c_heart44 = Optional.of(c_heart4);
         
         Card c_heart4 = new Card();
         c_heart3.setId(3);
@@ -209,6 +199,7 @@ public class GameControllerTest {
         c_stomach.setVaccines(new ArrayList<>());
         c_stomach.setVirus(new ArrayList<>());
         c_stomach.setType(stomach);
+
         Optional<Card> c_stomacho = Optional.of(c_stomach);
 
         Card c_stomach2 = new Card();
@@ -221,6 +212,9 @@ public class GameControllerTest {
         c_stomach.setVirus(new ArrayList<>());
         c_stomach.setType(stomach2);
 
+        Optional<Card> c_stomach1 = Optional.of(c_stomach);
+
+
         Game g = new Game();
         g.setCards(new ArrayList<>());
         g.setClassification(new HashMap<>());
@@ -229,7 +223,6 @@ public class GameControllerTest {
         g.setTurn(0);
         g.setRound(0);
         g.setInitialHour(LocalDateTime.now());
-
 
         GamePlayer gp1 = new GamePlayer();
         gp1.setId(0);
@@ -245,39 +238,79 @@ public class GameControllerTest {
         gp2.setWinner(false);
         Optional<GamePlayer> gp2_o = Optional.of(gp2);
 
-        g.setGamePlayer(List.of(gp1,gp2));
+        GamePlayer gp3 = new GamePlayer();
+        gp3.setId(2);
+        gp3.setHost(true);
+        gp3.setCards(List.of(c_heart2, c_stomach));
+        gp3.setWinner(false);
+        Optional<GamePlayer> gp3_o = Optional.of(gp3);
+
+        GamePlayer gp4 = new GamePlayer();
+        gp4.setId(3);
+        gp4.setHost(true);
+        gp4.setCards(List.of(c_heart3, c_heart4));
+        gp4.setWinner(false);
+        Optional<GamePlayer> gp4_o = Optional.of(gp4);
+
+        g.setGamePlayer(List.of(gp1,gp2,gp3));
 
         when(gameServ.findGames(0)).thenReturn(g);
-        when(cardServ.findCard(0)).thenReturn(c_heart1);
-        when(cardServ.findCard(1)).thenReturn(c_heart1);
-        when(cardServ.findCard(2)).thenReturn(c_heart1);
-        when(cardServ.findCard(3)).thenReturn(c_heart1);
-        when(cardServ.findCard(4)).thenReturn(c_heart1);
+        when(cardService.findCard(0)).thenReturn(c_heart1);
+        when(cardService.findCard(1)).thenReturn(c_heart22);
+        when(cardService.findCard(1)).thenReturn(c_heart44);
+        when(cardService.findCard(2)).thenReturn(c_stomach1);
+        when(cardService.findCard(3)).thenReturn(c_heart33);
         when(gamePlayerServ.findById(0)).thenReturn(gp1_o);
         when(gamePlayerServ.findById(1)).thenReturn(gp2_o);
+        when(gamePlayerServ.findById(2)).thenReturn(gp3_o);
+        when(gamePlayerServ.findById(3)).thenReturn(gp4_o);
+        when(cardService.getBodyFromAGamePlayer(0)).thenReturn(List.of(c_heart));
+        when(cardService.getBodyFromAGamePlayer(1)).thenReturn(new ArrayList<>());
+        when(cardService.getBodyFromAGamePlayer(2)).thenReturn(List.of(c_stomach));
+        when(cardService.getBodyFromAGamePlayer(3)).thenReturn(List.of(c_heart3));
 
     }
 
-   
+    GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
 
+    //Jugar un órgano corazón sin tener ningún organo
     @Test
-    public void testTurn(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardServ);
-        assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.turn(0, 0));
-    }
-
-    @Test
-    public void testPlayOrgan() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardServ);
+    public void testPlayOrganPositive1() {
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
         assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 0, 0, 0));
 
     }
 
 
-    
-}
-
+    //Jugar un órgano corazón teniendo un cerebro
+    @Test
+    public void testPlayOrganPositive2() {
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 2, 2, 1));
     }
+
+    //Jugar un órgano corazón a otro jugador
+    @Test
+    public void testPlayOrganPositive3() {
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 0, 1, 0));
+    }
+
+    //Jugar un órgano corazón teniendo un corazón en el cuerpo
+    @Test
+    public void testPlayOrganNegativo1() {
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+0+"/gamePlayer/"+3+"/decision", gc.playOrgan(0, 3, 3, 4));
+    }
+
+    //Jugar un órgano corazón a otro que ya tiene un corazón en el cuerpo
+    @Test
+    public void testPlayOrganNegativo2() {
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+0+"/gamePlayer/"+0+"/decision", gc.playOrgan(0, 0, 3, 0));
+    }
+
+
     /* 
     @WithMockUser
     @Test

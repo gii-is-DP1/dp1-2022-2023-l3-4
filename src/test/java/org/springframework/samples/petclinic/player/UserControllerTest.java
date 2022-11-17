@@ -16,7 +16,6 @@ import org.springframework.samples.petclinic.configuration.SecurityConfiguration
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.user.AuthoritiesService;
 import org.springframework.samples.petclinic.user.UserController;
-import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -38,9 +37,6 @@ public class UserControllerTest{
 
     @MockBean
     private AuthoritiesService authoritiesService;
-
-    @MockBean
-    private UserService userService;
 
     @BeforeEach
     void setUp() {

@@ -2,7 +2,6 @@ package org.springframework.samples.petclinic.statistics;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.Player;
-import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ public class StatisticsService {
     return statisticsRepository.findByPlayer(player);
   }
 
-  @Transactional
   public void save(Statistics s) throws WonPlayedGamesException {
     if (s.getNumWonGames() > s.getNumPlayedGames()) {
       throw new WonPlayedGamesException();
@@ -31,14 +29,13 @@ public class StatisticsService {
   }
 
   @Transactional
-  public void saveStatisticsForNewPlayer(Player player, Statistics s) throws PlayerNotFoundException {
-    if (player != null){
-      s.setPlayer(player);
-      statisticsRepository.save(s);
-    } else {
-      throw new PlayerNotFoundException();
-    }
+  public void saveStatisticsForNewPlayer(Player player) {
+    Statistics playerStatistics = new Statistics();
+    playerStatistics.setPlayer(player);
+    playerStatistics.setNumPlayedGames(0);
+    playerStatistics.setNumWonGames(null);
 
+    statisticsRepository.save(playerStatistics);
   }
 
   @Transactional

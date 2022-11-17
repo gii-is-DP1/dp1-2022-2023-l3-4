@@ -21,10 +21,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.player.Player;
-import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -69,19 +67,16 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/users/new")
-	public String processCreationForm(@Valid Player player, BindingResult result) throws PlayerNotFoundException {
+	public String processCreationForm(@Valid Player player, BindingResult result) {
 		if (result.hasErrors()) {
 			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
 			//creating player, user, and authority
 			this.playerService.savePlayer(player);
-			Statistics s = new Statistics();
-			try {
-				this.statisticsService.saveStatisticsForNewPlayer(player, s);
-			} catch (PlayerNotFoundException e) {
-				throw new PlayerNotFoundException();
-			}
+			this.userService.saveUser(player.getUser());
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+			this.statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}
 	}

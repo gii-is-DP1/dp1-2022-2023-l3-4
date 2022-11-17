@@ -33,7 +33,7 @@ public class CardRepositoryTest {
     @Transactional
     public void testFindById(){
         Optional<Card> card = this.cr.findById(1);
-        assertNotNull(card, "There should be a card with an id of 1.");
+        assertTrue(card.isPresent(), "There should be a card with an id of 1.");
         assertTrue(card.get().getId() == 1);
     }
 

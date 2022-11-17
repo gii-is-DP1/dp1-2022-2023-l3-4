@@ -199,6 +199,11 @@ public class GameControllerTest {
         brainVXN2.setColour(Colour.BLUE);
         brainVXN2.setType(Type.ORGAN);
 
+        GenericCard transplant = new GenericCard();
+        transplant.setId(21);
+        transplant.setColour(Colour.RAINBOW);
+        transplant.setType(Type.TRANSPLANT);
+
         Card c_heart = new Card();
         c_heart.setId(0);
         c_heart.setBody(false);
@@ -437,6 +442,18 @@ public class GameControllerTest {
         Optional<Card> c_brainVXN2O = Optional.of(c_brainVXN2);
         c_vaxVXN2.setCardVaccine(c_brainVXN2);
         c_vax2VXN2.setCardVaccine(c_brainVXN2);
+ 
+        Card c_transplant = new Card();
+        c_transplant.setId(21);
+        c_transplant.setBody(false);
+        c_transplant.setPlayed(false);
+        c_transplant.setCardVaccine(null);
+        c_transplant.setCardVirus(null);
+        c_transplant.setVaccines(new ArrayList<>());
+        c_transplant.setVirus(new ArrayList<>());
+        c_transplant.setType(transplant);
+        Optional<Card> c_transplantO = Optional.of(c_transplant);
+  
 
         Game g = new Game();
         g.setCards(new ArrayList<>());
@@ -465,6 +482,16 @@ public class GameControllerTest {
         g3.setRound(0);
         g3.setInitialHour(LocalDateTime.now());
 
+        Game g4 = new Game();
+        g4.setCards(new ArrayList<>());
+        g4.setClassification(new HashMap<>());
+        g4.setIsRunning(true);
+        g4.setId(3);
+        g4.setTurn(0);
+        g4.setRound(0);
+        g4.setInitialHour(LocalDateTime.now());
+
+
         GamePlayer gp1 = new GamePlayer();
         gp1.setId(0);
         gp1.setHost(true);
@@ -492,6 +519,7 @@ public class GameControllerTest {
         gp4.setCards(List.of(c_heart3, c_heart_N1));
         gp4.setWinner(false);
         Optional<GamePlayer> gp4_o = Optional.of(gp4);
+        c_heart3.setGamePlayer(gp4);
 
         GamePlayer gp5 = new GamePlayer();
         gp5.setId(4);
@@ -548,6 +576,7 @@ public class GameControllerTest {
         gp11.setCards(List.of(c_brainVXP2, c_virusVXP2));
         gp11.setWinner(false);
         Optional<GamePlayer> gp11_o = Optional.of(gp11);
+        c_brainVXP2.setGamePlayer(gp11);
 
         GamePlayer gp12 = new GamePlayer();
         gp12.setId(11);
@@ -556,13 +585,23 @@ public class GameControllerTest {
         gp12.setWinner(false);
         Optional<GamePlayer> gp12_o = Optional.of(gp12);
 
+        GamePlayer gp13 = new GamePlayer();
+        gp13.setId(12);
+        gp13.setHost(true);
+        gp13.setCards(List.of(c_transplant));
+        gp13.setWinner(false);
+        Optional<GamePlayer> gp13_o = Optional.of(gp13);
+        c_transplant.setGamePlayer(gp13);
+ 
         g.setGamePlayer(List.of(gp1,gp2,gp3,gp4));
         g2.setGamePlayer(List.of(gp5,gp6,gp7,gp3,gp8,gp9));
-        g3.setGamePlayer(List.of(gp10,gp1,gp11,gp12));
+        g3.setGamePlayer(List.of(gp10,gp1,gp11,gp12,gp13,gp4));
+        g4.setGamePlayer(List.of(gp13,gp4,gp11, gp12));
 
         when(gameServ.findGames(0)).thenReturn(g);
         when(gameServ.findGames(1)).thenReturn(g2);
         when(gameServ.findGames(2)).thenReturn(g3);
+        when(gameServ.findGames(3)).thenReturn(g4);
         when(cardService.findCard(0)).thenReturn(c_heart1);
         when(cardService.findCard(1)).thenReturn(c_heart22);
         when(cardService.findCard(4)).thenReturn(c_heartN1);
@@ -584,6 +623,7 @@ public class GameControllerTest {
         when(cardService.findCard(18)).thenReturn(c_vaxVXN2O);
         when(cardService.findCard(19)).thenReturn(c_vax2VXN2O);
         when(cardService.findCard(20)).thenReturn(c_brainVXN2O);
+        when(cardService.findCard(21)).thenReturn(c_transplantO);
         when(gamePlayerServ.findById(0)).thenReturn(gp1_o);
         when(gamePlayerServ.findById(1)).thenReturn(gp2_o);
         when(gamePlayerServ.findById(2)).thenReturn(gp3_o);
@@ -596,6 +636,7 @@ public class GameControllerTest {
         when(gamePlayerServ.findById(9)).thenReturn(gp10_o);
         when(gamePlayerServ.findById(10)).thenReturn(gp11_o);
         when(gamePlayerServ.findById(11)).thenReturn(gp12_o);
+        when(gamePlayerServ.findById(12)).thenReturn(gp13_o);
         when(cardService.getBodyFromAGamePlayer(0)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(1)).thenReturn(new ArrayList<>());
         when(cardService.getBodyFromAGamePlayer(2)).thenReturn(List.of(c_stomach));
@@ -695,6 +736,18 @@ public class GameControllerTest {
     public void testPlayVaccineNegative2(){
         GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
         assertEquals("/games/"+2+"/gamePlayer/"+9+"/decision", gc.playVaccine(2, 9, 15, 20));
+    }
+
+    @Test
+    public void testPlayTransplantPositive1(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+3+"/gamePlayer/"+3+"/decision", gc.playTransplant(3, 12, 3, 17));
+    }
+
+    @Test
+    public void testPlayTransplantNegative(){
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        assertEquals("/games/"+3+"/gamePlayer/"+12+"/decision", gc.playTransplant(3, 12, 3, 20));
     }
 
     /* 

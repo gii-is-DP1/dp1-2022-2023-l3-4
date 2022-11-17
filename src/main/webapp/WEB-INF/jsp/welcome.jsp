@@ -20,19 +20,4 @@
       <img class="img-responsive" src="${logoUS}"/>
     </div>
   </div>
-  <tr>
-    <td>
-        <a href="<spring:url value="/room/new" htmlEscape="true" />">New room</a>
-    </td>
-    <br>
-    <td>
-      <a href="<spring:url value="/room/createSearch" htmlEscape="true" />">Searc room </a>
-  </td>          
-  <br>
-  <td>
-    <a href="<spring:url value="/room/find" htmlEscape="true" />">Rooms listing </a>
-</td>
-
-
-</tr>
 </petclinic:layout>

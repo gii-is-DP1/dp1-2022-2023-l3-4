@@ -16,12 +16,6 @@
 package org.springframework.samples.petclinic.game;
 
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -247,7 +241,7 @@ public class GameController {
 			Card c_virus = c1.get();
 			Card c_organ = c2.get();
 			if(c_organ.getType().getType().name()=="ORGAN" && 
-			(c_virus.getType().getColour()==c_organ.getType().getColour() || c_organ.getType().getColour().name()=="RAINBOW")){
+			(c_virus.getType().getColour()==c_organ.getType().getColour() || c_organ.getType().getColour().name()=="RAINBOW" || c_virus.getType().getColour().name()=="RAINBOW")){
 				
 				if(c_organ.getVaccines().size()==0){
 					if(c_organ.getVirus().size()==0){
@@ -257,7 +251,7 @@ public class GameController {
 
 					}else{
 						Card virus1 = c_organ.getVirus().get(0);
-						c_organ.getVirus().clear();
+						c_organ.setVirus(new ArrayList<>());
 						virus1.setBody(false);
 						virus1.setPlayed(true);
 						virus1.setCardVirus(null);
@@ -274,7 +268,7 @@ public class GameController {
 					vaccine.setPlayed(true);
 					vaccine.setCardVaccine(null);
 					c_virus.setPlayed(true);
-					c_organ.getVaccines().clear();
+					c_organ.setVaccines(new ArrayList<>());
 					cardService.save(c_virus);
 					cardService.save(c_organ);
 					cardService.save(vaccine);
@@ -325,7 +319,7 @@ public class GameController {
 					virus.setPlayed(true);
 					virus.setCardVirus(null);
 					c_vaccine.setPlayed(true);
-					c_organ.getVirus().clear();
+					c_organ.setVirus(new ArrayList<>());;
 					cardService.save(c_vaccine);
 					cardService.save(c_organ);
 					cardService.save(virus);
@@ -333,7 +327,7 @@ public class GameController {
 
 				}
 				}else{
-					log.error("No puedes vacunar un ógano que no sea ni arcoirís ni de tu color");
+					log.error("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");
 					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 				}
 			
@@ -344,18 +338,48 @@ public class GameController {
 		
 	}
 
-	//Jugar transplante
+	//Jugar transplante (Añadir restricción de no quedarse con dos órganos iguales en el cuerpo)
 	public String playTransplant(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
+		Set<Card> sc = new HashSet<>();
+		Set<Card> sc1 = new HashSet<>();
 		if(c1.isPresent() && c2.isPresent()){
 			Card c_organ1 = c1.get();
 			Card c_organ2 = c2.get();
 			if(c_organ1.getVaccines().size()<2 && c_organ2.getVaccines().size()<2){
 				GamePlayer g1 = c_organ1.getGamePlayer();
 				GamePlayer g2 = c_organ2.getGamePlayer();
-				g1.getCards().remove(c_organ1);
-				g2.getCards().remove(c_organ2);
+				sc= g1.getCards().stream().collect(Collectors.toSet());
+				sc.remove(c_organ1);
+				if(c_organ1.getVaccines().size()==1){
+					sc.remove(c_organ1.getVaccines().get(0));
+					sc1= g2.getCards().stream().collect(Collectors.toSet());
+					sc1.add(c_organ1.getVaccines().get(0));
+					g2.setCards(sc1.stream().collect(Collectors.toList()));
+				}
+				else if(c_organ1.getVirus().size()==1){
+					sc.remove(c_organ1.getVirus().get(0));
+					sc1= g2.getCards().stream().collect(Collectors.toSet());
+					sc1.add(c_organ1.getVirus().get(0));
+					g2.setCards(sc1.stream().collect(Collectors.toList()));
+				}
+				g1.setCards(sc.stream().collect(Collectors.toList()));
+				sc= g2.getCards().stream().collect(Collectors.toSet());
+				sc.remove(c_organ2);
+				if(c_organ2.getVaccines().size()==1){
+					sc.remove(c_organ2.getVaccines().get(0));
+					sc1= g1.getCards().stream().collect(Collectors.toSet());
+					sc1.add(c_organ2.getVaccines().get(0));
+					g1.setCards(sc1.stream().collect(Collectors.toList()));
+				}
+				else if(c_organ2.getVirus().size()==1){
+					sc.remove(c_organ2.getVirus().get(0));
+					sc1= g1.getCards().stream().collect(Collectors.toSet());
+					sc1.add(c_organ2.getVirus().get(0));
+					g1.setCards(sc1.stream().collect(Collectors.toList()));
+				}
+				g2.setCards(sc.stream().collect(Collectors.toList()));
 				g1.getCards().add(c_organ2);
 				g2.getCards().add(c_organ1);
 				c_organ1.setGamePlayer(g2);

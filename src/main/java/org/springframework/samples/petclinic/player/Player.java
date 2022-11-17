@@ -24,11 +24,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.samples.petclinic.achievements.Achievement;
 import org.springframework.samples.petclinic.model.Person;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.user.User;
 
 import lombok.Getter;
@@ -55,4 +57,11 @@ public class Player extends Person {
 	@JoinTable(name = "player_achievements", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "achievement_id"))
 	private Set<Achievement> achievements;
 	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="room_id",referencedColumnName = "id")
+	private Room room;
+	
+	public void addRoom(Room room) {
+		this.room=room;
+    }
 }

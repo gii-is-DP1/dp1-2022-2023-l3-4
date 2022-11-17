@@ -6,6 +6,7 @@
 
 <petclinic:layout pageName="vets">
     <h2>Veterinarians</h2>
+    
 
     <table id="vetsTable" class="table table-striped">
         <thead>

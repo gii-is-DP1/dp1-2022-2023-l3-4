@@ -31,10 +31,15 @@ public class StatisticsService {
   }
 
   @Transactional
-  public void saveStatisticsForNewPlayer(Player player, Statistics s) throws PlayerNotFoundException {
+  public void saveStatisticsForNewPlayer(Player player) throws PlayerNotFoundException {
+
+    Statistics statistics = new Statistics();
+    statistics.setNumPlayedGames(0);
+    statistics.setNumWonGames(0);
+    statistics.setPoints(0);
     if (player != null){
-      s.setPlayer(player);
-      statisticsRepository.save(s);
+      statistics.setPlayer(player);
+      statisticsRepository.save(statistics);
     } else {
       throw new PlayerNotFoundException();
     }

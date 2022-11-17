@@ -76,12 +76,9 @@ public class UserController {
 		else {
 			//creating player, user, and authority
 			this.playerService.savePlayer(player);
-			Statistics s = new Statistics();
-			try {
-				this.statisticsService.saveStatisticsForNewPlayer(player, s);
-			} catch (PlayerNotFoundException e) {
-				throw new PlayerNotFoundException();
-			}
+			this.userService.saveUser(player.getUser());
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+			statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}
 	}

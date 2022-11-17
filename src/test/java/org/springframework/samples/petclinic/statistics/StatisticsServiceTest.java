@@ -56,11 +56,10 @@ public class StatisticsServiceTest {
   
   @Test
   public void testSaveUnsuccessfulStatisticsPlayerNull() {
-    Statistics statistics = createStatistics(40, 5, 2, 30, null);
     Player player = null;
     StatisticsService statisticsService = new StatisticsService(statisticsRepository);
     
-    assertThrows(PlayerNotFoundException.class, () -> {statisticsService.saveStatisticsForNewPlayer(player, statistics);});
+    assertThrows(PlayerNotFoundException.class, () -> {statisticsService.saveStatisticsForNewPlayer(player);});
 
   }
   @Test

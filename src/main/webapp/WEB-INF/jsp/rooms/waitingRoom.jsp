@@ -35,6 +35,19 @@
               </td>
             </tr>
         </c:forEach>
+            <tr> 
+              <td>
+                <c:choose>
+                  <c:when test="${host}">
+                    <button class="btn btn-default" type="submit">Delete Room</button>
+                  </c:when>
+                    <c:otherwise>
+                        
+                    </c:otherwise>
+                </c:choose>
+                
+              </td>
+            </tr>
         </tbody>
       </table>
 

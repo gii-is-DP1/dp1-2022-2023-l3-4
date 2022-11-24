@@ -39,7 +39,11 @@
               <td>
                 <c:choose>
                   <c:when test="${host}">
-                    <button class="btn btn-default" type="submit">Delete Room</button>
+                    <a href='<spring:url value="/room/delete/${room.id}" htmlEscape="true"/>'>
+                                <button>
+                                    Delete Room
+                                </button>
+                    </a>
                   </c:when>
                     <c:otherwise>
                         

@@ -135,7 +135,7 @@ public class RoomController {
 			player.setRoom(null);
 			playerService.savePlayer(player);
 			roomService.deleteRoom(roomId);
-			return "room/roomsList";
+			return "redirect:/room/find";
 		} else {
 			return "redirect:/room/" + roomId;
 		}

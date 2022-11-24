@@ -5,9 +5,11 @@ import java.util.Collection;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
+import org.springframework.samples.petclinic.room.exceptions.PlayerHostsExistingRoomException;
 import org.springframework.stereotype.Controller;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
@@ -69,8 +71,13 @@ public class RoomController {
 						this.roomService.saveRoom(room);
                     	player.setRoom(room);
 						playerService.savePlayer(player);
-                    }catch(DuplicatedNameRoomException ex){
-                        result.rejectValue("roomName", "duplicate", "already exists");
+                    }catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
+                        if(ex.getClass().equals(DuplicatedNameRoomException.class)){
+							result.rejectValue("roomName", "duplicate", "already exists");
+						} else {
+							model.put("message", "You are already host of another room.");
+							model.put("messageType", "warning");
+						}
                         return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
                     }
                     return "redirect:/room/" + room.getId();

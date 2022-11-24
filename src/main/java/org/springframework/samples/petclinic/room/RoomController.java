@@ -62,25 +62,22 @@ public class RoomController {
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 		}
 		else {
-                    try{
-						if(room.isPrivate==null){
-							room.setIsPrivate(false);
-						}
-						room.setTotalGamesPlayer(0);
-						room.setHost(player);
-						this.roomService.saveRoom(room);
-                    	player.setRoom(room);
-						playerService.savePlayer(player);
-                    }catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
-                        if(ex.getClass().equals(DuplicatedNameRoomException.class)){
-							result.rejectValue("roomName", "duplicate", "already exists");
-						} else {
-							model.put("message", "You are already host of another room.");
-							model.put("messageType", "warning");
-						}
-                        return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
-                    }
-                    return "redirect:/room/" + room.getId();
+				try{
+					room.setTotalGamesPlayer(0);
+					room.setHost(player);
+					this.roomService.saveRoom(room);
+					player.setRoom(room);
+					playerService.savePlayer(player);
+				}catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
+					if(ex.getClass().equals(DuplicatedNameRoomException.class)){
+						result.rejectValue("roomName", "duplicate", "already exists");
+					} else {
+						model.put("message", "You are already host of another room.");
+						model.put("messageType", "warning");
+					}
+					return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
+				}
+				return "redirect:/room/" + room.getId();
 		}
 	}
 
@@ -123,6 +120,7 @@ public class RoomController {
 		model.put("room", this.roomService.findRoomById(roomId));
 		model.put("players",players);
 		model.put("countPlayer",players.size());
+		model.put("host", player.equals(room.getHost()));
 		
 		return VIEWS_WAITING_ROOM;
 	}

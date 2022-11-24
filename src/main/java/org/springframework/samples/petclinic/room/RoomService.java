@@ -39,5 +39,10 @@ public class RoomService {
 			}else
 				roomRepository.save(room);
 			}
+
+	@Transactional
+	public void deleteRoom(int id) throws DataAccessException {
+		roomRepository.deleteById(id);
+	}
     
 }

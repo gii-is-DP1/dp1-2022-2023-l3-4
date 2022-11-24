@@ -41,5 +41,5 @@ public class Room extends BaseEntity{
     @OneToOne(optional = false)
     private Player host;
 
-    
+    String password;
 }

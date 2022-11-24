@@ -98,13 +98,7 @@ public class RoomController {
 			result.rejectValue("roomName", "notFound", "not found");
 			return "rooms/createOrSearch";
 		}
-		else if (results.size() == 1) {
-			// 1 room found
-			room = results.iterator().next();
-			player.setRoom(room);
-			playerService.savePlayer(player);
-			return "redirect:/room/" + room.getId();
-		}
+
 		else {
 			// multiple roomss found
 			model.put("rooms", results);

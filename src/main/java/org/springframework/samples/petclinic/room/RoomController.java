@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -126,4 +127,22 @@ public class RoomController {
 		
 		return VIEWS_WAITING_ROOM;
 	}
+
+	@GetMapping("/delete/{roomId}")
+	public String deleteRoom(@PathVariable("roomId") int roomId, ModelMap model){
+		Player player = authService.getPlayer();
+		Room room =this.roomService.findRoomById(roomId);
+		if(room.getHost().equals(player)){
+			model.remove("room",this.roomService.findRoomById(roomId));
+			player.setRoom(null);
+			playerService.savePlayer(player);
+			roomService.deleteRoom(roomId);
+			return "room/roomsList";
+		} else {
+			return "redirect:/room/" + roomId;
+		}
+
+
+	}
+
 }

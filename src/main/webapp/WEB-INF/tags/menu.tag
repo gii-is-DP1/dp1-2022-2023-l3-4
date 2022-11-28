@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="navbar-header">
 			<a class="navbar-brand"
-				href="<spring:url value="/" htmlEscape="true" />"><span></span></a>
+				href="<spring:url value="https://tranjisgames.com/wp-content/uploads/2022/02/RULES_v1.10-0122-Cas-WAH_web.pdf" htmlEscape="true" />"><span></span></a>
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
 				data-target="#main-navbar">
 				<span class="sr-only"><os-p>Toggle navigation</os-p></span> <span

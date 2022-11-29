@@ -15,7 +15,8 @@
  */
 package org.springframework.samples.petclinic.card;
 
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,7 +27,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,24 +42,38 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "cards")
-public class Card extends BaseEntity {
+public class Card extends BaseEntity implements Serializable {
  
 	private Boolean played;
 	private Boolean body;
+
+	// @ManyToOne
+    // @JoinColumn(name="card_id")
+    // private Card cards;
+
+	// @ElementCollection
+	// @Size(min=0, max=2)
+    // @CollectionTable(name = "vaccines", joinColumns = @JoinColumn(name = "card_id")) // 2
+    // @Column(name = "vaccine_set") // 3
+    // private Set<Card> vaccineSet;	
 	
 	@ManyToOne
-	@JoinColumn(name="card_id")
-	private Card cards;
-	
-	@Size(min=0, max=2)
-	@OneToMany(mappedBy="cards", cascade=CascadeType.ALL)
-	private Set<Card> vaccines;
+	@JoinColumn(name="cardVaccine_id")
+	private Card cardVaccine;
 
 	@Size(min=0, max=2)
-	@OneToMany(mappedBy="cards", cascade=CascadeType.ALL)
-	private Set<Card> virus;
+	@OneToMany(mappedBy="cardVaccine", cascade=CascadeType.ALL)
+	private List<Card> vaccines;
 
 	@ManyToOne
+	@JoinColumn(name="cardVirus_id")
+	private Card cardVirus;
+
+	@Size(min=0, max=2)
+	@OneToMany(mappedBy="cardVirus", cascade=CascadeType.ALL)
+	private List<Card> virus = new ArrayList<>();
+
+	@ManyToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "type_id")
 	private GenericCard type;
 
@@ -67,4 +81,15 @@ public class Card extends BaseEntity {
 	@JoinColumn(name = "gamePlayer_id")
 	private GamePlayer gamePlayer;
 
+	public Card(int id, boolean body, boolean played, List<Card> vaccines, List<Card> virus, GamePlayer game_player_id, GenericCard type) {
+		this.id = id;
+		this.body = body;
+		this.played = played;
+		this.vaccines = vaccines;
+		this.virus = virus;
+		this.gamePlayer = game_player_id;
+		this.type = type;
+	}
+
+	public Card() {}
 }

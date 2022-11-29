@@ -2,9 +2,10 @@
 package org.springframework.samples.petclinic.gamePlayer;
 
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +24,17 @@ public class GamePlayerService {
 	public List<GamePlayer> findAll(){
 		return gamePlayerRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public Optional<GamePlayer> findById(Integer i){
+		return gamePlayerRepository.findById(i);
+	}
+
+	@Transactional
+	public GamePlayer save(GamePlayer gamePlayer){
+		return gamePlayerRepository.save(gamePlayer);
+	}
+
+	public GamePlayerService() {}
 	
 }

@@ -2,10 +2,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 <!-- %@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %-->  
 
-<petclinic:layout pageName="home">
+<virus:layout pageName="home">
   <h2><fmt:message key="welcome"/></h2>
   <div class="row">
   <h2> Project ${title} </h2>
@@ -20,4 +20,19 @@
       <img class="img-responsive" src="${logoUS}"/>
     </div>
   </div>
-</petclinic:layout>
+  <tr>
+    <td>
+        <a href="<spring:url value="/room/new" htmlEscape="true" />">New room</a>
+    </td>
+    <br>
+    <td>
+      <a href="<spring:url value="/room/createSearch" htmlEscape="true" />">Searc room </a>
+  </td>          
+  <br>
+  <td>
+    <a href="<spring:url value="/room/find" htmlEscape="true" />">Rooms listing </a>
+</td>
+
+
+</tr>
+</virus:layout>

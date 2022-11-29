@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -38,16 +37,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/users/new").permitAll()
 				.antMatchers("/session/**").permitAll()
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
+				.antMatchers("/genericCards/**").hasAnyAuthority("admin")
+				.antMatchers("/games/**").hasAnyAuthority("admin")
 				.antMatchers("/owners/**").hasAnyAuthority("owner","admin")				
 				.antMatchers("/vets/**").authenticated()
-				.antMatchers("/statistics/all").hasAnyAuthority("admin")
-				.antMatchers("/statistics/achievements/new").hasAnyAuthority("admin")
+				.antMatchers("/player/**").authenticated()
+				.antMatchers("/room/**").authenticated()
 				.antMatchers("/statistics/**").hasAnyAuthority("admin")
 				.anyRequest().denyAll()
 				.and()
 				 	.formLogin()
 				 	/*.loginPage("/login")*/
 				 	.failureUrl("/login-error")
+					.defaultSuccessUrl("/", true)
 				.and()
 					.logout()
 						.logoutSuccessUrl("/"); 

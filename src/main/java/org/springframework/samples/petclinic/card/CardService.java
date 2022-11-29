@@ -15,15 +15,17 @@
  */
 package org.springframework.samples.petclinic.card;
 
-
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerRepository;
+
+import java.util.Optional;
 
 
 /**
@@ -32,10 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Michael Isvy
  */
+
+
 @Service 
 public class CardService {
 
 	private CardRepository cardRepository;
+	private GamePlayerRepository gamePlayerRepository;
 
 	@Autowired
 	public CardService(CardRepository cardRepository) {
@@ -51,5 +56,25 @@ public class CardService {
 	public List<Card> findPlayed(){
 		return cardRepository.findAll().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
 
+	}
+
+  @Transactional(readOnly = true)
+		public Optional<Card> findCard(Integer i){
+			return cardRepository.findById(i);
+		}
+
+	@Transactional
+		public Card save(Card card){
+			return cardRepository.save(card);	
+		}
+	
+	@Transactional(readOnly = true)
+	public List<Card> getBodyFromAGamePlayer(Integer gamePlayerId){
+		List<Card> result = new ArrayList<>();
+		Optional<GamePlayer> gp = gamePlayerRepository.findById(gamePlayerId);
+		if(gp.isPresent()){
+			result = gp.get().getCards().stream().filter(x->x.getBody()).collect(Collectors.toList());
+		}
+		return result;
 	}
 }

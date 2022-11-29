@@ -21,7 +21,10 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.PlayerService;
+import org.springframework.samples.petclinic.statistics.Statistics;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -40,11 +43,17 @@ public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 
-	private final PlayerService playerService;
+	private UserService userService;
+	private PlayerService playerService;
+	private StatisticsService statisticsService;
+	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(PlayerService clinicService) {
-		this.playerService = clinicService;
+	public UserController(UserService userService, PlayerService playerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
+		this.userService = userService;
+		this.playerService = playerService;
+		this.statisticsService = statisticsService;
+		this.authoritiesService = authoritiesService;
 	}
 
 	@InitBinder
@@ -60,13 +69,16 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/users/new")
-	public String processCreationForm(@Valid Player player, BindingResult result) {
+	public String processCreationForm(@Valid Player player, BindingResult result) throws PlayerNotFoundException {
 		if (result.hasErrors()) {
 			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
 			//creating player, user, and authority
 			this.playerService.savePlayer(player);
+			this.userService.saveUser(player.getUser());
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+			statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}
 	}

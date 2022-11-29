@@ -17,8 +17,6 @@ package org.springframework.samples.petclinic.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.petclinic.user.AuthoritiesService;
-import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,11 +31,6 @@ public class PlayerService {
 
     private PlayerRepository playerRepository;
     
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AuthoritiesService authoritiesService;
 
     @Autowired
     public PlayerService(PlayerRepository playerRepository){
@@ -46,12 +39,14 @@ public class PlayerService {
 
     @Transactional
     public void savePlayer(Player player) throws DataAccessException {
-        player.setStatus(false);
+        if(player.getStatus() == null) {
+            player.setStatus(false);
+        }
         //creating player
         playerRepository.save(player);
-        //creating user
-        userService.saveUser(player.getUser());
-        //creating authorities
-        authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+    }
+
+    public Player getPlayerByUsername(String username) {
+        return playerRepository.findPlayerByUsername(username);
     }
 }

@@ -15,8 +15,7 @@
  */
 package org.springframework.samples.petclinic.gamePlayer;
 
-import java.util.List;
-
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,12 +30,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/games/{gameId}/players")
 public class GamePlayerController {
 
-
 	private final GamePlayerService gamePlayerService;
 
 	@Autowired
 	public GamePlayerController(GamePlayerService gamePlayerService) {
 		this.gamePlayerService = gamePlayerService;
+		
 	}
 
 	@GetMapping

@@ -5,9 +5,11 @@ INSERT INTO authorities(id,username,authority) VALUES (1,'admin1','admin');
 INSERT INTO users(username,password,enabled) VALUES ('owner1','0wn3r',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('josgarber6','276591',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('frabenrui1','z3bas',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('lucperrom','laquesea',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('juaanjimdel','laquesea2',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
-INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','owner');
-INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','owner');
+INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
+INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');
 
 -- One vet user, named vet1 with passwor v3t
 INSERT INTO users(username,password,enabled) VALUES ('vet1','v3t',TRUE);
@@ -30,7 +32,38 @@ INSERT INTO vet_specialties VALUES (3, 3);
 INSERT INTO vet_specialties VALUES (4, 2);
 INSERT INTO vet_specialties VALUES (5, 1);
 
+-- Achievement Type
 
+INSERT INTO achievement_types(id,name) VALUES (1,'Explorador');
 
+-- Achievements
 
+INSERT INTO achievements(id,name,threshold,description,badge_image,achievement_type_id) VALUES 
+(1, 'Viciado', 10.0, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
+(2, 'Triunfador', 20.0, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
 
+-- Player
+
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (1,'Francisco Sebastian','Benitez Ruis Diaz','frabenrui1','Me encanta este juego',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (2,'Jose Maria','Garcia Berdejo','josgarber6','Lets gooo',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE);
+
+-- PlayerAchievements
+
+INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
+
+-- Statitics
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (1, 1, 10, 5, 30);
+
+INSERT INTO generic_cards(id,colour,type) VALUES (1, 'RED', 'ORGAN');
+INSERT INTO generic_cards(id,colour,type) VALUES (2, 'RED', 'VIRUS');
+INSERT INTO games(id,initial_hour,is_running,round,turn) VALUES(1,'2022-11-10 17:00:00',TRUE,0,0);
+INSERT INTO game_players(id, host, winner, game_id, game_player_id ) VALUES (1,FALSE,FALSE,1,1);
+INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (1,TRUE,FALSE,1,1,1,1);
+INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (2,TRUE,FALSE,2,2,1,2);
+
+-- Rooms
+
+INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,HOST_ID) VALUES(1,True,3,'sala1',0,1);
+INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,HOST_ID) VALUES(2,False,6,'sala2',0,2);

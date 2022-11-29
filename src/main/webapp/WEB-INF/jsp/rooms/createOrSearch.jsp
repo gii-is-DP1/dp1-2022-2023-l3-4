@@ -12,9 +12,6 @@
     </h2>
 
             <div>
-                <a href="/room/new" class="btn btn-primary btn-lg btn-block">Create Room</a>
-            </div>
-            <div>
                 <form:form modelAttribute="room" action="/room/find" method="get" class="form-horizontal"
                 id="search-player-form">
          <div class="form-group">

@@ -26,8 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
+import org.springframework.samples.petclinic.card.GenericCard;
+import org.springframework.samples.petclinic.card.GenericCardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.web.bind.annotation.PathVariable;
 
 /**
@@ -40,13 +44,17 @@ public class GameController {
 	
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
+	private final RoomService roomService;
+	private final GenericCardService genericCardService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
 
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService) {
+	CardService cardService,RoomService roomService,GenericCardService genericCardService) {
+		this.roomService=roomService;
+		this.genericCardService=genericCardService;
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
@@ -60,6 +68,40 @@ public class GameController {
 		model.put("games", allGames);
 		return "games/listing";
 	}
+
+	//Empezar Juego
+	@GetMapping(value = "/game/start/{roomId}")
+    public String init(@PathVariable("roomId") Integer roomId) {
+
+        Game game = new Game();
+        game.setRound(0);
+        game.setTurn(0);
+        game.setGamePlayer(new ArrayList<>());
+        game.setCards(new ArrayList<>());
+        game.setClassification(new HashMap<>());
+        List<Player> players = new ArrayList<>(roomService.findRoomById(roomId).getPlayers());
+
+        for(Player p: players) {
+            GamePlayer gp = new GamePlayer();
+            gp.setPlayer(p);
+            gp.setGame(game);
+            gamePlayerService.save(gp);
+            game.getGamePlayer().add(gp);
+        }
+
+        List<GenericCard> deck = genericCardService.findGCards();
+        for(GenericCard c: deck){
+            Card card = new Card();
+            card.setType(c);
+            game.getCards().add(card);
+            cardService.save(card);
+        }
+
+        gameService.save(game);
+
+        return "redirect:/game/" + game.getId();
+
+    }
 
 	/* 
 	public void init(Integer gameId) {

@@ -83,7 +83,7 @@ public class RoomController {
 	}
 
 	@GetMapping("/createSearch")
-	public String createSearch(ModelMap model) {
+	public String createSearch(@Valid Room room,ModelMap model) {
 		model.put("room", new Room());
 		return VIEWS_ROOM_SEARCH;
 	}

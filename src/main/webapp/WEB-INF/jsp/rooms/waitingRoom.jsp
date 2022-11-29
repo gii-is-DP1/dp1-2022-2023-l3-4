@@ -44,6 +44,11 @@
                                     Delete Room
                                 </button>
                     </a>
+                    <a href='<spring:url value="/game/start/${room.id}" htmlEscape="true"/>'>
+                                <button>
+                                    Start Game
+                                </button>
+                    </a>
                   </c:when>
                     <c:otherwise>
                         

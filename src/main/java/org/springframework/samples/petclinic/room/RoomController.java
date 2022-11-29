@@ -67,8 +67,7 @@ public class RoomController {
 					room.setTotalGamesPlayer(0);
 					room.setHost(player);
 					this.roomService.saveRoom(room);
-					player.setRoom(room);
-					playerService.savePlayer(player);
+
 				}catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
 					if(ex.getClass().equals(DuplicatedNameRoomException.class)){
 						result.rejectValue("roomName", "duplicate", "already exists");
@@ -84,13 +83,14 @@ public class RoomController {
 
 	@GetMapping("/createSearch")
 	public String createSearch(ModelMap model) {
+		Player player = authService.getPlayer();
+		model.put("player", player);
 		model.put("room", new Room());
 		return VIEWS_ROOM_SEARCH;
 	}
 
 	@GetMapping(value = "/find")
 	public String processFindRoomForm(Room room, BindingResult result, ModelMap model) {
-		Player player = authService.getPlayer();
 		// allow parameterless GET request for /find to return all records
 		if (room.getRoomName() == null) {
 			room.setRoomName(""); // empty string signifies broadest possible search
@@ -116,7 +116,7 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
 		player.setRoom(room);
-		playerService.savePlayer(player);
+		this.playerService.savePlayer(player);
 		Collection<Player> players = room.getPlayers();
 		model.put("room", this.roomService.findRoomById(roomId));
 		model.put("players",players);
@@ -137,7 +137,7 @@ public class RoomController {
 			roomService.deleteRoom(roomId);
 			return "redirect:/room/find";
 		} else {
-			return "redirect:/room/" + roomId;
+			return "redirect:/";
 		}
 
 

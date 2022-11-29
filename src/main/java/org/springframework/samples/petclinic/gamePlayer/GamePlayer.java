@@ -36,9 +36,7 @@ public class GamePlayer extends BaseEntity {
     @OneToOne
     private Player player;
     
-    @ManyToOne
-    @JoinColumn(name = "game_id")
-	private Game game;
+    
 
     @OneToMany
     private List<Card> cards;

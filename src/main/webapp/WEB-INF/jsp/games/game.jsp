@@ -22,7 +22,7 @@
                 <c:forEach items="${hand}" var="card">
                     
                     <td>
-                        <c:out value="${card.type.image}"/>
+                        <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt=""/>
                     </td>
                 </c:forEach>
             </tr>

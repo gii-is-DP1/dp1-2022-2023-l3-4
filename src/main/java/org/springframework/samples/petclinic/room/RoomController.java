@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -142,5 +143,13 @@ public class RoomController {
 
 
 	}
+
+	//redirect hacia my room
+	@GetMapping("/myRoom")
+        public String showMyRoom() {
+			Player player = authService.getPlayer();
+			Optional<Room> room=roomService.findRoomByHost(player);
+        return "redirect:/room/"+room.get().getId();
+  }
 
 }

@@ -3,6 +3,8 @@ package org.springframework.samples.petclinic.card;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ public class GenericCardController {
 	}
 
     List<GenericCard> cards = new ArrayList<GenericCard>(68);
+	@PostConstruct
 	//Generar baraja
 	public void reset() {
 		GenericCard.Colour[] colours = GenericCard.Colour.values();

@@ -10,7 +10,6 @@
     <h2>
         Welcome Player:
     </h2>
-
             <div>
                 <form:form modelAttribute="room" action="/room/find" method="get" class="form-horizontal"
                 id="search-player-form">
@@ -29,5 +28,8 @@
              </div>
          </div>
         </form:form>
+            </div>
+            <div>
+                <a href="/room/${player.room.id}" class="btn btn-primary btn-lg btn-block">Search Room</a>
             </div>
 </virus:layout>

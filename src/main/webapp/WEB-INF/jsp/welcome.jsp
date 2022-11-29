@@ -18,10 +18,7 @@
   <div>
     <a href="/room/createSearch" class="btn btn-primary btn-lg btn-block">Search Room</a>
 </div>
-<br/>
-<div>
-  <a href="/room/" class="btn btn-primary btn-lg btn-block">Search Room</a>
-</div>
+
 
 
 

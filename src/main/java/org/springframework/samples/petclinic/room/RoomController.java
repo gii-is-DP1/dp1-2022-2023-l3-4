@@ -67,8 +67,7 @@ public class RoomController {
 					room.setTotalGamesPlayer(0);
 					room.setHost(player);
 					this.roomService.saveRoom(room);
-					player.setRoom(room);
-					this.playerService.savePlayer(player);
+
 				}catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
 					if(ex.getClass().equals(DuplicatedNameRoomException.class)){
 						result.rejectValue("roomName", "duplicate", "already exists");

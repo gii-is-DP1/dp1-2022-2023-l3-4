@@ -147,15 +147,21 @@ public class GameController {
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
 	public String muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
-		Map<String, List<Card>> bodies = new HashMap<>(); 
-		for(GamePlayer gp: gameService.findGames(gameId).getGamePlayer()){
-			if(gp== gp_vista){
+		Game game = gameService.findGames(gameId);
+		model = generaTablero(model, gp_vista, game);
+		return "games/game";
+	}
+
+	private ModelMap generaTablero(ModelMap model, GamePlayer gamePlayer, Game game) {
+		Map<GamePlayer, List<Card>> bodies = new HashMap<>(); 
+		for(GamePlayer gp: game.getGamePlayer()){
+			if(gp.equals(gamePlayer)){
 				model.put("hand", gp.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList()));
 			}
-			bodies.put(gp.getPlayer().getFirstName(), gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
+			bodies.put(gp, gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
 		model.put("bodies", bodies);
-		return "games/game";
+		return model;
 	}
 
 	//Cambio de turno
@@ -192,12 +198,15 @@ public class GameController {
 		}
 
 	//Jugar
-	@GetMapping(value="/games/{gameId}/gamePlayer/play")
-	public String play(@PathVariable("gameId") int gameId, @PathVariable("currentPlayer") int currentPlayer, Integer cardId){
+	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}/play/{cardId}")
+	public String play(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @PathVariable("cardId") Integer cardId, ModelMap model){
 		Optional<Card> c = cardService.findCard(cardId);
 		Optional<GamePlayer> gp = gamePlayerService.findById(gameId);
+		Game game = gameService.findGames(gameId);
+		
 		if(c.isPresent() && gp.isPresent()){
 			if(gp.get().getCards().contains(c.get())){
+				model = generaTablero(model, gp.get(), game);
 				switch(c.get().getType().toString()){
 					case("ORGAN"):
 					log.info("Elige el jugador a quien quieras dar este órgano");
@@ -208,14 +217,14 @@ public class GameController {
 					case("TRANSPLANT"):
 					log.info("Selecciona qué dos organos quieres intercambiar");
 				}
-				return "/games/{gameId}/gamePlayer/play/selecciona";
+				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
-				return "/games/"+gameId+"/gamePlayer/"+currentPlayer+"/decision";
+				return muestraVista(gameId, gamePlayerId, model);
 			}
 		} else{
 			log.error("Movimiento no válido");
-			return "/games/"+gameId+"/gamePlayer/"+currentPlayer+"/decision";
+			return muestraVista(gameId, gamePlayerId, model);
 		}
 	}
 

@@ -118,8 +118,8 @@ public class RoomController {
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
-		if(roomService.findRoomByHost(player).isEmpty()||room.getHost()==player){
-			if (room.getPlayers().size()>= room.getNumMaxPlayers()) {
+		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){
+			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&!(room.getId()==player.getRoom().getId())) {
 				model.put("player", player);
 				model.put("room", new Room());
 				model.put("message", "The room is full of players");
@@ -127,12 +127,13 @@ public class RoomController {
 				return VIEWS_ROOM_SEARCH;
 			} else {
 				player.setRoom(room);
-				playerService.savePlayer(player);
-				Collection<Player> players = room.getPlayers();
-				model.put("room", this.roomService.findRoomById(roomId));
+				this.playerService.savePlayer(player);
+				Room roomUpdate=this.roomService.findRoomById(roomId);
+				model.put("room", roomUpdate);
+				Collection<Player> players = roomUpdate.getPlayers();
 				model.put("players",players);
 				model.put("countPlayer",players.size());
-				model.put("host", player.equals(room.getHost()));
+				model.put("host", player.equals(roomUpdate.getHost()));
 				return VIEWS_WAITING_ROOM;
 				} 
 		} else {
@@ -150,8 +151,12 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room room =this.roomService.findRoomById(roomId);
 		if(room.getHost().equals(player)){
-			player.setRoom(null);
-			playerService.savePlayer(player);
+			Collection<Player> players=room.getPlayers();
+			players.forEach(p->{
+				p.setRoom(null);
+				playerService.savePlayer(p);
+			});
+			
 			roomService.deleteRoom(roomId);
 			return "redirect:/";
 		} else {

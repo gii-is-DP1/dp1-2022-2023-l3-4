@@ -182,7 +182,7 @@ public class GameController {
 				}
 				gameService.save(game); //Guardamos los cambios de game
 				gamePlayerId = game.getGamePlayer().get(game.getTurn()).getId();
-				return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+				return muestraVista(gameId, gamePlayerId, model);
 			}
 
 		}
@@ -217,6 +217,8 @@ public class GameController {
 					case("TRANSPLANT"):
 					log.info("Selecciona qué dos organos quieres intercambiar");
 				}
+				model.put("cardId", cardId);
+				model.put("gamePlayerId", gamePlayerId);
 				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
@@ -226,6 +228,30 @@ public class GameController {
 			log.error("Movimiento no válido");
 			return muestraVista(gameId, gamePlayerId, model);
 		}
+	}
+
+	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toPlayer/{targetGamePlayerid}")
+	public String playOnBody(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+			@PathVariable("targetGamePlayerid") Integer targetGP, ModelMap model) {
+		Card card = cardService.findCard(cardId).get();
+		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
+			return playOrgan(gameId, sourceGP, targetGP, cardId);
+		}
+		
+		return muestraVista(gameId, sourceGP, model);
+	}
+
+	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toCard/{targetCardId}")
+	public String playOnCard(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+			@PathVariable("targetCardId") Integer targetC, ModelMap model) {
+		Card card = cardService.findCard(cardId).get();
+		if(card.getType().getType().equals(GenericCard.Type.VACCINE)){
+			return playVaccine(gameId, sourceGP, cardId, targetC);
+		} else if(card.getType().getType().equals(GenericCard.Type.VIRUS)) {
+			return playVirus(gameId, sourceGP, cardId, targetC);
+		}
+		
+		return muestraVista(gameId, sourceGP, model);
 	}
 
 	//Jugar un órgano

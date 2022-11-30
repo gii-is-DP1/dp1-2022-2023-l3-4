@@ -161,7 +161,7 @@ public class GameController {
 			bodies.put(gp, gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
 		model.put("bodies", bodies);
-		return model;
+		return "games/game";
 	}
 
 	//Cambio de turno

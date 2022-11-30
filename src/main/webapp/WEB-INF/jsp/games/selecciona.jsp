@@ -10,7 +10,9 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                        <c:out value="${body.key}'s body"/>
+                      <a href="games/${gameId}/gamePlayer/${body.key.id}/play/${cardId}/${body.value.get(0).getId()}">
+                        <c:out value="${body.key.player.firstName}'s body"/>
+                      </a>
                     </td>
                 </tr>
                 <c:forEach items="${body.value}" var="bodycard">

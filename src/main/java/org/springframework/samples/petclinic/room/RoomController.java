@@ -78,6 +78,8 @@ public class RoomController {
 					}
 					return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 				}
+				player.setRoom(room);
+				this.playerService.savePlayer(player);
 				return "redirect:/room/" + room.getId();
 		}
 	}
@@ -116,15 +118,23 @@ public class RoomController {
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
-		player.setRoom(room);
-		this.playerService.savePlayer(player);
-		Collection<Player> players = room.getPlayers();
-		model.put("room", this.roomService.findRoomById(roomId));
-		model.put("players",players);
-		model.put("countPlayer",players.size());
-		model.put("host", player.equals(room.getHost()));
-		
-		return VIEWS_WAITING_ROOM;
+		if(roomService.findRoomByHost(player).isEmpty()||room.getHost()==player){
+			player.setRoom(room);
+			playerService.savePlayer(player);
+			Collection<Player> players = room.getPlayers();
+			model.put("room", this.roomService.findRoomById(roomId));
+			model.put("players",players);
+			model.put("countPlayer",players.size());
+			model.put("host", player.equals(room.getHost()));
+			return VIEWS_WAITING_ROOM;
+		}else{
+			model.put("player", player);
+			model.put("room", new Room());
+			model.put("message", "First delete your room.");
+			model.put("messageType", "warning");
+			return VIEWS_ROOM_SEARCH;
+		}
+
 	}
 
 	@GetMapping("/delete/{roomId}")

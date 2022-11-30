@@ -38,8 +38,6 @@
             </tr>
         </tbody>
     </table>
-    <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play" class="btn btn-primary">Jugar</a><a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
-
 
 
 </virus:layout>

@@ -10,7 +10,7 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                        <c:out value="${body.key}'s body"/>
+                        <c:out value="${body.key.player.firstName}'s body"/>
                     </td>
                 </tr>
                 <c:forEach items="${body.value}" var="bodycard">
@@ -29,7 +29,7 @@
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <a href="games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/">
+                        <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/">
                             <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
                         </a>
                     </c:forEach>

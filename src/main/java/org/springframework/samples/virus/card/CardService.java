@@ -43,8 +43,9 @@ public class CardService {
 	private GamePlayerRepository gamePlayerRepository;
 
 	@Autowired
-	public CardService(CardRepository cardRepository) {
+	public CardService(CardRepository cardRepository, GamePlayerRepository gamePlayerRepository) {
 		this.cardRepository = cardRepository;
+		this.gamePlayerRepository = gamePlayerRepository;
 	}
 
 	@Transactional(readOnly = true)	

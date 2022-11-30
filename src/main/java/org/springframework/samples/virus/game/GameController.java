@@ -182,7 +182,7 @@ public class GameController {
 				}
 				gameService.save(game); //Guardamos los cambios de game
 				gamePlayerId = game.getGamePlayer().get(game.getTurn()).getId();
-				return muestraVista(gameId, gamePlayerId, model);
+				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
 			}
 
 		}
@@ -233,7 +233,7 @@ public class GameController {
 			@PathVariable("targetGamePlayerid") Integer targetGP, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
-			return playOrgan(gameId, sourceGP, targetGP, cardId);
+			return playOrgan(gameId, targetGP, sourceGP, cardId);
 		}
 		
 		return muestraVista(gameId, sourceGP, model);

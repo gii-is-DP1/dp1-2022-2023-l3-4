@@ -217,8 +217,6 @@ public class GameController {
 					case("TRANSPLANT"):
 					log.info("Selecciona qué dos organos quieres intercambiar");
 				}
-				model.put("cardId", cardId);
-				model.put("gamePlayerId", gamePlayerId);
 				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");

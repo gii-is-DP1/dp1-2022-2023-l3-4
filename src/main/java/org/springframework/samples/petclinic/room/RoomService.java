@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
+import org.springframework.samples.petclinic.room.exceptions.PlayerHostsExistingRoomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +31,18 @@ public class RoomService {
 	}
 
 	@Transactional(rollbackFor = DuplicatedNameRoomException.class)
-	public void saveRoom(Room room) throws DataAccessException, DuplicatedNameRoomException {
+	public void saveRoom(Room room) throws DataAccessException, DuplicatedNameRoomException, PlayerHostsExistingRoomException {
 			if(roomRepository.findByRoomName(room.roomName)!=null){
 				throw new DuplicatedNameRoomException();
-           
+			}else if(roomRepository.findRoomByHost(room.getHost()).isPresent()) {
+				throw new PlayerHostsExistingRoomException();
 			}else
 				roomRepository.save(room);
+			}
+
+	@Transactional
+	public void deleteRoom(int id) throws DataAccessException {
+		roomRepository.deleteById(id);
 	}
     
 }

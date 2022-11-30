@@ -17,7 +17,7 @@
                     <petclinic:inputField label="Room Name" name="roomName"/>
                     <petclinic:inputField label="Num max player" name="numMaxPlayers"/>
                     <label for="isPrivate">is Private?</label>
-                    <input type="checkbox" id="isPrivate" name="isPrivate"/>
+                    <form:checkbox path="isPrivate"/>
                 </div>
 
 

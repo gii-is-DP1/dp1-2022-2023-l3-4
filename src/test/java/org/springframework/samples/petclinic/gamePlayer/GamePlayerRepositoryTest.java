@@ -1,6 +1,8 @@
 package org.springframework.samples.petclinic.gamePlayer;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.samples.virus.gamePlayer.GamePlayer;
+import org.springframework.samples.virus.gamePlayer.GamePlayerRepository;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

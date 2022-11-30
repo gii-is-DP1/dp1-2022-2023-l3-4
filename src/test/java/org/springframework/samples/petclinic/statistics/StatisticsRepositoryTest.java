@@ -7,7 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.virus.player.Player;
+import org.springframework.samples.virus.statistics.Statistics;
+import org.springframework.samples.virus.statistics.StatisticsRepository;
 
 @DataJpaTest
 @ExtendWith(MockitoExtension.class)

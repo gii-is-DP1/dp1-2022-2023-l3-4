@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.samples.virus.gamePlayer.GamePlayer;
+import org.springframework.samples.virus.gamePlayer.GamePlayerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

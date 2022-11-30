@@ -10,6 +10,8 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.samples.virus.game.Game;
+import org.springframework.samples.virus.game.GameRepository;
 
 @DataJpaTest
 public class GameRepositoryTest {

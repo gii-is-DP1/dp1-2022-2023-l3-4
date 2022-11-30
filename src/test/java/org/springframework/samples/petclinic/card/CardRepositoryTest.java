@@ -11,8 +11,11 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.samples.petclinic.card.GenericCard.Colour;
-import org.springframework.samples.petclinic.card.GenericCard.Type;
+import org.springframework.samples.virus.card.Card;
+import org.springframework.samples.virus.card.CardRepository;
+import org.springframework.samples.virus.card.GenericCard;
+import org.springframework.samples.virus.card.GenericCard.Colour;
+import org.springframework.samples.virus.card.GenericCard.Type;
 
 @DataJpaTest
 public class CardRepositoryTest {

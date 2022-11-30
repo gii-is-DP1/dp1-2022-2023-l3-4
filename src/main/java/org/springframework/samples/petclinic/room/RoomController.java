@@ -116,6 +116,10 @@ public class RoomController {
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
+		if (room.numMaxPlayers <= room.getPlayers().size()){
+			model.put("message", "The room is full of players");
+			return "rooms/roomsList";
+		} else {
 		player.setRoom(room);
 		this.playerService.savePlayer(player);
 		Collection<Player> players = room.getPlayers();
@@ -125,6 +129,7 @@ public class RoomController {
 		model.put("host", player.equals(room.getHost()));
 		
 		return VIEWS_WAITING_ROOM;
+		}
 	}
 
 	@GetMapping("/delete/{roomId}")

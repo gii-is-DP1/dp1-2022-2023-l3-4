@@ -10,7 +10,7 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                      <a href="games/${gameId}/gamePlayer/${body.key.id}/play/${cardId}/${body.value.get(0).getId()}">
+                      <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${cardId}/toPlayer/${body.key.id}">
                         <c:out value="${body.key.player.firstName}'s body"/>
                       </a>
                     </td>
@@ -18,6 +18,7 @@
                 <c:forEach items="${body.value}" var="bodycard">
                     <tr>
                         <td>
+                            <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${cardId}/toCard/${bodycard.id}"
                             <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
                         </td>
                     </tr>

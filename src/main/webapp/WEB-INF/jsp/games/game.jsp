@@ -29,13 +29,15 @@
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
+                        <a href="games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/">
+                            <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
+                        </a>
                     </c:forEach>
                 </td>
             </tr>
         </tbody>
     </table>
-    <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play" class="btn btn-primary">Jugar</a><a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
+    <a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
 
 
 

@@ -132,11 +132,10 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room room =this.roomService.findRoomById(roomId);
 		if(room.getHost().equals(player)){
-			model.remove("room",this.roomService.findRoomById(roomId));
 			player.setRoom(null);
 			playerService.savePlayer(player);
 			roomService.deleteRoom(roomId);
-			return "redirect:/room/find";
+			return "redirect:/";
 		} else {
 			return "redirect:/";
 		}
@@ -149,7 +148,12 @@ public class RoomController {
         public String showMyRoom() {
 			Player player = authService.getPlayer();
 			Optional<Room> room=roomService.findRoomByHost(player);
-        return "redirect:/room/"+room.get().getId();
+			if(room.isEmpty()){
+				return "redirect:/room/new";
+			}else{
+				return "redirect:/room/"+room.get().getId();
+			}
+      	  
   }
 
 }

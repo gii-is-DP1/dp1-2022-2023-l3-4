@@ -67,6 +67,3 @@ INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_
 INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (2,TRUE,FALSE,2,2,1,2);
 
 -- Rooms
-
-INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,PASSWORD,HOST_ID) VALUES(1,True,3,'sala1',0,'1234',1);
-INSERT INTO ROOM(ID,IS_PRIVATE,NUM_MAX_PLAYERS,ROOM_NAME,TOTAL_GAMES_PLAYER,PASSWORD,HOST_ID) VALUES(2,False,6,'sala2',0,null,2);

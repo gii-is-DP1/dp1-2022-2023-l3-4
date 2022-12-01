@@ -39,6 +39,11 @@
               <td>
                 <c:choose>
                   <c:when test="${host}">
+                    <a href='<spring:url value="/room/edit" htmlEscape="true"/>'>
+                                <button>
+                                    Edit Room
+                                </button>
+                    </a>
                     <a href='<spring:url value="/room/delete/${room.id}" htmlEscape="true"/>'>
                                 <button>
                                     Delete Room

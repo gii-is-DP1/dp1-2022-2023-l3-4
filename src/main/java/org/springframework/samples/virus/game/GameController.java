@@ -181,7 +181,6 @@ public class GameController {
 				else{game.setTurn(game.getTurn()+1); //Sino solo incrementamos el turno en 1
 				}
 				gameService.save(game); //Guardamos los cambios de game
-				gamePlayerId = game.getGamePlayer().get(game.getTurn()).getId();
 				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
 			}
 
@@ -201,7 +200,7 @@ public class GameController {
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}/play/{cardId}")
 	public String play(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @PathVariable("cardId") Integer cardId, ModelMap model){
 		Optional<Card> c = cardService.findCard(cardId);
-		Optional<GamePlayer> gp = gamePlayerService.findById(gameId);
+		Optional<GamePlayer> gp = gamePlayerService.findById(gamePlayerId);
 		Game game = gameService.findGames(gameId);
 		
 		if(c.isPresent() && gp.isPresent()){
@@ -259,6 +258,7 @@ public class GameController {
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		Set<Card> sc = new HashSet<>();
 		Set<String> cards = new HashSet<>();
+		ModelMap model = new ModelMap();
 		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
 				Card organ = c.get();
 				GamePlayer gplayer1 = gp1.get();
@@ -281,15 +281,22 @@ public class GameController {
 						return turn(gameId,gamePlayerId);
 					}else{
 						log.error("No puede poner dos órganos del mismo color en un cuerpo");
-						return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+						
+						model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
+						model.put("messageType", "info");
+						return muestraVista(gameId, gamePlayerId, model);
 					}	
 				}else{
 					log.error("Esta carta no es un órgano");
-					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+					model.put("message", "Esta carta no es un órgano");
+						model.put("messageType", "info");
+						return muestraVista(gameId, gamePlayerId, model);
 				}			
 		}else{
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			model.put("message", "Movimiento inválido");
+			model.put("messageType", "info");
+			return muestraVista(gameId, gamePlayerId, model);
 		}
 	}	
 

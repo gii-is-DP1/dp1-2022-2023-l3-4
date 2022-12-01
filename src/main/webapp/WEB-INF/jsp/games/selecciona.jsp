@@ -10,13 +10,17 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
+                      <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${cardId}/toPlayer/${body.key.id}">
                         <c:out value="${body.key.player.firstName}'s body"/>
+                      </a>
                     </td>
                 </tr>
                 <c:forEach items="${body.value}" var="bodycard">
                     <tr>
                         <td>
+                            <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${cardId}/toCard/${bodycard.id}">
                             <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
+                            </a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -29,16 +33,12 @@
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/">
-                            <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
-                        </a>
+                        <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
                     </c:forEach>
                 </td>
             </tr>
         </tbody>
     </table>
-    <a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
-
 
 
 </virus:layout>

@@ -13,6 +13,7 @@
         <thead>
         <tr>
             <th>Room Name</th>
+            <th>Public/Private</th>
             <th></th>
 
         </tr>
@@ -23,6 +24,16 @@
             <tr>
                 <td>
                     <c:out value="${room.roomName} "/>
+                </td>
+                <td>
+                    <c:choose>
+                        <c:when test="${room.isPrivate}">
+                            Private
+                        </c:when>
+                        <c:otherwise>
+                            Public
+                        </c:otherwise>
+                    </c:choose>
                 </td>
                 <td>
                     <a href="/room/${room.id}" class="btn btn-primary">Join Room</a>

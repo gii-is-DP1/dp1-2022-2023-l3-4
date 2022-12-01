@@ -83,6 +83,40 @@ public class RoomController {
 				return "redirect:/room/" + room.getId();
 		}
 	}
+	@GetMapping(value = "/edit")
+	public String initEditForm( ModelMap model) {
+		Player player = authService.getPlayer();
+		Room room =roomService.findRoomByHost(player).get();
+		model.put("room", room);
+		model.put("player", player);
+		return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping(value = "/edit")
+	public String processEditForm(@Valid Room room, BindingResult result, ModelMap model) throws PlayerHostsExistingRoomException {	
+		Player player = authService.getPlayer();
+		Room roomOld = roomService.findRoomByHost(player).get();
+		if (result.hasErrors()) {
+			model.put("room", room);
+			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
+		}
+		else {
+				try{
+					room.setId(roomOld.getId());
+					room.setPlayers(roomOld.getPlayers());
+					room.setTotalGamesPlayer(roomOld.getTotalGamesPlayer());
+					room.setHost(player);
+					this.roomService.saveRoom(room);
+
+				}catch(DuplicatedNameRoomException ex){
+					
+						result.rejectValue("roomName", "duplicate", "already exists");
+					
+					return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
+				}
+				return "redirect:/room/" + room.getId();
+		}
+	}
 
 	@GetMapping("/createSearch")
 	public String createSearch(ModelMap model) {
@@ -117,9 +151,11 @@ public class RoomController {
 @GetMapping("/{roomId}")
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
+		Room roomPlayer=player.getRoom();
 		Room room=this.roomService.findRoomById(roomId);
+		//Si no eres host de una room o ya perteneces a esa sala
 		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){
-			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&!(room.getId()==player.getRoom().getId())) {
+			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&(player.getRoom()==null||!(room.getId()==roomPlayer.getId()))) {
 				model.put("player", player);
 				model.put("room", new Room());
 				model.put("message", "The room is full of players");
@@ -128,12 +164,14 @@ public class RoomController {
 			} else {
 				player.setRoom(room);
 				this.playerService.savePlayer(player);
-				Room roomUpdate=this.roomService.findRoomById(roomId);
-				model.put("room", roomUpdate);
-				Collection<Player> players = roomUpdate.getPlayers();
+				Collection<Player> players=room.getPlayers();
+				if(!(players.contains(player))){
+					players.add(player);
+				}
+				model.put("room", room);
 				model.put("players",players);
 				model.put("countPlayer",players.size());
-				model.put("host", player.equals(roomUpdate.getHost()));
+				model.put("host", player.equals(room.getHost()));
 				return VIEWS_WAITING_ROOM;
 				} 
 		} else {
@@ -156,7 +194,6 @@ public class RoomController {
 				p.setRoom(null);
 				playerService.savePlayer(p);
 			});
-			
 			roomService.deleteRoom(roomId);
 			return "redirect:/";
 		} else {

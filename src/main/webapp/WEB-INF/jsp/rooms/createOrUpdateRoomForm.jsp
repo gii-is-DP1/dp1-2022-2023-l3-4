@@ -16,6 +16,7 @@
                 <div class="form-group">
                     <petclinic:inputField label="Room Name" name="roomName"/>
                     <petclinic:inputField label="Num max player" name="numMaxPlayers"/>
+                    <petclinic:inputField label="Password" name="password"/>
                     <label for="isPrivate">is Private?</label>
                     <form:checkbox path="isPrivate"/>
                 </div>

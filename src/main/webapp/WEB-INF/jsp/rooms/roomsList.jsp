@@ -14,7 +14,7 @@
         <tr>
             <th>Room Name</th>
             <th>Public/Private</th>
-            <th></th>
+            <th>Password</th>
 
         </tr>
  
@@ -36,7 +36,28 @@
                     </c:choose>
                 </td>
                 <td>
-                    <a href="/room/${room.id}" class="btn btn-primary">Join Room</a>
+                    <form>
+                        <option id="roomPassword">${room.password}</option> 
+                        <c:if test="${room.isPrivate}">
+                            <label for="pswd">Enter your password: </label> 
+                            <input type="password" id="pswd">
+                        </c:if>
+                        <input type="button" value="Join Room" class="btn btn-primary" onclick="checkPswd();" />
+                    </form>
+                    <script type="text/javascript">
+                        function checkPswd() {
+                            var confirmPassword = document.getElementById("roomPassword").value;
+                            var password = document.getElementById("pswd").value;
+                            console.log(password);
+                            console.log(confirmPassword);
+                            if (password == confirmPassword) {
+                                window.location.href="/room/${room.id}";
+                            }
+                            else{
+                                alert("Incorrect password.");
+                            }
+                        }
+                    </script>
                 </td>
             </tr>
 

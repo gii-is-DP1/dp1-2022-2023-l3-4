@@ -1,9 +1,11 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
 import org.springframework.samples.petclinic.room.exceptions.PlayerHostsExistingRoomException;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,11 @@ public class RoomService {
 	@Transactional
 	public Collection<Room> findRoomsByRoomName(String roomName) throws DataAccessException{
 		return roomRepository.findRoomsByRoomName(roomName);
+	}
+
+	@Transactional
+	public Optional<Room> findRoomByHost(Player player) throws DataAccessException{
+		return roomRepository.findRoomByHost(player);
 	}
 
     @Transactional(readOnly = true)

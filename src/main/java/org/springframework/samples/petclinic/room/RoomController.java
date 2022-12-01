@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -67,8 +68,7 @@ public class RoomController {
 					room.setTotalGamesPlayer(0);
 					room.setHost(player);
 					this.roomService.saveRoom(room);
-					player.setRoom(room);
-					this.playerService.savePlayer(player);
+
 				}catch(DuplicatedNameRoomException | DataAccessException | PlayerHostsExistingRoomException ex){
 					if(ex.getClass().equals(DuplicatedNameRoomException.class)){
 						result.rejectValue("roomName", "duplicate", "already exists");
@@ -78,6 +78,8 @@ public class RoomController {
 					}
 					return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 				}
+				player.setRoom(room);
+				this.playerService.savePlayer(player);
 				return "redirect:/room/" + room.getId();
 		}
 	}
@@ -112,41 +114,69 @@ public class RoomController {
 		}
 	}
 
-	@GetMapping("/{roomId}")
+@GetMapping("/{roomId}")
 	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
 		Player player = authService.getPlayer();
 		Room room=this.roomService.findRoomById(roomId);
-		if (room.numMaxPlayers <= room.getPlayers().size()){
-			model.put("message", "The room is full of players");
-			return "rooms/roomsList";
+		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){
+			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&!(room.getId()==player.getRoom().getId())) {
+				model.put("player", player);
+				model.put("room", new Room());
+				model.put("message", "The room is full of players");
+				model.put("messageType", "warning");
+				return VIEWS_ROOM_SEARCH;
+			} else {
+				player.setRoom(room);
+				this.playerService.savePlayer(player);
+				Room roomUpdate=this.roomService.findRoomById(roomId);
+				model.put("room", roomUpdate);
+				Collection<Player> players = roomUpdate.getPlayers();
+				model.put("players",players);
+				model.put("countPlayer",players.size());
+				model.put("host", player.equals(roomUpdate.getHost()));
+				return VIEWS_WAITING_ROOM;
+				} 
 		} else {
-		player.setRoom(room);
-		this.playerService.savePlayer(player);
-		Collection<Player> players = room.getPlayers();
-		model.put("room", this.roomService.findRoomById(roomId));
-		model.put("players",players);
-		model.put("countPlayer",players.size());
-		model.put("host", player.equals(room.getHost()));
-		
-		return VIEWS_WAITING_ROOM;
-		}
-	}
+			model.put("player", player);
+			model.put("room", new Room());
+			model.put("message", "First delete your room.");
+			model.put("messageType", "warning");
+			return VIEWS_ROOM_SEARCH;
+			}
 
+	}
+	
 	@GetMapping("/delete/{roomId}")
 	public String deleteRoom(@PathVariable("roomId") int roomId, ModelMap model){
 		Player player = authService.getPlayer();
 		Room room =this.roomService.findRoomById(roomId);
 		if(room.getHost().equals(player)){
-			model.remove("room",this.roomService.findRoomById(roomId));
-			player.setRoom(null);
-			playerService.savePlayer(player);
+			Collection<Player> players=room.getPlayers();
+			players.forEach(p->{
+				p.setRoom(null);
+				playerService.savePlayer(p);
+			});
+			
 			roomService.deleteRoom(roomId);
-			return "redirect:/room/find";
+			return "redirect:/";
 		} else {
 			return "redirect:/";
 		}
 
 
 	}
+
+	//redirect hacia my room
+	@GetMapping("/myRoom")
+        public String showMyRoom() {
+			Player player = authService.getPlayer();
+			Optional<Room> room=roomService.findRoomByHost(player);
+			if(room.isEmpty()){
+				return "redirect:/room/new";
+			}else{
+				return "redirect:/room/"+room.get().getId();
+			}
+      	  
+  }
 
 }

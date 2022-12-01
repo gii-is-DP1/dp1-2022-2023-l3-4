@@ -25,7 +25,14 @@
 					title="home page">
 					<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
 					<span>Home</span>
-				</virus:menuItem>
+				</petclinic:menuItem>
+
+				<petclinic:menuItem active="${name eq 'room'}" url="/room/myRoom"
+					title="this is my room">
+					<span class="glyphicon glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+					<span>My room</span>
+				</petclinic:menuItem>
+				
 
 			</ul>
 

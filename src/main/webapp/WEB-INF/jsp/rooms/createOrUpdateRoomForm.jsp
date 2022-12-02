@@ -26,7 +26,7 @@
                     </div>
                     <script type="text/javascript">
                         function add_password() {
-                            document.getElementById('wrapper').innerHTML = '<span>Password: <input type="text"></span>';
+                            document.getElementById('wrapper').innerHTML = '<span>Password: <input type="password"></span>';
                         }
                     </script>
                 </div>

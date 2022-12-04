@@ -7,6 +7,7 @@
 <virus:layout pageName="game">
     <table align="center">
         <tbody>
+            <h1><c:out value="${currentTurnGamePlayer.player.user.username}'s turn"/></h1>
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
@@ -51,9 +52,10 @@
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/">
+                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/"></c:if>
                             <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
-                        </a>
+                        <c:if test="${isYourTurn}"></a></c:if>
+
                     </c:forEach>
                 </td>
             </tr>

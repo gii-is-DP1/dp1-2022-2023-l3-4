@@ -152,6 +152,11 @@ public class GameController {
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
 		Game game = gameService.findGames(gameId);
 		model = generaTablero(model, gp_vista, game);
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(gp_vista);
+		model.put("isYourTurn", isYourTurn);
+		model.put("currentTurnGamePlayer", currentTurnGamePlayer);
+
 		return "games/game";
 	}
 

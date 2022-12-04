@@ -86,9 +86,12 @@ public class GameController {
 			card.setType(c);
 			card.setBody(false);
 			card.setPlayed(false);
+			card.setVaccines(new ArrayList<>());
+			card.setVirus(new ArrayList<>());
 			game.getCards().add(card);
 			cardService.save(card);
 		}
+		Collections.shuffle(game.getCards());
 		gameService.save(game);
 		reparteCartas(game.getId());
 
@@ -313,13 +316,13 @@ public class GameController {
 				if(c_organ.getVaccines().size()==0){
 					if(c_organ.getVirus().size()==0){
 						c_organ.getVirus().add(c_virus);
-						c_virus.setBody(true);
+						
 						c_virus.setCardVirus(c_organ);	
 
 					}else{
 						Card virus1 = c_organ.getVirus().get(0);
 						c_organ.setVirus(new ArrayList<>());
-						virus1.setBody(false);
+						
 						virus1.setPlayed(true);
 						virus1.setCardVirus(null);
 						c_virus.setPlayed(true);
@@ -331,7 +334,7 @@ public class GameController {
 					return turn(gameId, gamePlayerId);			
 				} else if(c_organ.getVaccines().size()==1){
 					Card vaccine = c_organ.getVaccines().get(0);
-					vaccine.setBody(false);
+					
 					vaccine.setPlayed(true);
 					vaccine.setCardVaccine(null);
 					c_virus.setPlayed(true);
@@ -370,7 +373,7 @@ public class GameController {
 				if(c_organ.getVirus().size()==0){
 					if(c_organ.getVaccines().size()<2){
 						c_organ.getVaccines().add(c_vaccine);
-						c_vaccine.setBody(true);
+						
 						c_vaccine.setCardVaccine(c_organ);
 						cardService.save(c_vaccine);
 						cardService.save(c_organ);
@@ -382,7 +385,7 @@ public class GameController {
 			
 				}else{
 					Card virus = c_organ.getVirus().get(0);
-					virus.setBody(false);
+					
 					virus.setPlayed(true);
 					virus.setCardVirus(null);
 					c_vaccine.setPlayed(true);

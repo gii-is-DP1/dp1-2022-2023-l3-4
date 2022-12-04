@@ -232,7 +232,7 @@ public class GameController {
 			@PathVariable("targetGamePlayerid") Integer targetGP, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
-			return playOrgan(gameId, targetGP, sourceGP, cardId);
+			return playOrgan(gameId, sourceGP, targetGP, cardId);
 		}
 		
 		return muestraVista(gameId, sourceGP, model);
@@ -289,8 +289,8 @@ public class GameController {
 				}else{
 					log.error("Esta carta no es un órgano");
 					model.put("message", "Esta carta no es un órgano");
-						model.put("messageType", "info");
-						return muestraVista(gameId, gamePlayerId, model);
+					model.put("messageType", "info");
+					return muestraVista(gameId, gamePlayerId, model);
 				}			
 		}else{
 			log.error("Movimiento inválido");

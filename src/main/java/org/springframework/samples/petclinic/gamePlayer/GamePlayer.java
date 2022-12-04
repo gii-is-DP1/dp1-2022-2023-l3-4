@@ -38,7 +38,7 @@ public class GamePlayer extends BaseEntity {
     
     
 
-    @OneToMany
+    @OneToMany(mappedBy = "gamePlayer")
     private List<Card> cards;
 
 }

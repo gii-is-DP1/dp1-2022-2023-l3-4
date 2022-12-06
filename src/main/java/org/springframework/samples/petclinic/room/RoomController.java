@@ -67,6 +67,9 @@ public class RoomController {
 		}
 		else {
 				try{
+					if(room.getPassword()==null){
+						room.setPassword("");
+					}
 					room.setTotalGamesPlayer(0);
 					room.setHost(player);
 					this.roomService.saveRoom(room);
@@ -104,6 +107,9 @@ public class RoomController {
 		}
 		else {
 				try{
+					if(room.getPassword()==null){
+						room.setPassword("");
+					}
 					room.setId(roomOld.getId());
 					room.setPlayers(roomOld.getPlayers());
 					room.setTotalGamesPlayer(roomOld.getTotalGamesPlayer());

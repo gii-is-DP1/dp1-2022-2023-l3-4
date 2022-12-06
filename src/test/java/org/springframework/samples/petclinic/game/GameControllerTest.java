@@ -15,6 +15,7 @@ import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -64,6 +65,9 @@ public class GameControllerTest {
 
     @MockBean
     private GenericCardService gCardService;
+
+    @MockBean
+    private RoomService roomService;
 
     @MockBean
     private GameRepository gameRepo;
@@ -650,7 +654,7 @@ public class GameControllerTest {
     //Jugar un órgano corazón sin tener ningún organo
     @Test
     public void testPlayOrganPositive1() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 0, 0, 0));
 
     }
@@ -659,94 +663,94 @@ public class GameControllerTest {
     //Jugar un órgano corazón teniendo un estómago
     @Test
     public void testPlayOrganPositive2() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 2, 2, 1));
     }
 
     //Jugar un órgano corazón a otro jugador
     @Test
     public void testPlayOrganPositive3() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService,gCardService);
         assertEquals("/games/"+0+"/gamePlayer/"+1+"/decision", gc.playOrgan(0, 0, 1, 0));
     }
 
     //Jugar un órgano corazón teniendo un corazón en el cuerpo
     @Test
     public void testPlayOrganNegative1() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+0+"/gamePlayer/"+3+"/decision", gc.playOrgan(0, 3, 3, 4));
     }
 
     //Jugar un órgano corazón a otro que ya tiene un corazón en el cuerpo
     @Test
     public void testPlayOrganNegative2() {
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+0+"/gamePlayer/"+0+"/decision", gc.playOrgan(0, 0, 3, 0));
     }
 
     @Test
     public void testPlayVirusPositive1(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+1+"/gamePlayer/"+5+"/decision", gc.playVirus(1, 4, 5, 6));
     }
 
     @Test
     public void testPlayVirusPositive2(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc =new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+1+"/gamePlayer/"+5+"/decision", gc.playVirus(1, 4, 5, 7));
     }
 
     @Test
     public void testPlayVirusPositive3(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+1+"/gamePlayer/"+5+"/decision", gc.playVirus(1, 4, 5, 10));
     }
 
     @Test
     public void testPlayVirusNegative1(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc =new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+1+"/gamePlayer/"+4+"/decision", gc.playVirus(1, 4, 5, 2));
     }
 
     @Test
     public void testPlayVirusNegative2(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc =new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+1+"/gamePlayer/"+4+"/decision", gc.playVirus(1, 4, 5, 13));
     }
 
     @Test
     public void testPlayVaccinePositive1(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc =new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+2+"/gamePlayer/"+0+"/decision", gc.playVaccine(2, 9, 15, 14));
     }
 
     @Test
     public void testPlayVaccinePositive2(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+2+"/gamePlayer/"+0+"/decision", gc.playVaccine(2, 9, 15, 17));
     }
 
     @Test
     public void testPlayVaccineNegative1(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc =new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+2+"/gamePlayer/"+9+"/decision", gc.playVaccine(2, 9, 15, 0));
     }
 
     @Test
     public void testPlayVaccineNegative2(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+2+"/gamePlayer/"+9+"/decision", gc.playVaccine(2, 9, 15, 20));
     }
 
     @Test
     public void testPlayTransplantPositive1(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+3+"/gamePlayer/"+3+"/decision", gc.playTransplant(3, 12, 3, 17));
     }
 
     @Test
     public void testPlayTransplantNegative(){
-        GameController gc = new GameController(gameServ, gamePlayerServ, cardService);
+        GameController gc = new GameController(gameServ, gamePlayerServ, cardService, roomService, gCardService);
         assertEquals("/games/"+3+"/gamePlayer/"+12+"/decision", gc.playTransplant(3, 12, 3, 20));
     }
 

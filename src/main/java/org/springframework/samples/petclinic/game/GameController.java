@@ -52,15 +52,51 @@ public class GameController {
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService,RoomService roomService,GenericCardService genericCardService) {
-		this.roomService=roomService;
-		this.genericCardService=genericCardService;
+	CardService cardService, GenericCardService genericCardService, RoomService roomService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
-
+		this.genericCardService=genericCardService;
+		this.roomService = roomService;
 	}
 
+	@GetMapping(value = "/game/start/{roomId}")
+	public String init(@PathVariable("roomId") Integer roomId) {
+
+		Game game = new Game();
+		game.setRound(0);
+		game.setTurn(0);
+		List<GamePlayer> gamePlayers = new ArrayList<>();
+		game.setCards(new ArrayList<>());
+		game.setClassification(new HashMap<>());
+		List<Player> players = new ArrayList<>(roomService.findRoomById(roomId).getPlayers());
+		
+		for(Player p: players) {
+			GamePlayer gp = new GamePlayer();
+			gp.setPlayer(p);
+			gp.setCards(new ArrayList<>());
+			gamePlayers.add(gp);
+			gamePlayerService.save(gp);
+		}
+
+		game.setGamePlayer(gamePlayers);
+		List<GenericCard> deck = genericCardService.findGCards();
+		for(GenericCard c: deck){
+			Card card = new Card();
+			card.setType(c);
+			card.setBody(false);
+			card.setPlayed(false);
+			game.getCards().add(card);
+			cardService.save(card);
+		}
+		gameService.save(game);
+		reparteCartas(game.getId());
+
+
+		return "redirect:/games/"+ game.getId() +"/gamePlayer/"+gamePlayers.get(0).getId();
+		
+	}
+	
 	//Listar juegos
 	@GetMapping(value="/games")
 	public String ListGames(ModelMap model){
@@ -68,58 +104,6 @@ public class GameController {
 		model.put("games", allGames);
 		return "games/listing";
 	}
-
-	//Empezar Juego
-	@GetMapping(value = "/game/start/{roomId}")
-    public String init(@PathVariable("roomId") Integer roomId) {
-
-        Game game = new Game();
-        game.setRound(0);
-        game.setTurn(0);
-        game.setGamePlayer(new ArrayList<>());
-        game.setCards(new ArrayList<>());
-        game.setClassification(new HashMap<>());
-        List<Player> players = new ArrayList<>(roomService.findRoomById(roomId).getPlayers());
-
-        for(Player p: players) {
-            GamePlayer gp = new GamePlayer();
-            gp.setPlayer(p);
-            gp.setGame(game);
-            gamePlayerService.save(gp);
-            game.getGamePlayer().add(gp);
-        }
-
-        List<GenericCard> deck = genericCardService.findGCards();
-        for(GenericCard c: deck){
-            Card card = new Card();
-            card.setType(c);
-            game.getCards().add(card);
-            cardService.save(card);
-        }
-
-        gameService.save(game);
-
-        return "redirect:/game/" + game.getId();
-
-    }
-
-	/* 
-	public void init(Integer gameId) {
-		Game game = new Game();
-		game.setRound(0);
-		game.setTurn(0);
-		reset();
-		List<Card> deck = new ArrayList<Card>(68);
-		Game currentGame = gameService.findGames(gameId);
-			int i = 0;
-		for(Card c: deck){
-			c.setId(i + gameId*100);
-			c.setType(cards.get(i));
-			i++;
-		}
-		currentGame.setCards(deck);
-	}
-	*/
 
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(@PathVariable("gameId") int gameId){
@@ -135,7 +119,7 @@ public class GameController {
 	}
 	
 	//Barajar
-	public void reparteCartas(@PathVariable("gameId") int gameId) {
+	public void reparteCartas(int gameId) {
 		Game currentGame = gameService.findGames(gameId); 
 		List<Card> baraja = currentGame.getCards().stream().filter(x->!x.getBody() && !x.getPlayed() && x.getGamePlayer()==null).collect(Collectors.toList());
 		if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a shuffle
@@ -161,16 +145,17 @@ public class GameController {
 
 	//Muestra vista Individual de cada jugador
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
-	public void muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
+	public String muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
-			
+		Map<String, List<Card>> bodies = new HashMap<>(); 
 		for(GamePlayer gp: gameService.findGames(gameId).getGamePlayer()){
 			if(gp== gp_vista){
 				model.put("hand", gp.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList()));
 			}
-			model.put("body"+gp.getId(), gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
+			bodies.put(gp.getPlayer().getFirstName(), gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
-
+		model.put("bodies", bodies);
+		return "games/game";
 	}
 
 	//Cambio de turno

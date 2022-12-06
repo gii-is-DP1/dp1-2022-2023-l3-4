@@ -3,6 +3,8 @@ package org.springframework.samples.petclinic.room;
 import java.util.Collection;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +107,8 @@ public class RoomController {
 					room.setId(roomOld.getId());
 					room.setPlayers(roomOld.getPlayers());
 					room.setTotalGamesPlayer(roomOld.getTotalGamesPlayer());
-					room.setHost(player);
-					this.roomService.saveRoom(room);
+					room.setHost(roomOld.getHost());
+					roomService.updateRoom(room);
 
 				}catch(DuplicatedNameRoomException ex){
 					
@@ -114,7 +116,7 @@ public class RoomController {
 					
 					return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
 				}
-				return "redirect:/room/" + room.getId();
+				return "redirect:/room/" + roomOld.getId();
 		}
 	}
 
@@ -149,9 +151,10 @@ public class RoomController {
 	}
 
 @GetMapping("/{roomId}")
-	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model) {
+	public String showRoom(@PathVariable("roomId") int roomId,ModelMap model,HttpServletRequest req, HttpServletResponse res) {
 		Player player = authService.getPlayer();
 		Room roomPlayer=player.getRoom();
+		String algun_nombre = req.getParameter("algun_nombre");
 		Room room=this.roomService.findRoomById(roomId);
 		//Si no eres host de una room o ya perteneces a esa sala
 		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){

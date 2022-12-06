@@ -13,6 +13,7 @@
         <thead>
         <tr>
             <th>Room Name</th>
+            <th>bla</th>
             <th></th>
 
         </tr>
@@ -23,6 +24,9 @@
             <tr>
                 <td>
                     <c:out value="${room.roomName} "/>
+                </td>
+                <td>
+                    <input id="passwordUserId" name="passwordUser" type="text" />
                 </td>
                 <td>
                     <a href="/room/${room.id}" class="btn btn-primary">Join Room</a>

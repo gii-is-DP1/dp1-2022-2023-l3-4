@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ class RoomServiceTests {
 
     @Autowired
     protected RoomService roomService;
+
 
     @Test
     void testConstraints(){
@@ -58,17 +60,5 @@ class RoomServiceTests {
 
 
 
-    @Test
-    @Transactional
-    void shouldUpdateRoom() {
-        Room room = this.roomService.findRoomById(1);
-        String oldRoomName = room.getRoomName();
-        String newRoomName = oldRoomName + "X";
-
-        room.setRoomName(newRoomName);
-
-        room = this.roomService.findRoomById(1);
-        assertThat(room.getRoomName()).isEqualTo(newRoomName);
-    }
 
 }

@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.friendRequest;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.transaction.Transactional;
@@ -26,8 +27,12 @@ public class FriendService {
         friendRepository.save(friend);
     }
 
-    // @Transactional
-    // public Collection<Player> findFriendById(Integer playerId) throws DataAccessException {
-    //     return friendRequestRepository.findFriendById(playerId);
-    // }
+    @Transactional
+    public Collection<Player> findFriendById(Integer playerId) throws DataAccessException {
+        Collection<Player> friendRec=friendRepository.findFriendBySendId(playerId);
+        Collection<Player> friendSend=friendRepository.findFriendByRecId(playerId);
+        Collection<Player> friends=new ArrayList<>(friendRec);
+        friends.addAll(friendSend);
+        return friends;
+    }
 }

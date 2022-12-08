@@ -10,8 +10,11 @@ import org.springframework.samples.petclinic.player.Player;
 
 public interface FriendRepository extends CrudRepository<Friend,Integer>{
 
-    // @Query("SELECT f FROM Friend f WHERE f.requestingPlayer = :playerId")
-    // public Collection<Player> findFriendById(@Param("playerId") Integer playerId);
+    @Query("SELECT f.playerRec FROM Friend f WHERE f.playerSend.id = :playerId AND f.status = true")
+    public Collection<Player> findFriendBySendId(@Param("playerId") Integer id);
+
+    @Query("SELECT f.playerSend FROM Friend f WHERE f.playerRec.id = :playerId AND f.status = true")
+    public Collection<Player> findFriendByRecId(@Param("playerId") Integer id);
 
     
 }

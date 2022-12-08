@@ -31,11 +31,11 @@ public class FriendController {
 	}
 
 
-    // @GetMapping("/myFriends")
-	// public String createSearch(ModelMap model) {
-    //     Player playerAuth= authService.getPlayer();
-    //     Collection<Player> myFriends=friendRequestService.findFriendById(playerAuth.getId());
-    //     model.put("myFriends",myFriends);
-	// 	return VIEWS_MY_FRIENDS;
-	// }
+    @GetMapping("/myFriends")
+	public String createSearch(ModelMap model) {
+        Player playerAuth= authService.getPlayer();
+        Collection<Player> myFriends=friendService.findFriendById(playerAuth.getId());
+        model.put("myFriends",myFriends);
+		return VIEWS_MY_FRIENDS;
+	}
 }

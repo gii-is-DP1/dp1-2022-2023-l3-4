@@ -5,7 +5,15 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="friends">
-    <h2>Friends</h2>
+    <div class="row">
+        <div class="col-md-9">
+            <h2>Friends</h2>
+        </div>
+        <div class="col-md-3">
+            <a href="/friend/myFriendsRequest">My Friends Request</a>
+        </div>
+    </div>
+
 
     <table id="friendsTable" class="table table-striped">
         <thead>

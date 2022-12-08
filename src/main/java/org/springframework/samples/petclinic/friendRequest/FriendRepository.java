@@ -16,5 +16,11 @@ public interface FriendRepository extends CrudRepository<Friend,Integer>{
     @Query("SELECT f.playerSend FROM Friend f WHERE f.playerRec.id = :playerId AND f.status = true")
     public Collection<Player> findFriendByRecId(@Param("playerId") Integer id);
 
+    @Query("SELECT f FROM Friend f WHERE f.playerSend.id = :playerId AND f.status = null")
+    public Collection<Friend> findMySendRequestById(@Param("playerId") Integer id);
+
+    @Query("SELECT f FROM Friend f WHERE f.playerRec.id = :playerId AND f.status = null")
+    public Collection<Friend> findMyRecRequestById(@Param("playerId") Integer id);
+
     
 }

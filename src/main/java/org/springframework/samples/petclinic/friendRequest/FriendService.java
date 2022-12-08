@@ -28,11 +28,23 @@ public class FriendService {
     }
 
     @Transactional
-    public Collection<Player> findFriendById(Integer playerId) throws DataAccessException {
-        Collection<Player> friendRec=friendRepository.findFriendBySendId(playerId);
-        Collection<Player> friendSend=friendRepository.findFriendByRecId(playerId);
+    public Collection<Player> findFriendsById(Integer playerId) throws DataAccessException {
+        Collection<Player> friendRec=friendRepository.findFriendByRecId(playerId);
+        Collection<Player> friendSend=friendRepository.findFriendBySendId(playerId);
         Collection<Player> friends=new ArrayList<>(friendRec);
         friends.addAll(friendSend);
         return friends;
+    }
+
+    @Transactional
+    public Collection<Friend> findMyRecRequestById(Integer playerId) throws DataAccessException {
+        Collection<Friend> requestRec=friendRepository.findMyRecRequestById(playerId);
+        return requestRec;
+    }
+
+    @Transactional
+    public Friend findFriendById(Integer playerId) throws DataAccessException {
+        Friend friend=friendRepository.findById(playerId).get();
+        return friend;
     }
 }

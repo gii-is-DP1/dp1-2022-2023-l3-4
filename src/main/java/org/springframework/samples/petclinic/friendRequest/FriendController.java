@@ -9,6 +9,7 @@ import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class FriendController {
 
     private static final String VIEWS_MY_FRIENDS = "friends/FriendsListing";
+    private static final String VIEWS_MY_REQUEST = "friends/FriendsRequestListing";
 
     private final FriendService friendService;
 
@@ -32,10 +34,36 @@ public class FriendController {
 
 
     @GetMapping("/myFriends")
-	public String createSearch(ModelMap model) {
+	public String friendsListing(ModelMap model) {
         Player playerAuth= authService.getPlayer();
-        Collection<Player> myFriends=friendService.findFriendById(playerAuth.getId());
+        Collection<Player> myFriends=friendService.findFriendsById(playerAuth.getId());
         model.put("myFriends",myFriends);
 		return VIEWS_MY_FRIENDS;
+	}
+
+    @GetMapping("/myFriendsRequest")
+	public String friendsRequestListing(ModelMap model) {
+        Player playerAuth= authService.getPlayer();
+        Collection<Friend> myRequest=friendService.findMyRecRequestById(playerAuth.getId());
+        model.put("myRequest",myRequest);
+		return VIEWS_MY_REQUEST;
+	}
+    @GetMapping("/myFriendsRequest/{requestId}/accept")
+	public String friendRequestAccept(@PathVariable("requestId") int requestId,ModelMap model) {
+        Player playerAuth= authService.getPlayer();
+        Friend friend=friendService.findFriendById(requestId);
+        friend.setStatus(true);
+        this.friendService.savePlayer(friend);
+		return "redirect:/friend/myFriendsRequest";
+	}
+
+    @GetMapping("/myFriendsRequest/{requestId}/denied")
+	public String friendRequestDenied(@PathVariable("requestId") int requestId,ModelMap model) {
+        Player playerAuth= authService.getPlayer();
+        Friend friend=friendService.findFriendById(requestId);
+        friend.setStatus(false);
+        this.friendService.savePlayer(friend);
+        this.friendService.savePlayer(friend);
+		return "redirect:/friend/myFriendsRequest";
 	}
 }

@@ -38,11 +38,18 @@
                 <td>
                     <form>
                         <option id="roomPassword">${room.password}</option> 
-                        <c:if test="${room.isPrivate}">
+                        <c:choose>
+                        <c:when test="${room.isPrivate}">
                             <label for="pswd">Enter your password: </label> 
                             <input type="password" id="pswd">
-                        </c:if>
-                        <input type="button" value="Join Room" class="btn btn-primary" onclick="checkPswd();" />
+                            <input type="button" value="Join Room" class="btn btn-primary" onclick="checkPswd();" />
+                        </c:when>
+                        <c:otherwise>
+                            <a href="/room/${room.id}">
+                                <input type="button" value="Join Room" class="btn btn-primary" />
+                            </a>
+                        </c:otherwise>
+                    </c:choose>   
                     </form>
                     <script type="text/javascript">
                         function checkPswd() {

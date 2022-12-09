@@ -77,5 +77,15 @@ public class FriendController {
 		return "redirect:/friend/myFriends";
 	}
 
+    @GetMapping("/request/{playerId}")
+	public String friendRequest(@PathVariable("playerId") int playerId) {
+        Player playerSend = authService.getPlayer();
+        Friend request = new Friend();
+        request.setStatus(null);
+        request.setPlayerSend(playerSend);
+        request.setPlayerRec(playerService.findPlayerById(playerId));
+        this.friendService.savePlayer(request);
+		return "redirect:/friend/myFriends";
+	}
 
 }

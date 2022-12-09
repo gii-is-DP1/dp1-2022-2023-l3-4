@@ -50,6 +50,7 @@ public class PlayerController {
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
     private static final String VIEW_FIND_PLAYER = "player/searchPlayer";
+    private static final String VIEW_LIST_PLAYER = "player/playerListing";
 
 
     @Autowired
@@ -105,14 +106,14 @@ public class PlayerController {
 
     @GetMapping(value = "/find")
 	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
-		if (player.getUser().getUsername() == null) {
-            User user=player.getUser();
-            user.setUsername("");
-			player.setUser(user);
-		}
+		// if (player.getUser().getUsername() == null) {
+            // User user=player.getUser();
+            // user.setUsername("");
+			// player.setUser(user);
+		// }
 		// find player by userName
-		Collection<Player> results = playerService.getPlayersByUsername(player.getUser().getUsername());
-		if (results.isEmpty()) {
+		Collection<Player> players = playerService.getPlayersByUsername("");
+		if (players.isEmpty()) {
 			// no player found
 			result.rejectValue("userName", "notFound", "not found");
 			return "player/createSearch";
@@ -120,8 +121,8 @@ public class PlayerController {
 
 		else {
 			// multiple roomss found
-			model.put("players", results);
-			return "/player/createSearch";
+			model.put("players", players);
+			return VIEW_LIST_PLAYER;
 		}
 	}
 	

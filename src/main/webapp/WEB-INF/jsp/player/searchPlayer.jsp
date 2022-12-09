@@ -9,14 +9,12 @@
     <h2>
         Welcome Player:
     </h2>
-    <div>
-        <form:form modelAttribute="player" action="/player/find" method="get" class="form-horizontal"
-            id="search-player-form">
+    <form:form modelAttribute="player" class="form-horizontal">
             <div class="form-group">
-                <div class="control-group" id="userName">
-                    <label class="col-sm-2 control-label">User Name </label>
+                <div class="control-group" id="username">
+                    <label class="col-sm-2 control-label">username </label>
                     <div class="col-sm-10">
-                        <form:input class="form-control" path="userName" size="20" maxlength="20" />
+                        <form:input class="form-control" path="username" size="20" maxlength="20" />
                         <span class="help-inline">
                             <form:errors path="*" />
                         </span>
@@ -25,10 +23,10 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary">Find Player</button>
+                    <button type="submit" class="btn btn-primary">Find Room</button>
                 </div>
             </div>
         </form:form>
-    </div>
 
-</petclinic:layout>
+
+    </petclinic:layout>

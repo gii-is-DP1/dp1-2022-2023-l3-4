@@ -22,12 +22,14 @@
         <c:forEach items="${players}" var="player">
             <tr>
                 <td>
-                    <c:out value="${room.roomName} "/>
+                    <c:out value="${player.user.username} "/>
                 </td>
                 <td>
-                    
-                </td>
-                
+
+                    <a href="/friend/request/${player.id}">
+                        <input type="button" value="Send Request" class="btn btn-primary" />
+                    </a>
+                </td> 
             </tr>
 
         </c:forEach>

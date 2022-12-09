@@ -63,5 +63,10 @@ public class PlayerService {
         return (Collection<Player>) playerRepository.findAll();
     }
 
+    @Transactional
+    public Player findPlayerById(Integer id) {
+        return playerRepository.findById(id).get();
+    }
+
 
 }

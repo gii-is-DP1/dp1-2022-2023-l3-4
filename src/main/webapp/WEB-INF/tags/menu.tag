@@ -29,9 +29,17 @@
 
 				<petclinic:menuItem active="${name eq 'room'}" url="/room/myRoom"
 					title="this is my room">
-					<span class="glyphicon glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+					<span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
 					<span>My room</span>
 				</petclinic:menuItem>
+
+				<sec:authorize access="isAuthenticated()">
+				<petclinic:menuItem active="${name eq 'friend'}" url="/friend/myFriends"
+					title="this is my friends">
+					<span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
+					<span>Friends</span>
+				</petclinic:menuItem>
+				</sec:authorize>
 				
 
 			</ul>
@@ -45,7 +53,6 @@
 					<li><a href="<c:url value="/users/new" />">Register</a></li>
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
-					<li><a href="<c:url value="/friend/myFriends" />">Friends</a></li>
 					<li class="dropdown"><a  class="dropdown-toggle"
 						data-toggle="dropdown"> 
 						<span class="glyphicon glyphicon-user"></span>

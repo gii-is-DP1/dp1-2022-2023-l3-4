@@ -3,21 +3,20 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
-<virus:layout pageName="room">
+<petclinic:layout pageName="player">
     <h2>
         Welcome Player:
     </h2>
     <div>
-        <form:form modelAttribute="room" action="/room/find" method="get" class="form-horizontal"
+        <form:form modelAttribute="player" action="/player/find" method="get" class="form-horizontal"
             id="search-player-form">
             <div class="form-group">
-                <div class="control-group" id="roomName">
-                    <label class="col-sm-2 control-label">Room Name </label>
+                <div class="control-group" id="userName">
+                    <label class="col-sm-2 control-label">User Name </label>
                     <div class="col-sm-10">
-                        <form:input class="form-control" path="roomName" size="20" maxlength="20" />
+                        <form:input class="form-control" path="userName" size="20" maxlength="20" />
                         <span class="help-inline">
                             <form:errors path="*" />
                         </span>
@@ -26,10 +25,10 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary">Find Room</button>
+                    <button type="submit" class="btn btn-primary">Find Player</button>
                 </div>
             </div>
         </form:form>
     </div>
 
-</virus:layout>
+</petclinic:layout>

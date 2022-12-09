@@ -53,5 +53,15 @@ public class PlayerService {
         return playerRepository.findPlayerByUsername(username);
     }
 
+    @Transactional
+    public Collection<Player> getPlayersByUsername(String username) {
+        return playerRepository.findPlayersByUsername(username);
+    }
+
+    @Transactional
+    public Collection<Player> getAllPlayers() {
+        return (Collection<Player>) playerRepository.findAll();
+    }
+
 
 }

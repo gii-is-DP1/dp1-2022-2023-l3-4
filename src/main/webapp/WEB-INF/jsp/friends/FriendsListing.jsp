@@ -6,11 +6,14 @@
 
 <petclinic:layout pageName="friends">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-8">
             <h2>Friends</h2>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/friend/myFriendsRequest">My Friends Request</a>
+        </div>
+        <div class="col-md-2">
+            <a href="/player/createSearch">Search Player</a>
         </div>
     </div>
 
@@ -19,6 +22,7 @@
         <thead>
         <tr>
             <th>User Name:</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +30,11 @@
             <tr>
                 <td>
                     <c:out value="${friend.user.username}"/>
+                </td>
+                <td>
+                    <a href="${playerAuth.id}/delete/${friend.id}">
+                        <input type="button" value="Delete" class="btn btn-danger" />
+                    </a>
                 </td>
             </tr>
         </c:forEach>

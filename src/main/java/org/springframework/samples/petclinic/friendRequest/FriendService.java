@@ -47,4 +47,14 @@ public class FriendService {
         Friend friend=friendRepository.findById(playerId).get();
         return friend;
     }
+
+    @Transactional
+    public Friend findByPlayersId(Integer player1,Integer player2) throws DataAccessException {
+        return friendRepository.findByPlayersId(player1,player2);
+    }
+
+    @Transactional
+    public void deleteFriendById(Integer requestId) throws DataAccessException{
+        friendRepository.deleteById(requestId);
+    }
 }

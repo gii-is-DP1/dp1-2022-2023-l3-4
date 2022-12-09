@@ -38,6 +38,7 @@ public class FriendController {
         Player playerAuth= authService.getPlayer();
         Collection<Player> myFriends=friendService.findFriendsById(playerAuth.getId());
         model.put("myFriends",myFriends);
+        model.put("playerAuth",playerAuth);
 		return VIEWS_MY_FRIENDS;
 	}
 
@@ -48,9 +49,9 @@ public class FriendController {
         model.put("myRequest",myRequest);
 		return VIEWS_MY_REQUEST;
 	}
+
     @GetMapping("/myFriendsRequest/{requestId}/accept")
-	public String friendRequestAccept(@PathVariable("requestId") int requestId,ModelMap model) {
-        Player playerAuth= authService.getPlayer();
+	public String friendRequestAccept(@PathVariable("requestId") int requestId) {
         Friend friend=friendService.findFriendById(requestId);
         friend.setStatus(true);
         this.friendService.savePlayer(friend);
@@ -58,12 +59,23 @@ public class FriendController {
 	}
 
     @GetMapping("/myFriendsRequest/{requestId}/denied")
-	public String friendRequestDenied(@PathVariable("requestId") int requestId,ModelMap model) {
-        Player playerAuth= authService.getPlayer();
+	public String friendRequestDenied(@PathVariable("requestId") int requestId) {
         Friend friend=friendService.findFriendById(requestId);
         friend.setStatus(false);
         this.friendService.savePlayer(friend);
         this.friendService.savePlayer(friend);
 		return "redirect:/friend/myFriendsRequest";
 	}
+
+    @GetMapping("/{player1Id}/delete/{player2Id}")
+	public String friendDelete(@PathVariable("player1Id") int player1Id,@PathVariable("player2Id") int player2Id) {
+        Friend friend= friendService.findByPlayersId(player1Id, player2Id);
+        friend.setPlayerRec(null);
+        friend.setPlayerSend(null);
+        this.friendService.savePlayer(friend);
+        friendService.deleteFriendById(friend.getId());
+		return "redirect:/friend/myFriends";
+	}
+
+
 }

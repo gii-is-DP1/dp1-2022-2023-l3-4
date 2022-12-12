@@ -7,9 +7,11 @@ INSERT INTO users(username,password,enabled) VALUES ('josgarber6','276591',TRUE)
 INSERT INTO users(username,password,enabled) VALUES ('frabenrui1','z3bas',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('lucperrom','laquesea',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('juaanjimdel','laquesea2',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p','p',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
 INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
 INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');
+INSERT INTO authorities(id,username,authority) VALUES (13,'p','player');
 
 -- One vet user, named vet1 with passwor v3t
 INSERT INTO users(username,password,enabled) VALUES ('vet1','v3t',TRUE);
@@ -48,6 +50,7 @@ INSERT INTO players(id,first_name,last_name,username,description,status) VALUES 
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (2,'Jose Maria','Garcia Berdejo','josgarber6','Lets gooo',TRUE);
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE);
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (5,'p','p','p','pp',TRUE);
 
 -- PlayerAchievements
 
@@ -59,4 +62,3 @@ INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, p
 
 
 -- Rooms
-

@@ -44,10 +44,10 @@ public class GameController {
 	
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
+	private final RoomService roomService;
+	private final GenericCardService genericCardService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
-	private final GenericCardService genericCardService;
-	private final RoomService roomService;
 
 
 	@Autowired

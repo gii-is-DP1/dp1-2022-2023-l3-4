@@ -18,6 +18,16 @@
                     <petclinic:inputField label="Num max player" name="numMaxPlayers"/>
                     <label for="isPrivate">is Private?</label>
                     <form:checkbox path="isPrivate"/>
+                    <input type="button" id="more_fields" onclick="add_password();" value="Add Password" />
+                    <div id="room_fileds">
+                        <div class="content" id="wrapper"> 
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function add_password() {
+                            document.getElementById('wrapper').innerHTML = '<span>Password: <input type:"password" label="Password" name="password"/></span>';
+                        }
+                    </script>
                 </div>
 
 

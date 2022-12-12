@@ -1,9 +1,11 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
 import org.springframework.samples.petclinic.room.exceptions.PlayerHostsExistingRoomException;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,16 @@ public class RoomService {
 		return roomRepository.findRoomsByRoomName(roomName);
 	}
 
+	@Transactional
+	public Room findRoomByRoomName(String roomName) throws DataAccessException{
+		return roomRepository.findByRoomName(roomName);
+	}
+
+	@Transactional
+	public Optional<Room> findRoomByHost(Player player) throws DataAccessException{
+		return roomRepository.findRoomByHost(player);
+	}
+
     @Transactional(readOnly = true)
 	public Room findRoomById(int id) throws DataAccessException {
 		return roomRepository.findById(id).orElse(null);
@@ -36,6 +48,14 @@ public class RoomService {
 				throw new DuplicatedNameRoomException();
 			}else if(roomRepository.findRoomByHost(room.getHost()).isPresent()) {
 				throw new PlayerHostsExistingRoomException();
+			}else
+				roomRepository.save(room);
+			}
+
+	@Transactional()
+	public void updateRoom(Room room) throws DuplicatedNameRoomException{
+			if(roomRepository.findByRoomName(room.roomName)!=null && roomRepository.findByRoomName(room.roomName).getHost()!=room.getHost()){
+					throw new DuplicatedNameRoomException();
 			}else
 				roomRepository.save(room);
 			}

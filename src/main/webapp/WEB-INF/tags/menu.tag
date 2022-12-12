@@ -1,6 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="virus" tagdir="/WEB-INF/tags"%>
+<%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!--  >%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%-->
 <%@ attribute name="name" required="true" rtexprvalue="true"
@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="navbar-header">
 			<a class="navbar-brand"
-				href="<spring:url value="/" htmlEscape="true" />"><span></span></a>
+				href="<spring:url value="https://tranjisgames.com/wp-content/uploads/2022/02/RULES_v1.10-0122-Cas-WAH_web.pdf" htmlEscape="true" />"><span></span></a>
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
 				data-target="#main-navbar">
 				<span class="sr-only"><os-p>Toggle navigation</os-p></span> <span
@@ -21,11 +21,18 @@
 		<div class="navbar-collapse collapse" id="main-navbar">
 			<ul class="nav navbar-nav">
 
-				<virus:menuItem active="${name eq 'home'}" url="/"
+				<petclinic:menuItem active="${name eq 'home'}" url="/"
 					title="home page">
 					<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
 					<span>Home</span>
-				</virus:menuItem>
+				</petclinic:menuItem>
+
+				<petclinic:menuItem active="${name eq 'room'}" url="/room/myRoom"
+					title="this is my room">
+					<span class="glyphicon glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+					<span>My room</span>
+				</petclinic:menuItem>
+				
 
 			</ul>
 

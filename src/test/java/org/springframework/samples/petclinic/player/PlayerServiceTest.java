@@ -1,5 +1,8 @@
 package org.springframework.samples.petclinic.player;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,4 +22,11 @@ public class PlayerServiceTest {
         assertNotNull(player);
     }
 
+    @Test
+    public void shouldFindPlayersByUsername() {
+        Collection<Player> player = this.playerService.getPlayersByUsername("");
+        Collection<Player> allPlayer = this.playerService.getAllPlayers();
+        assertTrue(player.size()==allPlayer.size());
+    }
 }
+

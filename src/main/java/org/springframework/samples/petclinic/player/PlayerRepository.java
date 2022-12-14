@@ -31,6 +31,9 @@ import org.springframework.samples.petclinic.room.Room;
  */
 public interface PlayerRepository extends CrudRepository<Player, Integer> {
 
+  @Query("SELECT p FROM Player p WHERE p.user.username like :username%")
+  public Collection<Player> findPlayersByUsername(@Param("username") String username);
+
   @Query("SELECT p FROM Player p WHERE p.user.username = :username")
   public Player findPlayerByUsername(@Param("username") String username);
 

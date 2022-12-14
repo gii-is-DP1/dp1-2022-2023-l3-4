@@ -67,3 +67,10 @@ INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_
 INSERT INTO cards(id, body, played, card_vaccine_id, card_virus_id, game_player_id, type_id ) VALUES (2,TRUE,FALSE,2,2,1,2);
 
 -- Rooms
+
+--Friends
+
+INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(1,TRUE,1,5);
+INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(2,FALSE,2,1);
+INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(3,TRUE,3,1);
+INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(4,null,1,4);

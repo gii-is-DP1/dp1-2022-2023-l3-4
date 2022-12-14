@@ -15,12 +15,15 @@
  */
 package org.springframework.samples.petclinic.player;
 
+import java.util.Collection;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -46,6 +49,8 @@ public class PlayerController {
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
+    private static final String VIEW_FIND_PLAYER = "player/searchPlayer";
+    private static final String VIEW_LIST_PLAYER = "player/playerListing";
 
 
     @Autowired
@@ -92,5 +97,33 @@ public class PlayerController {
         return "redirect:/player/me";
     }
 
+    @GetMapping("/createSearch")
+	public String findPlayer(ModelMap model) {
+        Player player = new Player();
+		model.put("player", player);
+		return VIEW_FIND_PLAYER;
+	}
+
+    @GetMapping(value = "/find")
+	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
+		// if (player.getUser().getUsername() == null) {
+            // User user=player.getUser();
+            // user.setUsername("");
+			// player.setUser(user);
+		// }
+		// find player by userName
+		Collection<Player> players = playerService.getPlayersByUsername("");
+		if (players.isEmpty()) {
+			// no player found
+			result.rejectValue("userName", "notFound", "not found");
+			return "player/createSearch";
+		}
+
+		else {
+			// multiple roomss found
+			model.put("players", players);
+			return VIEW_LIST_PLAYER;
+		}
+	}
 	
 }

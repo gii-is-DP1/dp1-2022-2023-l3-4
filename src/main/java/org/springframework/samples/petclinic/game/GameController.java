@@ -86,9 +86,12 @@ public class GameController {
 			card.setType(c);
 			card.setBody(false);
 			card.setPlayed(false);
+			card.setVaccines(new ArrayList<>());
+			card.setVirus(new ArrayList<>());
 			game.getCards().add(card);
 			cardService.save(card);
 		}
+		Collections.shuffle(game.getCards());
 		gameService.save(game);
 		reparteCartas(game.getId());
 
@@ -147,15 +150,26 @@ public class GameController {
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
 	public String muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
-		Map<String, List<Card>> bodies = new HashMap<>(); 
-		for(GamePlayer gp: gameService.findGames(gameId).getGamePlayer()){
-			if(gp== gp_vista){
+		Game game = gameService.findGames(gameId);
+		model = generaTablero(model, gp_vista, game);
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(gp_vista);
+		model.put("isYourTurn", isYourTurn);
+		model.put("currentTurnGamePlayer", currentTurnGamePlayer);
+
+		return "games/game";
+	}
+
+	private ModelMap generaTablero(ModelMap model, GamePlayer gamePlayer, Game game) {
+		Map<GamePlayer, List<Card>> bodies = new HashMap<>(); 
+		for(GamePlayer gp: game.getGamePlayer()){
+			if(gp.equals(gamePlayer)){
 				model.put("hand", gp.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList()));
 			}
-			bodies.put(gp.getPlayer().getFirstName(), gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
+			bodies.put(gp, gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
 		model.put("bodies", bodies);
-		return "games/game";
+		return model;
 	}
 
 	//Cambio de turno
@@ -175,8 +189,7 @@ public class GameController {
 				else{game.setTurn(game.getTurn()+1); //Sino solo incrementamos el turno en 1
 				}
 				gameService.save(game); //Guardamos los cambios de game
-				gamePlayerId = game.getGamePlayer().get(game.getTurn()).getId();
-				return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
 			}
 
 		}
@@ -192,12 +205,15 @@ public class GameController {
 		}
 
 	//Jugar
-	@GetMapping(value="/games/{gameId}/gamePlayer/play")
-	public String play(@PathVariable("gameId") int gameId, @PathVariable("currentPlayer") int currentPlayer, Integer cardId){
+	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}/play/{cardId}")
+	public String play(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @PathVariable("cardId") Integer cardId, ModelMap model){
 		Optional<Card> c = cardService.findCard(cardId);
-		Optional<GamePlayer> gp = gamePlayerService.findById(gameId);
+		Optional<GamePlayer> gp = gamePlayerService.findById(gamePlayerId);
+		Game game = gameService.findGames(gameId);
+		
 		if(c.isPresent() && gp.isPresent()){
 			if(gp.get().getCards().contains(c.get())){
+				model = generaTablero(model, gp.get(), game);
 				switch(c.get().getType().toString()){
 					case("ORGAN"):
 					log.info("Elige el jugador a quien quieras dar este órgano");
@@ -208,15 +224,39 @@ public class GameController {
 					case("TRANSPLANT"):
 					log.info("Selecciona qué dos organos quieres intercambiar");
 				}
-				return "/games/{gameId}/gamePlayer/play/selecciona";
+				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
-				return "/games/"+gameId+"/gamePlayer/"+currentPlayer+"/decision";
+				return muestraVista(gameId, gamePlayerId, model);
 			}
 		} else{
 			log.error("Movimiento no válido");
-			return "/games/"+gameId+"/gamePlayer/"+currentPlayer+"/decision";
+			return muestraVista(gameId, gamePlayerId, model);
 		}
+	}
+
+	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toPlayer/{targetGamePlayerid}")
+	public String playOnBody(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+			@PathVariable("targetGamePlayerid") Integer targetGP, ModelMap model) {
+		Card card = cardService.findCard(cardId).get();
+		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
+			return playOrgan(gameId, sourceGP, targetGP, cardId);
+		}
+		
+		return muestraVista(gameId, sourceGP, model);
+	}
+
+	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toCard/{targetCardId}")
+	public String playOnCard(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+			@PathVariable("targetCardId") Integer targetC, ModelMap model) {
+		Card card = cardService.findCard(cardId).get();
+		if(card.getType().getType().equals(GenericCard.Type.VACCINE)){
+			return playVaccine(gameId, sourceGP, cardId, targetC);
+		} else if(card.getType().getType().equals(GenericCard.Type.VIRUS)) {
+			return playVirus(gameId, sourceGP, cardId, targetC);
+		}
+		
+		return muestraVista(gameId, sourceGP, model);
 	}
 
 	//Jugar un órgano
@@ -226,6 +266,7 @@ public class GameController {
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		Set<Card> sc = new HashSet<>();
 		Set<String> cards = new HashSet<>();
+		ModelMap model = new ModelMap();
 		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
 				Card organ = c.get();
 				GamePlayer gplayer1 = gp1.get();
@@ -248,15 +289,22 @@ public class GameController {
 						return turn(gameId,gamePlayerId);
 					}else{
 						log.error("No puede poner dos órganos del mismo color en un cuerpo");
-						return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+						
+						model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
+						model.put("messageType", "info");
+						return muestraVista(gameId, gamePlayerId, model);
 					}	
 				}else{
 					log.error("Esta carta no es un órgano");
-					return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+					model.put("message", "Esta carta no es un órgano");
+					model.put("messageType", "info");
+					return muestraVista(gameId, gamePlayerId, model);
 				}			
 		}else{
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			model.put("message", "Movimiento inválido");
+			model.put("messageType", "info");
+			return muestraVista(gameId, gamePlayerId, model);
 		}
 	}	
 
@@ -273,13 +321,13 @@ public class GameController {
 				if(c_organ.getVaccines().size()==0){
 					if(c_organ.getVirus().size()==0){
 						c_organ.getVirus().add(c_virus);
-						c_virus.setBody(true);
+						
 						c_virus.setCardVirus(c_organ);	
 
 					}else{
 						Card virus1 = c_organ.getVirus().get(0);
 						c_organ.setVirus(new ArrayList<>());
-						virus1.setBody(false);
+						
 						virus1.setPlayed(true);
 						virus1.setCardVirus(null);
 						c_virus.setPlayed(true);
@@ -291,7 +339,7 @@ public class GameController {
 					return turn(gameId, gamePlayerId);			
 				} else if(c_organ.getVaccines().size()==1){
 					Card vaccine = c_organ.getVaccines().get(0);
-					vaccine.setBody(false);
+					
 					vaccine.setPlayed(true);
 					vaccine.setCardVaccine(null);
 					c_virus.setPlayed(true);
@@ -330,7 +378,7 @@ public class GameController {
 				if(c_organ.getVirus().size()==0){
 					if(c_organ.getVaccines().size()<2){
 						c_organ.getVaccines().add(c_vaccine);
-						c_vaccine.setBody(true);
+						
 						c_vaccine.setCardVaccine(c_organ);
 						cardService.save(c_vaccine);
 						cardService.save(c_organ);
@@ -342,7 +390,7 @@ public class GameController {
 			
 				}else{
 					Card virus = c_organ.getVirus().get(0);
-					virus.setBody(false);
+					
 					virus.setPlayed(true);
 					virus.setCardVirus(null);
 					c_vaccine.setPlayed(true);

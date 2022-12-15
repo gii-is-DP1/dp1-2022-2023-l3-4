@@ -5,29 +5,63 @@
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
 <virus:layout pageName="game">
-    <table>
+    <table align="center">
         <tbody>
+            <h1><c:out value="${currentTurnGamePlayer.player.user.username}'s turn"/></h1>
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                        <c:out value="${body.key}'s body"/>
+                        <c:out value="${body.key.player.firstName}'s body"/>
                     </td>
-                    
+                </tr>
+                <tr>
+                    <c:forEach items="${body.value}" var="bodycard">
+                        
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <c:if test="${bodycard.virus.size() > 0}">
+                                            <c:forEach items="${bodycard.virus}" var="virus">
+                                                <img src="<spring:url value='/resources/images/cards/${virus.type.image}.png'/>" alt="There is no body here" height="100"/>
+                                            </c:forEach>
+                                        </c:if>
+                                        <c:if test="${bodycard.vaccines.size() > 0}">
+                                            <c:forEach items="${bodycard.vaccines}" var="vaccine">
+                                                <img src="<spring:url value='/resources/images/cards/${vaccine.type.image}.png'/>" alt="There is no body here" height="100"/>
+                                            </c:forEach>
+                                        </c:if>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        
+                    </c:forEach>
                 </tr>
             </c:forEach>
             <tr>
                 <td>
-                    Your hand:
+                    Your hand
                 </td>
-                <c:forEach items="${hand}" var="card">
-                    
-                    <td>
-                        <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt=""/>
-                    </td>
-                </c:forEach>
+            </tr>
+            <tr>
+                <td>
+                    <c:forEach items="${hand}" var="card">
+                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/"></c:if>
+                            <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
+                        <c:if test="${isYourTurn}"></a></c:if>
+
+                    </c:forEach>
+                </td>
             </tr>
         </tbody>
-    </table>  
+    </table>
+    <a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
 
 
 

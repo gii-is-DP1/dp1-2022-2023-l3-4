@@ -78,7 +78,6 @@ public class Card extends BaseEntity implements Serializable {
 	private GenericCard type;
 
 	@ManyToOne(optional = true)
-	@JoinColumn(name = "gamePlayer_id")
 	private GamePlayer gamePlayer;
 
 	public Card(int id, boolean body, boolean played, List<Card> vaccines, List<Card> virus, GamePlayer game_player_id, GenericCard type) {

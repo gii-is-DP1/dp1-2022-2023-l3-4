@@ -45,7 +45,6 @@ public class Game extends BaseEntity {
 
 	@Size(min=2, max=6)
 	@OneToMany
-    @JoinColumn(name = "gamePlayer_id")
 	private List<GamePlayer> gamePlayer;
 
 }

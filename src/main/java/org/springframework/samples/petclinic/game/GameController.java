@@ -342,9 +342,12 @@ public class GameController {
 	//Clasificación tras la finalización de la partida
 	@GetMapping(value= "/games/{gameId}/clasificacion")
 	public String clasification(@PathVariable("gameId") int gameId, ModelMap model) {
+	public String clasification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGames(gameId);
 		game.endGame();
+		game.endGame();
 		log.info("Clasificando");
+		Map<Integer,List<GamePlayer>> classification = gameService.clasificate(game.getGamePlayer());
 		Map<Integer,List<GamePlayer>> classification = gameService.clasificate(game.getGamePlayer());
 				game.setClassification(classification);
 				gameService.save(game);

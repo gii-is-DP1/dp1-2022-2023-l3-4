@@ -1,8 +1,12 @@
 
 package org.springframework.samples.petclinic.game;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -37,6 +41,7 @@ public class Game extends BaseEntity {
 	private Boolean isRunning;
 	private Integer round;
 	private Integer turn;
+	private Duration duration;
 	@Transient
 	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 
@@ -46,5 +51,21 @@ public class Game extends BaseEntity {
 	@Size(min=2, max=6)
 	@OneToMany
 	private List<GamePlayer> gamePlayer;
+
+	public List<Card> baraja(){
+		return getCards().stream().filter(x->!x.getBody() && !x.getPlayed() && x.getGamePlayer()==null).collect(Collectors.toList());
+	}
+	public List<Card> discarted(){
+		return getCards().stream().filter(x->x.getPlayed()).collect(Collectors.toList());
+	}
+
+	public Integer getCurrentGamePlayerId(){
+		return getGamePlayer().get(getTurn()).getId();
+}
+	public void endGame(){
+		setIsRunning(false);
+		getDuration();
+		setDuration(Duration.between(getInitialHour(), LocalDateTime.now()));
+	}
 
 }

@@ -1,7 +1,10 @@
 
 package org.springframework.samples.petclinic.game;
 import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +12,9 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
-import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
@@ -20,10 +23,15 @@ public class GameService {
 	private GameRepository gameRepository;
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
+	private CardService cardService;
+	private GamePlayerService gamePlayerService;
 
 	@Autowired
 	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
 		this.gameRepository = gameRepository;
+		this.cardService=cardService;
+		this.gamePlayerService=gamePlayerService;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 	}
@@ -41,11 +49,6 @@ public class GameService {
 	public void save(Game game){
 		gameRepository.save(game);
 
-	}
-
-	@Transactional(readOnly = true)
-	public GamePlayer findGamePlayerByPlayer(Player player){
-		return gameRepository.findGamePlayerByPlayer(player);
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(Integer gameId){
@@ -71,7 +74,6 @@ public class GameService {
 				while(cartasJugador.size()<3){
 					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a rellenaBaraja
 						rellenaBaraja(gameId);
-						baraja = game.baraja();
 					}
 					Card card = baraja.get(0);
 					cartasJugador.add(card); //Se la añadimos al jugador

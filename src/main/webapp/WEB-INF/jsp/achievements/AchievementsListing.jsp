@@ -13,6 +13,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>BadgeImage</th>
+            <th>Type</th>
             <th>Threshold</th>
             <th></th>
         </tr>
@@ -32,6 +33,9 @@
                         <spring:url value="${ach.badgeImage}" var="badgeImage"/>
                         <img class="img-responsive" src="${badgeImage}" width="80" height="80"/>
                     </c:if>
+                </td>
+                <td>
+                    <c:out value="${ach.type.name}"/>
                 </td>
                 <td>
                     <c:out value="${ach.threshold}"/>

@@ -1,8 +1,12 @@
 package org.springframework.samples.petclinic.friendRequest;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.MethodInvocationRecorder.Recorded.ToCollectionConverter;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
@@ -80,11 +84,20 @@ public class FriendController {
     @GetMapping("/request/{playerId}")
 	public String friendRequest(@PathVariable("playerId") int playerId) {
         Player playerSend = authService.getPlayer();
-        Friend request = new Friend();
-        request.setStatus(null);
-        request.setPlayerSend(playerSend);
-        request.setPlayerRec(playerService.findPlayerById(playerId));
-        this.friendService.savePlayer(request);
+        Player playerRec=playerService.findPlayerById(playerId);
+        Collection<Friend> myRequest=friendService.findAllMyRequestById(playerSend.getId());
+        Set<Friend> repeat=myRequest.stream().filter(r->(r.getPlayerRec().equals(playerRec) ||
+        r.getPlayerRec().equals(playerSend)) &&
+        (r.getPlayerSend().equals(playerSend) ||
+        r.getPlayerSend().equals(playerRec))).collect(Collectors.toSet());
+        if(repeat.isEmpty()){
+            Friend request = new Friend();
+            request.setStatus(null);
+            request.setPlayerSend(playerSend);
+            request.setPlayerRec(playerRec);
+            this.friendService.savePlayer(request);
+            
+        }
 		return "redirect:/friend/myFriends";
 	}
 

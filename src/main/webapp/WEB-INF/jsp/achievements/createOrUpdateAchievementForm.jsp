@@ -12,19 +12,19 @@
 		<table>
 			<tr>
 				<td><mvc:label path="name">Name:</mvc:label></td>
-				<td><mvc:input path="name"/></td>
+				<td style="padding-left: 10px;"><mvc:input path="name"/></td>
 			</tr>
 			<tr>
 				<td><mvc:label path="description">Description:</mvc:label></td>
-				<td><mvc:input path="description" /></td>
+				<td style="padding-left: 10px;"><mvc:input path="description" /></td>
 			</tr>
 			<tr>
 				<td><mvc:label path="threshold">Threshold:</mvc:label></td>
-				<td><mvc:input path="threshold" /></td>
+				<td style="padding-left: 10px;"><mvc:input path="threshold" /></td>
 			</tr>
 			<tr>
 				<td><mvc:label path="type">Tipo: </mvc:label></td>
-				<td>
+				<td style="padding-left: 10px;">
 					<mvc:select path="type">
 						<mvc:options items="${types}" size="1"/>
 					</mvc:select>
@@ -32,11 +32,7 @@
 			</tr>
 			<tr>
 				<td><mvc:label path="badgeImage">Badge Image: </mvc:label></td>
-				<td>
-					<form action="UploadServlet" method="post" enctype="multipart/form-data">
-						<input type="file" name="image" size="50"/>
-					</form>
-				</td>
+				<td style="padding-left: 10px;"><mvc:input path="badgeImage"/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value="Save" /></td>

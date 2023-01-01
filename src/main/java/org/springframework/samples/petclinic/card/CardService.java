@@ -82,7 +82,6 @@ public class CardService {
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
 		cardRepository.save(card);
-
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());
@@ -95,7 +94,7 @@ public class CardService {
 		}		
 	}
 
-	@Transactional
+  @Transactional
 	public void vaccinate(Card organ, Card vaccine){
 		if(organ.areCompatible(vaccine)){
 			if(organ.getVirus().size()==0){
@@ -144,11 +143,11 @@ public class CardService {
 				cardRepository.save(virus);
 				cardRepository.save(organ);
 				cardRepository.save(vaccine);
-	}else{
-		throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
-	}
-}else{
-	throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
-}
-}
+	  }else{
+		  throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
+	  }
+  }else{
+	  throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
+  }
+ }
 }

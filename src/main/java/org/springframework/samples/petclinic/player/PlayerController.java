@@ -115,8 +115,8 @@ public class PlayerController {
 		Collection<Player> players = playerService.getPlayersByUsername(player.getUser().getUsername());
 		if (players.isEmpty()) {
 			// no player found
-			result.rejectValue("userName", "notFound", "not found");
-			return "player/createSearch";
+			result.rejectValue("User.username", "notFound", "not found");
+			return VIEW_FIND_PLAYER;
 		}
 
 		else {

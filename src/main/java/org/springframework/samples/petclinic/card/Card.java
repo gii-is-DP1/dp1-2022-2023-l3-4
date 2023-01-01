@@ -17,7 +17,6 @@ package org.springframework.samples.petclinic.card;
 
 import java.io.Serializable;
 import java.util.*;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -78,7 +77,6 @@ public class Card extends BaseEntity implements Serializable {
 	private GenericCard type;
 
 	@ManyToOne(optional = true)
-	@JoinColumn(name = "gamePlayer_id")
 	private GamePlayer gamePlayer;
 
 	public Card(int id, boolean body, boolean played, List<Card> vaccines, List<Card> virus, GamePlayer game_player_id, GenericCard type) {
@@ -92,4 +90,28 @@ public class Card extends BaseEntity implements Serializable {
 	}
 
 	public Card() {}
+
+	public void discard(){
+		if(getType().toString()=="ORGAN"){
+			setVaccines(new ArrayList<>());
+			setVirus(new ArrayList<>());
+		}
+		else if(getType().toString()=="VIRUS") setCardVirus(null);
+		
+		else if(getType().toString()=="VACCINE") setCardVaccine(null);
+		
+		setPlayed(true);
+		setBody(false);
+		setGamePlayer(null);
+		
+	}
+
+	public Boolean areCompatible(Card virus_or_vaccine){
+		return (getType().getType().name()=="ORGAN") && 
+		(virus_or_vaccine.getType().getColour().name()==getType().getColour().name() || getType().getColour().name()=="RAINBOW" ||
+		virus_or_vaccine.getType().getColour().name()=="RAINBOW");
+
+	}
+
+
 }

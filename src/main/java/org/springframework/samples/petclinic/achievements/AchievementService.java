@@ -26,9 +26,19 @@ public class AchievementService {
     // return achievementRepository.findByUsername(username);
   }
 
-  @Transactional
-  public Achievement saveAchievement(Achievement achievement) {
-    return this.achievementRepository.save(achievement);
+  @Transactional(readOnly = true)
+  public List<AchievementType> findAchievementTypes() {
+    return achievementRepository.findAllTypes();
+  }
+
+  @Transactional(rollbackFor = DuplicatedAchievementNameException.class)
+  public Achievement saveAchievement(Achievement achievement) throws DuplicatedAchievementNameException {
+    List<String> achNames = getAllAchievements().stream().map(x -> x.getName()).toList();
+    if (achNames.contains(achievement.getName())) {
+      throw new DuplicatedAchievementNameException();
+    } else {
+      return this.achievementRepository.save(achievement);
+    }
   }
 
   @Transactional

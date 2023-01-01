@@ -50,7 +50,9 @@ public class FriendController {
 	public String friendsRequestListing(ModelMap model) {
         Player playerAuth= authService.getPlayer();
         Collection<Friend> myRequest=friendService.findMyRecRequestById(playerAuth.getId());
+        Collection<Friend> mySendRequest=friendService.findSendRequestById(playerAuth.getId());
         model.put("myRequest",myRequest);
+        model.put("mySendRequest",mySendRequest);
 		return VIEWS_MY_REQUEST;
 	}
 
@@ -86,11 +88,8 @@ public class FriendController {
         Player playerSend = authService.getPlayer();
         Player playerRec=playerService.findPlayerById(playerId);
         Collection<Friend> myRequest=friendService.findAllMyRequestById(playerSend.getId());
-        Set<Friend> repeat=myRequest.stream().filter(r->(r.getPlayerRec().equals(playerRec) ||
-        r.getPlayerRec().equals(playerSend)) &&
-        (r.getPlayerSend().equals(playerSend) ||
-        r.getPlayerSend().equals(playerRec))).collect(Collectors.toSet());
-        if(repeat.isEmpty()){
+        Friend repeat=friendService.findByPlayersId(playerRec.getId(), playerSend.getId());
+        if(repeat==null){
             Friend request = new Friend();
             request.setStatus(null);
             request.setPlayerSend(playerSend);

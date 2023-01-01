@@ -18,7 +18,11 @@ package org.springframework.samples.petclinic.game;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,7 +30,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findAll(); 
 	Optional<Game> findById(int id);
-
-    
+    @Query("SELECT gp FROM GamePlayer gp WHERE gp.player = :player")
+    GamePlayer findGamePlayerByPlayer(@Param(value = "player") Player player);
     
 }

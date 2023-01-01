@@ -9,6 +9,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,11 @@ public class GameService {
 		gameRepository.save(game);
 
 	}
+
+	@Transactional(readOnly = true)
+	public GamePlayer findGamePlayerByPlayer(Player player){
+		return gameRepository.findGamePlayerByPlayer(player);
+	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(Integer gameId){
 		Optional<Game> currentGame = gameRepository.findById(gameId);
@@ -65,6 +71,7 @@ public class GameService {
 				while(cartasJugador.size()<3){
 					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a rellenaBaraja
 						rellenaBaraja(gameId);
+						baraja = game.baraja();
 					}
 					Card card = baraja.get(0);
 					cartasJugador.add(card); //Se la añadimos al jugador

@@ -31,6 +31,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.RoomService;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
 
 /**
@@ -47,16 +48,18 @@ public class GameController {
 	private final GenericCardService genericCardService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
+	private final AuthenticationService authenticationService;
 
 	//Constructor
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService, GenericCardService genericCardService, RoomService roomService) {
+	CardService cardService, GenericCardService genericCardService, RoomService roomService, AuthenticationService authenticationService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
 		this.genericCardService=genericCardService;
 		this.roomService = roomService;
+		this.authenticationService = authenticationService;
 	}
 
 	@GetMapping(value = "/game/start/{roomId}")
@@ -94,8 +97,9 @@ public class GameController {
 		gameService.save(game);
 		reparteCartas(game.getId());
 
+		Player currentPlayer = authenticationService.getPlayer();
 
-		return "redirect:/games/"+ game.getId() +"/gamePlayer/"+gamePlayers.get(0).getId();
+		return "redirect:/games/"+ game.getId() +"/gamePlayer/"+gameService.findGamePlayerByPlayer(currentPlayer).getId();
 		
 	}
 	

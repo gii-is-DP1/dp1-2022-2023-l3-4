@@ -21,6 +21,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.user.User;
@@ -46,6 +47,7 @@ public class PlayerController {
     private PlayerService playerService;
     private StatisticsService statisticsService;
     private AuthenticationService authenticationService;
+    private FriendService friendService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -54,10 +56,11 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as) {
+    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as, FriendService fs) {
         this.playerService = ps;
         this.statisticsService = ss;
         this.authenticationService = as;
+        this.friendService=fs;
     }
 
 
@@ -106,6 +109,7 @@ public class PlayerController {
 
     @PostMapping(value = "/createSearch")
 	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
+        Player playerAuth = authenticationService.getPlayer();
 		if (player.getUser().getUsername() == null) {
             User user=player.getUser();
             user.setUsername("");
@@ -113,6 +117,7 @@ public class PlayerController {
 		}
 		// find player by userName
 		Collection<Player> players = playerService.getPlayersByUsername(player.getUser().getUsername());
+        players.remove(playerAuth);
 		if (players.isEmpty()) {
 			// no player found
 			result.rejectValue("User.username", "notFound", "not found");
@@ -120,7 +125,9 @@ public class PlayerController {
 		}
 
 		else {
-			// multiple roomss found
+			// multiple player found
+            Collection<Player> myFriends=friendService.findFriendsById(playerAuth.getId());
+            players.removeAll(myFriends);
 			model.put("players", players);
 			return VIEW_LIST_PLAYER;
 		}

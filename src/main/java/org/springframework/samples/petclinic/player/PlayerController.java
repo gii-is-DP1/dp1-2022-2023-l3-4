@@ -104,15 +104,15 @@ public class PlayerController {
 		return VIEW_FIND_PLAYER;
 	}
 
-    @GetMapping(value = "/find")
+    @PostMapping(value = "/createSearch")
 	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
-		// if (player.getUser().getUsername() == null) {
-            // User user=player.getUser();
-            // user.setUsername("");
-			// player.setUser(user);
-		// }
+		if (player.getUser().getUsername() == null) {
+            User user=player.getUser();
+            user.setUsername("");
+			player.setUser(user);
+		}
 		// find player by userName
-		Collection<Player> players = playerService.getPlayersByUsername("");
+		Collection<Player> players = playerService.getPlayersByUsername(player.getUser().getUsername());
 		if (players.isEmpty()) {
 			// no player found
 			result.rejectValue("userName", "notFound", "not found");

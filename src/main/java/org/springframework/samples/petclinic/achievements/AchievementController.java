@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.achievements;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +28,18 @@ public class AchievementController {
   public static final String ACHIEVEMENT_LISTING = "achievements/AchievementsListing";
   public static final String GET_ACHIEVEMENT = "achievements/Achievement";
   public static final String EDIT_ACHIEVEMENT = "achievements/createOrUpdateAchievementForm";
+  public static final String INVALID_ACH = "achievements/invalidAchievement";
+  
 
   @Autowired
   public AchievementController(AchievementService achievementService) {
     this.achievementService = achievementService;
   }
+
+  @ModelAttribute("types")
+	public Collection<AchievementType> populateAchievementTypes() {
+		return this.achievementService.findAchievementTypes();
+	}
 
   @GetMapping("/")
   public String listAllAchievements(ModelMap model) {
@@ -70,8 +79,12 @@ public class AchievementController {
       Achievement achievementToUpdate = achievementService.getAchievement(id);
       if (achievementToUpdate != null) {
         BeanUtils.copyProperties(achievement, achievementToUpdate, "id");
-        achievementService.saveAchievement(achievementToUpdate);
-        model.put("message", "Achievement " + id + " succesfully updated");
+        try {
+          achievementService.saveAchievement(achievementToUpdate);
+          model.put("message", "Achievement " + id + " succesfully updated");
+        } catch (DuplicatedAchievementNameException e) {
+          return INVALID_ACH;
+        }
         return listAllAchievements(model);
       } else {
         model.put("message", "Achievement " + id + " doesn't exist");
@@ -99,20 +112,26 @@ public class AchievementController {
   @GetMapping("/new")
   public String addAchievement(ModelMap model) {
     model.put("achievement", new Achievement());
+    model.put("types", populateAchievementTypes());
     return EDIT_ACHIEVEMENT;
   }
   @PostMapping("/new")
   public String saveAchievement(@Valid Achievement achievement, BindingResult bindingResult, ModelMap model) {
     if (bindingResult.hasErrors()) {
-      model.put("message", "Description cannot be empty");
+      model.put("message", "The achievement already exists in the database");
       model.put("messageType", "info");
       return EDIT_ACHIEVEMENT;
     } else { 
       Achievement newAchievement = new Achievement();
       BeanUtils.copyProperties(achievement, newAchievement, "id");
-      Achievement createdAchievement = achievementService.saveAchievement(newAchievement);
-      model.put("message", "Achievement " + createdAchievement.getId() + " succesfully created");
-      return "redirect:/statistics/achievements/"; // con esto evitamos que vuelvan a cargar el formulario en servidor
+      Achievement createdAchievement;
+      try {
+        createdAchievement = achievementService.saveAchievement(newAchievement);
+        model.put("message", "Achievement " + createdAchievement.getId() + " succesfully created");
+      } catch (DuplicatedAchievementNameException e) {
+        return INVALID_ACH;
+      }
+      return listAllAchievements(model); // con esto evitamos que vuelvan a cargar el formulario en servidor
     }
   }
 

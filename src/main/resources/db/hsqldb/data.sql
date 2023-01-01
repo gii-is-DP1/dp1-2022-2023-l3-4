@@ -36,11 +36,11 @@ INSERT INTO vet_specialties VALUES (5, 1);
 
 -- Achievement Type
 
-INSERT INTO achievement_types(id,name) VALUES (1,'Explorador');
+INSERT INTO achievement_types(id,name) VALUES (1,'Explorador'), (2,'Aprendiz'), (3,'Experimentado'), (4,'Gran Jugador'), (5,'Maestro');
 
 -- Achievements
 
-INSERT INTO achievements(id,name,threshold,description,badge_image,achievement_type_id) VALUES 
+INSERT INTO achievements(id,name,threshold,description,badge_image,type) VALUES 
 (1, 'Viciado', 10.0, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
 (2, 'Triunfador', 20.0, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
 

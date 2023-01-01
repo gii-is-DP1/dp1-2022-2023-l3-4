@@ -40,6 +40,14 @@
 					<span>Friends</span>
 				</petclinic:menuItem>
 				</sec:authorize>
+
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<petclinic:menuItem active="${name eq 'achievement'}" url="/statistics/achievements/"
+					title="Achievements">
+					<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+					<span>Achievements</span>
+				</petclinic:menuItem>
+				</sec:authorize>
 				
 
 			</ul>

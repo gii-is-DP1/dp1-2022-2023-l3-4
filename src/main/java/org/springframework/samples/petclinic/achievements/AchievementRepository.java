@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface AchievementRepository extends CrudRepository<Achievement, Integer> {
   public List<Achievement> findAll();
 
-  @Query("SELECT at FROM AchievementType at")
+  @Query("SELECT at FROM AchievementType at ORDER BY at.name")
   public List<AchievementType> findAllTypes();
 
   // @Query("SELECT u.achievements FROM User u WHERE u.username = :username")

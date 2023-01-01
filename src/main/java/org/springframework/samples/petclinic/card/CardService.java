@@ -17,7 +17,6 @@ package org.springframework.samples.petclinic.card;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +42,8 @@ public class CardService {
 	private CardRepository cardRepository;
 
 	@Autowired
-	public CardService(CardRepository cardRepository, GamePlayerRepository gamePlayerRepository) {
+	public CardService(CardRepository cardRepository) {
 		this.cardRepository = cardRepository;
-		this.gamePlayerRepository = gamePlayerRepository;
 	}
 
 	@Transactional(readOnly = true)	
@@ -69,7 +67,6 @@ public class CardService {
 			return cardRepository.save(card);	
 		}
 
-
 	@Transactional(readOnly = true)
 	public void shuffle(List<Card> cards){
 		Collections.shuffle(cards);
@@ -88,7 +85,6 @@ public class CardService {
 
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
-		virus_vaccine.setBody(true);
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());
 		if(virus_vaccine.getType().getType().toString()=="VIRUS"){
 			organ.getVirus().add(virus_vaccine);
@@ -98,63 +94,6 @@ public class CardService {
 			virus_vaccine.setCardVaccine(organ);
 		}		
 	}
-
-	@Transactional
-	public void vaccinate(Card organ, Card vaccine){
-		if(organ.areCompatible(vaccine)){
-			if(organ.getVirus().size()==0){
-				if(organ.getVaccines().size()<2){
-					infectOrVaccinate(organ, vaccine);
-					cardRepository.save(vaccine);
-					cardRepository.save(organ);
-				}else{
-					throw new IllegalArgumentException("Este órgano ya está inmunizado");
-				}
-		
-			}else{
-				Card virus = organ.getVirus().get(0);
-				virus.discard();
-				vaccine.discard();
-				cardRepository.save(vaccine);
-				cardRepository.save(organ);
-				cardRepository.save(virus);
-			}
-			}else{
-				throw new IllegalArgumentException("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");
-			}
-	}
-
-	@Transactional
-	public void infect(Card organ, Card virus){
-		if(organ.areCompatible(virus)){
-			if(organ.getVaccines().size()==0){
-				if(organ.getVirus().size()==0){
-					infectOrVaccinate(organ, virus);
-				}else{
-					Card virus1 = organ.getVirus().get(0);
-					organ.discard();
-					virus1.discard();
-					virus.discard();
-					cardRepository.save(virus1);
-				
-				}
-				cardRepository.save(virus);
-				cardRepository.save(organ);			
-			} else if(organ.getVaccines().size()==1){
-				Card vaccine = organ.getVaccines().get(0);
-				vaccine.discard();
-				virus.discard();
-				organ.setVaccines(new ArrayList<>());
-				cardRepository.save(virus);
-				cardRepository.save(organ);
-				cardRepository.save(vaccine);
-	}else{
-		throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
-	}
-}else{
-	throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
-}
-}
 
 	@Transactional
 	public void vaccinate(Card organ, Card vaccine){

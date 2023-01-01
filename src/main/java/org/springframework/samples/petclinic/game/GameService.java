@@ -1,10 +1,7 @@
 
 package org.springframework.samples.petclinic.game;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,6 @@ import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GameService {
@@ -24,15 +20,10 @@ public class GameService {
 	private GameRepository gameRepository;
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
-	private CardService cardService;
-	private GamePlayerService gamePlayerService;
 
 	@Autowired
 	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
 		this.gameRepository = gameRepository;
-		this.cardService=cardService;
-		this.gamePlayerService=gamePlayerService;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 	}
@@ -135,7 +126,7 @@ public class GameService {
 			}
 
 
-		public String changeTurn(Game game)	{
+		public void changeTurn(Game game)	{
 			if(game.getTurn()==game.getGamePlayer().size()-1){ //Si es el último jugador
 				game.setTurn(0); //Cambiamos el turno a 0
 				game.setRound(game.getRound()+1); //Añadimos una ronda
@@ -143,7 +134,6 @@ public class GameService {
 			else{game.setTurn(game.getTurn()+1); //Sino solo incrementamos el turno en 1
 			}
 			gameRepository.save(game); //Guardamos los cambios de game
-			return "/games/"+game.getId()+"/gamePlayer/"+game.getCurrentGamePlayerId()+"/decision";
 		}
 
 		public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){

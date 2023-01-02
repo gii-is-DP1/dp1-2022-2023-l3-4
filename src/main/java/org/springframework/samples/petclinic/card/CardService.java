@@ -143,15 +143,14 @@ public class CardService {
 				cardRepository.save(virus);
 				cardRepository.save(organ);
 				cardRepository.save(vaccine);
-	}else{
-		throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
-	}
-}else{
-	throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
-}
-}
-
-public List<Card> findAllCardsByIds(List<Integer> cardIds) {
+	  }else{
+		  throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
+	  }
+  }else{
+	  throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
+  }
+ }
+ public List<Card> findAllCardsByIds(List<Integer> cardIds) {
 	return cardRepository.findCardsByIds(cardIds);
 }
 }

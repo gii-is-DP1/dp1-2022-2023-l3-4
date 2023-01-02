@@ -1,5 +1,6 @@
 
 package org.springframework.samples.petclinic.game;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,13 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
+	public String humanReadableDuration(Duration d) {
+		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
+	}
+
+	@Transactional(readOnly = true)
 	public GamePlayer findGamePlayerByPlayer(Player player){
-		return gameRepository.findGamePlayerByPlayer(player);
+		return gameRepository.findGamePlayerByPlayer(player.getId());
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(Integer gameId){

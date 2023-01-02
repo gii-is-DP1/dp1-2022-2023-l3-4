@@ -12,6 +12,7 @@ INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
 INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
 INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');
 INSERT INTO authorities(id,username,authority) VALUES (13,'p','player');
+INSERT INTO authorities(id,username,authority) VALUES (14,'lucperrom','player');
 
 -- One vet user, named vet1 with passwor v3t
 INSERT INTO users(username,password,enabled) VALUES ('vet1','v3t',TRUE);

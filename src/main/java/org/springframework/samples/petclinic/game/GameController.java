@@ -19,6 +19,7 @@ package org.springframework.samples.petclinic.game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,12 +29,14 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.Hand;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * @author Juergen Hoeller
@@ -131,7 +134,7 @@ public class GameController {
 		Map<GamePlayer, List<Card>> bodies = new HashMap<>(); 
 		for(GamePlayer gp: game.getGamePlayer()){
 			if(gp.equals(gamePlayer)){
-				model.put("hand", gp.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList()));
+				model.put("hand", gp.getHand());
 			}
 			bodies.put(gp, gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
@@ -306,26 +309,45 @@ public class GameController {
 	}
 	}
 	
+
 	// Método para descartar cartas
-    public String discard(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId, @PathVariable Integer gameId) {
-        if(gamePlayerService.findById(gamePlayerId).isPresent()){
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			if(gamePlayer.getCards().containsAll(cards)){
-				for(Card card: cards){	//Recorremos las cartas que quiere descartar					
-						gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
-						card.setPlayed(true); //Se cambia el estado de la carta a jugada
-						cardService.save(card);	//Se guarda la carta	
-			}  
-				gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
-				return turn(gameId, gamePlayerId); //Volvemos al método del turno
-			}else{
-				log.error("you can't discard those cards");
-				return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-			}				
+
+	@GetMapping(value = "/games/{gameId}/discard")
+	public String discardView(@PathVariable("gameId") Integer gameId, ModelMap model){
+		Player player = authenticationService.getPlayer();
+		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
+		Game game = gameService.findGames(gameId);
+		List<Card> hand = currentGamePlayer.getHand();
+		Hand emptyForm = new Hand();
+		
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(currentGamePlayer);
+		model.put("isYourTurn", isYourTurn);
+		model.put("hand", hand);
+		model.put("cardsForm", emptyForm);
+		return "games/discard";
+	}
+
+	@PostMapping(value = "/games/{gameId}/discard")
+    public String discard(Hand cardIds, @PathVariable("gameId") Integer gameId, ModelMap model, BindingResult br) {
+
+		Player player = authenticationService.getPlayer();
+		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
+		List<Card> cards = cardService.findAllCardsByIds(cardIds.getCards());
+		if(currentGamePlayer.getCards().containsAll(cards)){
+			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
+					currentGamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
+					card.setPlayed(true);
+					card.setGamePlayer(null); //Se cambia el estado de la carta a jugada
+					cardService.save(card);	//Se guarda la carta	
+		}  
+			gamePlayerService.save(currentGamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+			return turn(gameId, currentGamePlayer.getId()); //Volvemos al método del turno
 		}else{
-			log.error("this player is not available");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-		} 
+			log.error("you can't discard those cards");
+			return muestraVista(gameId, currentGamePlayer.getId(), model);
+		}				
+		
 					
     }
 

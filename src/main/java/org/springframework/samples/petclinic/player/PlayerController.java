@@ -81,13 +81,13 @@ public class PlayerController {
         List<Duration> durations = games.stream().map(x -> x.getDuration()).collect(Collectors.toList());
         Duration totalTimePlayed = Duration.ZERO;
         for (Duration d: durations) {
-            totalTimePlayed.plus(d);
+            totalTimePlayed = totalTimePlayed.plus(d);
         }
         model.put("statistics", playerStatistics);
         model.put("player", player);
         model.put("gameplayer", gp);
         model.put("games", games);
-        model.put("totalTimePlayed", totalTimePlayed);
+        model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
         return USER_PROFILE;
   }
 

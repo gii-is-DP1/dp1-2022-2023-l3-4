@@ -1,5 +1,6 @@
 
 package org.springframework.samples.petclinic.game;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,11 @@ public class GameService {
 	public void save(Game game){
 		gameRepository.save(game);
 
+	}
+
+	@Transactional(readOnly = true)
+	public String humanReadableDuration(Duration d) {
+		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
 	}
 
 	@Transactional(readOnly = true)

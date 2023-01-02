@@ -136,7 +136,7 @@
         </thead>
         <tbody>
           <td>
-            <c:out value="${game.humanReadableDuration(totalTimePlayed)}"/>
+            <c:out value="${totalTimePlayed}"/>
           </td>
         </tbody>
       </table>

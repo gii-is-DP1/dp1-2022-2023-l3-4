@@ -61,11 +61,15 @@ public class Game extends BaseEntity {
 
 	public Integer getCurrentGamePlayerId(){
 		return getGamePlayer().get(getTurn()).getId();
-}
+	}
 	public void endGame(){
 		setIsRunning(false);
 		getDuration();
 		setDuration(Duration.between(getInitialHour(), LocalDateTime.now()));
+	}
+
+	public static String humanReadableDuration(Duration d) {
+		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
 	}
 
 }

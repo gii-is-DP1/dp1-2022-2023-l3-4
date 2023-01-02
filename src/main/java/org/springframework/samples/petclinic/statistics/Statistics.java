@@ -23,8 +23,8 @@ public class Statistics extends BaseEntity {
   @Min(0)
   private Integer numPlayedGames;
   
-  @Min(0)
   @Column(name = "num_won_games")
+  @Min(0)
   private Integer numWonGames;
 
   @Min(0)

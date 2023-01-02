@@ -53,16 +53,24 @@ INSERT INTO players(id,first_name,last_name,username,description,status) VALUES 
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE);
 INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (5,'p','p','p','pp',TRUE);
 
+-- GamePlayer
+
+INSERT INTO game_players VALUES (1,null,null,1), (2,null,null,2);
+
+-- Games
+
+INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
+
+-- GamePlayerGames
+
+INSERT INTO games_game_player VALUES (1,1), (1,2);
+
 -- PlayerAchievements
 
 INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
 
 -- Statitics
 INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (1, 1, 10, 5, 30);
-
-
-
--- Rooms
 
 --Friends
 

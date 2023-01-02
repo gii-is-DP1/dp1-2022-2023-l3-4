@@ -45,7 +45,7 @@ public class GameService {
 
 	@Transactional(readOnly = true)
 	public GamePlayer findGamePlayerByPlayer(Player player){
-		return gameRepository.findGamePlayerByPlayer(player);
+		return gameRepository.findGamePlayerByPlayer(player.getId());
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(Integer gameId){

@@ -151,4 +151,8 @@ public class CardService {
 	throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
 }
 }
+
+public List<Card> findAllCardsByIds(List<Integer> cardIds) {
+	return cardRepository.findCardsByIds(cardIds);
+}
 }

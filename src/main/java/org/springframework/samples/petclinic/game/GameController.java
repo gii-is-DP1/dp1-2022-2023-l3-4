@@ -21,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -72,6 +74,7 @@ public class GameController {
 		Game game = new Game();
 		game.setRound(0);
 		game.setTurn(0);
+		game.setInitialHour(LocalDateTime.now());
 		List<GamePlayer> gamePlayers = new ArrayList<>();
 		game.setCards(new ArrayList<>());
 		game.setClassification(new HashMap<>());
@@ -149,7 +152,7 @@ public class GameController {
 			if(gamePlayer.isWinner())
 			 { //Si ya alguien ganó, finalizar la partida
 				ModelMap model = new ModelMap();
-				return clasification(gameId, model);
+				return classification(gameId, model);
 			}else{
 				gameService.changeTurn(game);
 				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
@@ -230,7 +233,11 @@ public class GameController {
 					cardService.save(organ);
 					gplayer2.getCards().add(organ);
 					gamePlayerService.save(gplayer2);
-					return turn(gameId,gamePlayerId);
+					if (gplayer2.isWinner()) {
+						return "redirect:/games/"+gameId+"/classification";
+					} else {
+						return turn(gameId,gamePlayerId);
+					}
 				}else{
 					log.error("No puede poner dos órganos del mismo color en un cuerpo");
 					
@@ -352,16 +359,16 @@ public class GameController {
     }
 
 	//Clasificación tras la finalización de la partida
-	@GetMapping(value= "/games/{gameId}/clasificacion")
-	public String clasification(@PathVariable("gameId") int gameId, ModelMap model) {
+	@GetMapping(value= "/games/{gameId}/classification")
+	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGames(gameId);
 		game.endGame();
 		log.info("Clasificando");
 		Map<Integer,List<GamePlayer>> classification = gameService.clasificate(game.getGamePlayer());
-				game.setClassification(classification);
-				gameService.save(game);
-				model.put("clasificacion", classification);
-				return "rondas/clasificacion";
+		game.setClassification(classification);
+		gameService.save(game);
+		model.put("classification", classification);
+		return "games/classification";
 	}
 
 }

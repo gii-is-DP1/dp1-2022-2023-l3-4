@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.room;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
@@ -36,10 +37,12 @@ public class Room extends BaseEntity{
     @NotNull
     Boolean isPrivate;
 
+    Boolean active;
+
     @OneToMany(mappedBy="room")
     private Collection<Player> players;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private Player host;
 
     String password;

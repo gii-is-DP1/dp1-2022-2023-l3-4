@@ -72,4 +72,8 @@ public class Game extends BaseEntity {
 		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
 	}
 
+	public Boolean hasAnyWinners() {
+		return gamePlayer.stream().anyMatch(g -> g.isWinner());
+	}
+
 }

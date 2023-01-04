@@ -148,16 +148,13 @@ public class GameController {
 	//Cambio de turno
 	public String turn(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId){
 			Game game = gameService.findGames(gameId); //Encontramos el juego
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			if(gamePlayer.isWinner())
+			if(game.hasAnyWinners())
 			 { //Si ya alguien ganó, finalizar la partida
-				ModelMap model = new ModelMap();
-				return classification(gameId, model);
+				return "redirect:/games/"+gameId+"/classification";
 			}else{
 				gameService.changeTurn(game);
 				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
 			}
-
 		}
 
 	//Jugar
@@ -170,16 +167,6 @@ public class GameController {
 		if(c.isPresent() && gp.isPresent()){
 			if(gp.get().getCards().contains(c.get())){
 				model = generaTablero(model, gp.get(), game);
-				switch(c.get().getType().toString()){
-					case("ORGAN"):
-					log.info("Elige el jugador a quien quieras dar este órgano");
-					case("VIRUS"):
-					log.info("Elige el órgano que quieras infectar");
-					case("VACCINE"):
-					log.info("Elige el órgano que quieras vacunar");
-					case("TRANSPLANT"):
-					log.info("Selecciona qué dos organos quieres intercambiar");
-				}
 				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
@@ -337,15 +324,13 @@ public class GameController {
 
 	@PostMapping(value = "/games/{gameId}/discard")
     public String discard(Hand cardIds, @PathVariable("gameId") Integer gameId, ModelMap model, BindingResult br) {
-
 		Player player = authenticationService.getPlayer();
 		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
 		List<Card> cards = cardService.findAllCardsByIds(cardIds.getCards());
 		if(currentGamePlayer.getCards().containsAll(cards)){
 			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
 					currentGamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
-					card.setPlayed(true);
-					card.setGamePlayer(null); //Se cambia el estado de la carta a jugada
+					card.discard();
 					cardService.save(card);	//Se guarda la carta	
 		}  
 			gamePlayerService.save(currentGamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador

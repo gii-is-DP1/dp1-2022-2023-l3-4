@@ -165,7 +165,19 @@ public class GameService {
 						}else{
 							classification.put(3, List.of(gamePlayer));
 						}
-					}
+					} else if(healthyOrgans==1){
+						if(classification.containsKey(4)){
+							classification.get(4).add(gamePlayer);
+						}else{
+							classification.put(4, List.of(gamePlayer));
+						}
+					} else {
+						if(classification.containsKey(5)){
+							classification.get(5).add(gamePlayer);
+						}else{
+							classification.put(5, List.of(gamePlayer));
+						}
+					} 
 				}
 				return classification;
 		}

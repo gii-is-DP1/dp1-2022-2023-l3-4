@@ -1,7 +1,9 @@
 
 package org.springframework.samples.petclinic.game;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +14,17 @@ import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
+import org.springframework.samples.petclinic.card.GenericCard;
+import org.springframework.samples.petclinic.card.GenericCardService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -25,12 +32,14 @@ public class GameService {
 	private GameRepository gameRepository;
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
+	private GenericCardService genericCardService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
+		this.genericCardService=genericCardService;
 	}
 
 	@Transactional(readOnly = true)
@@ -182,27 +191,87 @@ public class GameService {
 				return classification;
 		}
 
-		public Map<GamePlayer, Integer> getRanking() {
-			List<GamePlayer> gpWinners = new ArrayList<>();
-			for (Game g: listGames()) {
-				GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
-				gpWinners.add(gp);
-			}
-
-			Map<GamePlayer, Integer> gpWins = new HashMap<>();
-			for (GamePlayer gp: gpWinners) {
-				if (gpWins.containsKey(gp)) {
-					gpWins.put(gp, gpWins.get(gp) + 1);
-				} else {
-					gpWins.put(gp, 1);
-				}
-			}
-
-			gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
-			return gpWins;
-			// return new ArrayList<>(gpWins.keySet());
-
+	public Map<GamePlayer, Integer> getRanking() {
+		List<GamePlayer> gpWinners = new ArrayList<>();
+		for (Game g: listGames()) {
+			GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
+			gpWinners.add(gp);
 		}
+
+		Map<GamePlayer, Integer> gpWins = new HashMap<>();
+		for (GamePlayer gp: gpWinners) {
+			if (gpWins.containsKey(gp)) {
+				gpWins.put(gp, gpWins.get(gp) + 1);
+			} else {
+				gpWins.put(gp, 1);
+			}
+		}
+
+		gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
+		return gpWins;
+		// return new ArrayList<>(gpWins.keySet());
+
+	}
+	
+	@Transactional(readOnly = false)
+	public Game startGame(Room room) {
+		Game game = new Game();
+		game.setRound(0);
+		game.setTurn(0);
+		game.setInitialHour(LocalDateTime.now());
+		List<GamePlayer> gamePlayers = new ArrayList<>();
+		game.setCards(new ArrayList<>());
+		game.setClassification(new HashMap<>());
+		List<Player> players = new ArrayList<>(room.getPlayers());
+		
+		for(Player p: players) {
+			GamePlayer gp = new GamePlayer();
+			gp.setPlayer(p);
+			gp.setCards(new ArrayList<>());
+			gamePlayers.add(gp);
+			gamePlayerService.save(gp);
+		}
+
+		game.setGamePlayer(gamePlayers);
+		List<GenericCard> deck = genericCardService.findGCards();
+		for(GenericCard c: deck){
+			Card card = new Card();
+			card.setType(c);
+			card.setBody(false);
+			card.setPlayed(false);
+			card.setVaccines(new ArrayList<>());
+			card.setVirus(new ArrayList<>());
+			game.getCards().add(card);
+			cardService.save(card);
+		}
+		Collections.shuffle(game.getCards());
+		save(game);
+		reparteCartas(game.getId());
+
+		return game;
+	}
+
+	@Transactional(readOnly = false)
+	public void discard(List<Card> cards, GamePlayer gamePlayer) {
+		if(gamePlayer.getCards().containsAll(cards)){
+			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
+					gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
+					card.discard();
+					cardService.save(card);	//Se guarda la carta	
+			}  
+			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+		}else{
+			
+		}
+	}
+
+	@Transactional(readOnly = false)
+	public void finishGame(Game game) {
+		game.endGame();
+		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
+		game.setClassification(classification);
+		save(game);
+	}
 
 }
 

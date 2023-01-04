@@ -22,7 +22,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -30,11 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
-import org.springframework.samples.petclinic.card.GenericCardService;
 import org.springframework.samples.petclinic.card.Hand;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,7 +50,6 @@ public class GameController {
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final RoomService roomService;
-	private final GenericCardService genericCardService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
 	private final AuthenticationService authenticationService;
@@ -61,11 +59,10 @@ public class GameController {
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService, GenericCardService genericCardService, RoomService roomService, AuthenticationService authenticationService) {
+	CardService cardService, RoomService roomService, AuthenticationService authenticationService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
-		this.genericCardService=genericCardService;
 		this.roomService = roomService;
 		this.authenticationService = authenticationService;
 	}
@@ -79,40 +76,8 @@ public class GameController {
 
 	@GetMapping(value = "/game/start/{roomId}")
 	public String init(@PathVariable("roomId") Integer roomId) {
-
-		Game game = new Game();
-		game.setRound(0);
-		game.setTurn(0);
-		game.setInitialHour(LocalDateTime.now());
-		List<GamePlayer> gamePlayers = new ArrayList<>();
-		game.setCards(new ArrayList<>());
-		game.setClassification(new HashMap<>());
-		List<Player> players = new ArrayList<>(roomService.findRoomById(roomId).getPlayers());
-		
-		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
-			gp.setCards(new ArrayList<>());
-			gamePlayers.add(gp);
-			gamePlayerService.save(gp);
-		}
-
-		game.setGamePlayer(gamePlayers);
-		List<GenericCard> deck = genericCardService.findGCards();
-		for(GenericCard c: deck){
-			Card card = new Card();
-			card.setType(c);
-			card.setBody(false);
-			card.setPlayed(false);
-			card.setVaccines(new ArrayList<>());
-			card.setVirus(new ArrayList<>());
-			game.getCards().add(card);
-			cardService.save(card);
-		}
-		Collections.shuffle(game.getCards());
-		gameService.save(game);
-		gameService.reparteCartas(game.getId());
-
+		Room room = roomService.findRoomById(roomId);
+		Game game = gameService.startGame(room);
 		Player currentPlayer = authenticationService.getPlayer();
 
 		return "redirect:/games/"+ game.getId() +"/gamePlayer/"+gameService.findGamePlayerByPlayer(currentPlayer).getId();
@@ -126,7 +91,6 @@ public class GameController {
 		model.put("games", allGames);
 		return "games/listing";
 	}
-
 	
 	//Muestra vista Individual de cada jugador
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
@@ -218,30 +182,19 @@ public class GameController {
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		ModelMap model = new ModelMap();
 		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
-				Card organ = c.get();
-				GamePlayer gplayer1 = gp1.get();
-				GamePlayer gplayer2 = gp2.get();
-				if(gplayer2.isThisOrganNotPresent(organ)){
-					gplayer1.getCards().remove(organ);
-					gamePlayerService.save(gplayer1);
-					organ.setGamePlayer(gplayer2);
-					organ.setBody(true);
-					cardService.save(organ);
-					gplayer2.getCards().add(organ);
-					gamePlayerService.save(gplayer2);
-					if (gplayer2.isWinner()) {
-						return "redirect:/games/"+gameId+"/classification";
-					} else {
-						return turn(gameId,gamePlayerId);
-					}
-				}else{
-					log.error("No puede poner dos órganos del mismo color en un cuerpo");
-					
-					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
-					model.put("messageType", "info");
-					return muestraVista(gameId, gamePlayerId, model);
-				}			
-		}else{
+			Card organ = c.get();
+			GamePlayer gplayer1 = gp1.get();
+			GamePlayer gplayer2 = gp2.get();
+			try {
+				cardService.addOrgan(organ, gplayer1, gplayer2);
+				return turn(gameId,gamePlayerId);
+			} catch (Exception e) {
+				log.error("No puede poner dos órganos del mismo color en un cuerpo");
+				model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
+				model.put("messageType", "info");
+				return muestraVista(gameId, gamePlayerId, model);
+			}
+		} else {
 			log.error("Movimiento inválido");
 			model.put("message", "Movimiento inválido");
 			model.put("messageType", "info");
@@ -306,15 +259,13 @@ public class GameController {
 				}catch(IllegalArgumentException e){
 					return "todo";
 				}
-	} else{
-		log.error("Movimiento inválido");
+		} else{
+			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-	}
+		}
 	}
 	
-
 	// Método para descartar cartas
-
 	@GetMapping(value = "/games/{gameId}/discard")
 	public String discardView(@PathVariable("gameId") Integer gameId, ModelMap model){
 		Player player = authenticationService.getPlayer();
@@ -337,32 +288,20 @@ public class GameController {
 		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
 		List<Card> cards = cardService.findAllCardsByIds(cardIds.getCards());
 		if(currentGamePlayer.getCards().containsAll(cards)){
-			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
-					currentGamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
-					card.discard();
-					cardService.save(card);	//Se guarda la carta	
-		}  
-			gamePlayerService.save(currentGamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+			gameService.discard(cards, currentGamePlayer);
 			return turn(gameId, currentGamePlayer.getId()); //Volvemos al método del turno
 		}else{
 			log.error("you can't discard those cards");
 			return muestraVista(gameId, currentGamePlayer.getId(), model);
 		}				
-		
-					
     }
 
 	//Clasificación tras la finalización de la partida
 	@GetMapping(value= "/games/{gameId}/classification")
 	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGame(gameId);
-		game.endGame();
-		log.info("Clasificando");
-		Map<Integer,List<GamePlayer>> classification = gameService.clasificate(game.getGamePlayer());
-		game.setClassification(classification);
-		gameService.save(game);
-		model.put("classification", classification);
+		gameService.finishGame(game);
+		model.put("classification", game.getClassification());
 		return "games/classification";
 	}
-
 }

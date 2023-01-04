@@ -268,6 +268,83 @@ public class GameController {
 			return "/games/"+gameId;
 		}
 	}
+
+
+    public String playThief(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id, Integer stolenCardId) {
+		// Obtenemos las cartas y jugadores involucrados en la acción
+		Card thiefCard = getCard(c_id);
+		GamePlayer thiefPlayer = getGamePlayer(gamePlayerId);
+		GamePlayer victimPlayer = getGamePlayer(g_id);
+		Card stolenCard = getCard(stolenCardId);
+		// Verificamos que todas las cartas y jugadores existan
+		if (thiefCard != null && thiefPlayer != null && victimPlayer != null && stolenCard != null) {
+			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
+			gamePlayerService.save(thiefPlayer);
+			gamePlayerService.save(victimPlayer);
+			return turn(gameId, gamePlayerId);
+		} else {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	private Card getCard(Integer cardId) {
+		Optional<Card> optionalCard = cardService.findCard(cardId);
+		return optionalCard.orElse(null);
+	}
+	
+	private GamePlayer getGamePlayer(Integer gamePlayerId) {
+		Optional<GamePlayer> optionalGamePlayer = gamePlayerService.findById(gamePlayerId);
+		return optionalGamePlayer.orElse(null);
+	}
+	
+	
+	public String playInfect(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+		try {
+			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			gameService.infection(card, gamePlayer1, gamePlayer2);
+			gamePlayerService.save(gamePlayer1);
+			gamePlayerService.save(gamePlayer2);
+			return turn(gameId, gamePlayerId);
+		} catch(Exception E) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	public String playGlove(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c_id) {
+		try {
+			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			Game game = gameService.findGame(gameId);
+			gameService.glove(card, gamePlayer, game);
+			for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
+				gamePlayerService.save(otherGamePlayer);
+			}
+			return turn(gameId, gamePlayerId);
+		} catch (Exception e) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	public String playMedicalError(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+		try {
+			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			gameService.medicalError(gamePlayer1, gamePlayer2);
+			// Finalizamos el turno
+			// Actualizamos los cambios en la base de datos
+			gamePlayerService.save(gamePlayer1);
+			gamePlayerService.save(gamePlayer2);
+			return turn(gameId, gamePlayerId);
+		} catch(Exception E) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
 	
 	// Método para descartar cartas
 	@GetMapping(value = "/games/{gameId}/discard")

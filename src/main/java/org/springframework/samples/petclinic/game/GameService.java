@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
@@ -155,18 +156,71 @@ public class GameService {
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
-		public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
-			Map<Integer,List<GamePlayer>> classification = new HashMap<>();
-			for(GamePlayer gamePlayer : gamePlayers){
-				Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
-					if(healthyOrgans==4){
-						gamePlayer.setWinner(true);
-						classification.put(1, List.of(gamePlayer));
-					} else if(healthyOrgans==3){
-						if(classification.containsKey(2)){
-							classification.get(2).add(gamePlayer);
-						}else{
-							classification.put(2, List.of(gamePlayer));
+
+        public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
+			// Verificamos que la víctima tenga la carta que se quiere robar
+			if (victimPlayer.getCards().contains(stolenCard)) {
+				// Realizamos el robo de la carta
+				victimPlayer.getCards().remove(stolenCard);
+				thiefPlayer.getCards().add(stolenCard);
+				thiefPlayer.getCards().remove(thiefCard);   
+			}
+	}
+
+	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		List<Card> infectedCards = new ArrayList<>();
+		for (Card c : gamePlayer1.getCards()) {
+			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
+				infectedCards.add(c);
+			}
+		}
+		gamePlayer1.getCards().remove(card);
+		for (Card infectedCard : infectedCards) {
+		//Comprobar si se pueden infectar sus organos
+			List<Card> body = gamePlayer2.getBody();
+			for (Card c : body) {
+				if (c.getType().getColour() == infectedCard.getType().getColour() 
+				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
+					gamePlayer1.getCards().remove(infectedCard);
+					infectedCard.setGamePlayer(gamePlayer2);
+					c.getVirus().add(infectedCard);
+				}
+			}
+		}
+	}
+
+	public void glove(Card card, GamePlayer gamePlayer, Game game) {
+		gamePlayer.getCards().remove(card);
+		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
+			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
+				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
+			}
+		}
+	}
+
+	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
+		// Intercambiamos los cuerpos de los dos jugadores
+		List<Card> player1Cards = gamePlayer1.getBody();
+		List<Card> player2Cards = gamePlayer2.getBody();
+		gamePlayer1.getBody().removeAll(player1Cards);
+		gamePlayer1.getBody().addAll(player2Cards);
+		gamePlayer2.getBody().removeAll(player2Cards);
+		gamePlayer2.getBody().addAll(player1Cards);
+
+	}
+		
+	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
+		Map<Integer,List<GamePlayer>> classification = new HashMap<>();
+		for(GamePlayer gamePlayer : gamePlayers){
+			Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
+			if(healthyOrgans==4){
+				gamePlayer.setWinner(true);
+				classification.put(1, List.of(gamePlayer));
+			} else if(healthyOrgans==3){
+				if(classification.containsKey(2)){
+					classification.get(2).add(gamePlayer);
+				}else{
+					classification.put(2, List.of(gamePlayer));
 						}
 					} else if(healthyOrgans==2){
 						if(classification.containsKey(3)){

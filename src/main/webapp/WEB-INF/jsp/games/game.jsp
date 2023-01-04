@@ -52,7 +52,7 @@
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/"></c:if>
+                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/play/${card.id}/"></c:if>
                             <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
                         <c:if test="${isYourTurn}"></a></c:if>
 
@@ -61,8 +61,9 @@
             </tr>
         </tbody>
     </table>
-    <div class="container" style="padding-left: 480px; padding-top: 20px;"><a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  </div>
-
+    <c:if test="${isYourTurn}">
+        <div class="container" style="padding-left: 480px; padding-top: 20px;"><a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  </div>
+    </c:if>
 
 
 </virus:layout>

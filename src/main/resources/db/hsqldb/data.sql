@@ -47,23 +47,23 @@ INSERT INTO achievements(id,name,threshold,description,badge_image,type) VALUES
 
 -- Player
 
-INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (1,'Francisco Sebastian','Benitez Ruis Diaz','frabenrui1','Me encanta este juego',TRUE);
-INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (2,'Jose Maria','Garcia Berdejo','josgarber6','Lets gooo',TRUE);
-INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE);
-INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE);
-INSERT INTO players(id,first_name,last_name,username,description,status) VALUES (5,'p','p','p','pp',TRUE);
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (1,'Francisco Sebastian','Benitez Ruis Diaz','frabenrui1','Me encanta este juego',TRUE,'/resources/images/user.png');
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (2,'Jose Maria','Garcia Berdejo','josgarber6','Lets gooo',TRUE,'');
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE,'');
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE,'');
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (5,'p','p','p','pp',TRUE,'');
 
 -- GamePlayer
 
--- INSERT INTO game_players VALUES (1,null,null,1), (2,null,null,2);
+INSERT INTO game_players VALUES (1,null,TRUE,1), (2,null,null,2);
 
 -- Games
 
--- INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
+INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
 
 -- GamePlayerGames
 
--- INSERT INTO games_game_player VALUES (1,1), (1,2);
+INSERT INTO games_game_player VALUES (1,1), (1,2);
 
 -- PlayerAchievements
 

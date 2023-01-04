@@ -36,9 +36,8 @@ public class StatisticsController {
     } else {
       model.put("message", "Cannot find player statistics, because the player does not exist");
       model.put("messageType", "info");
+      return "redirect:/";
     }
-
-    return "redirect:/";
 
   }
   

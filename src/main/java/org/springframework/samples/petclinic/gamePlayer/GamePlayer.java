@@ -6,13 +6,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.samples.petclinic.card.Card;
-import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
 import org.springframework.samples.petclinic.player.Player;

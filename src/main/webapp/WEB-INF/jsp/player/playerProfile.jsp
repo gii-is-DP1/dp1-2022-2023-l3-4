@@ -12,7 +12,8 @@
           <thead>
             <tr>
               <td rowspan="2">
-                <img src="/resources/images/user.png" width="50">
+                <spring:url value="${player.profileImage}" var="profileImage"/>
+                <img class="img-responsive" src="${profileImage}" width="50"/>
               </td>
               <td>
                 <h1><c:out value="${player.user.username}"/></h1>

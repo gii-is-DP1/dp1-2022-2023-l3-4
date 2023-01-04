@@ -16,9 +16,7 @@
 package org.springframework.samples.petclinic.player;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -53,6 +51,9 @@ public class Player extends Person {
 
 	@Column(name = "status")
 	private Boolean status;
+
+	@Column(name = "profile_image")
+	private String profileImage;
 	
 	@OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "username", referencedColumnName = "username")

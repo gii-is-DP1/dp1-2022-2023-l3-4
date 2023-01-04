@@ -61,7 +61,7 @@
             </tr>
         </tbody>
     </table>
-    <a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  
+    <div class="container" style="padding-left: 480px; padding-top: 20px;"><a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  </div>
 
 
 

@@ -27,6 +27,12 @@
         <td style="padding-left: 20px"><mvc:checkbox path="status"/> Online</td>
 			</tr>
 			<tr>
+				<tr>
+					<td><mvc:label path="profileImage">Select profile image:</mvc:label>
+					<td style="padding-left: 20px"><mvc:input path="profileImage"/></td>
+				</tr>
+			</tr>
+			<tr>
 				<td colspan="2"><input type="submit" value="Save" /></td>
 			</tr>
 		</table>

@@ -56,6 +56,8 @@ public class GameController {
 	private final CardService cardService;
 	private final AuthenticationService authenticationService;
 
+	public static final String RANKING = "statistics/ranking";
+
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
@@ -67,6 +69,13 @@ public class GameController {
 		this.roomService = roomService;
 		this.authenticationService = authenticationService;
 	}
+
+	@GetMapping("/ranking/global")
+  public String getPlayersRanking(ModelMap model) {
+    Map<GamePlayer, Integer> gps = gameService.getRanking();
+    model.put("topGamers", gps);
+    return RANKING;
+  }
 
 	@GetMapping(value = "/game/start/{roomId}")
 	public String init(@PathVariable("roomId") Integer roomId) {
@@ -113,7 +122,7 @@ public class GameController {
 	//Listar juegos
 	@GetMapping(value="/games")
 	public String ListGames(ModelMap model){
-		List<Game> allGames=  gameService.ListGames();
+		List<Game> allGames=  gameService.listGames();
 		model.put("games", allGames);
 		return "games/listing";
 	}
@@ -123,7 +132,7 @@ public class GameController {
 	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
 	public String muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
 		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
-		Game game = gameService.findGames(gameId);
+		Game game = gameService.findGame(gameId);
 		model = generaTablero(model, gp_vista, game);
 		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
 		Boolean isYourTurn = currentTurnGamePlayer.equals(gp_vista);
@@ -147,7 +156,7 @@ public class GameController {
 
 	//Cambio de turno
 	public String turn(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId){
-			Game game = gameService.findGames(gameId); //Encontramos el juego
+			Game game = gameService.findGame(gameId); //Encontramos el juego
 			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
 			if(gamePlayer.isWinner())
 			 { //Si ya alguien ganó, finalizar la partida
@@ -165,7 +174,7 @@ public class GameController {
 	public String play(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @PathVariable("cardId") Integer cardId, ModelMap model){
 		Optional<Card> c = cardService.findCard(cardId);
 		Optional<GamePlayer> gp = gamePlayerService.findById(gamePlayerId);
-		Game game = gameService.findGames(gameId);
+		Game game = gameService.findGame(gameId);
 		
 		if(c.isPresent() && gp.isPresent()){
 			if(gp.get().getCards().contains(c.get())){
@@ -323,7 +332,7 @@ public class GameController {
 	public String discardView(@PathVariable("gameId") Integer gameId, ModelMap model){
 		Player player = authenticationService.getPlayer();
 		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
-		Game game = gameService.findGames(gameId);
+		Game game = gameService.findGame(gameId);
 		List<Card> hand = currentGamePlayer.getHand();
 		Hand emptyForm = new Hand();
 		

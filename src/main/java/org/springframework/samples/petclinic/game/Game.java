@@ -68,8 +68,8 @@ public class Game extends BaseEntity {
 		setDuration(Duration.between(getInitialHour(), LocalDateTime.now()));
 	}
 
-	public static String humanReadableDuration(Duration d) {
-		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
+	public String humanReadableDuration() {
+		return getDuration().toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
 	}
 
 }

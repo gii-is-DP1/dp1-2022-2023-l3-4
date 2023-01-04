@@ -77,7 +77,7 @@ public class PlayerController {
         Player player = authenticationService.getPlayer();
         Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
         GamePlayer gp = gameService.findGamePlayerByPlayer(player);
-        List<Game> games = gameService.ListGames().stream().filter(x -> x.getGamePlayer().contains(gp)).collect(Collectors.toList());
+        List<Game> games = gameService.listGames().stream().filter(x -> x.getGamePlayer().contains(gp)).collect(Collectors.toList());
         List<Duration> durations = games.stream().map(x -> x.getDuration()).collect(Collectors.toList());
         Duration totalTimePlayed = Duration.ZERO;
         for (Duration d: durations) {

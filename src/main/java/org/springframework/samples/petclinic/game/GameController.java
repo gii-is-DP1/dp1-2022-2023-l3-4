@@ -281,7 +281,7 @@ public class GameController {
 			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
 			gamePlayerService.save(thiefPlayer);
 			gamePlayerService.save(victimPlayer);
-			return turn(gameId, gamePlayerId);
+			return turn(gameId);
 		} else {
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
@@ -307,7 +307,7 @@ public class GameController {
 			gameService.infection(card, gamePlayer1, gamePlayer2);
 			gamePlayerService.save(gamePlayer1);
 			gamePlayerService.save(gamePlayer2);
-			return turn(gameId, gamePlayerId);
+			return turn(gameId);
 		} catch(Exception E) {
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
@@ -323,7 +323,7 @@ public class GameController {
 			for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 				gamePlayerService.save(otherGamePlayer);
 			}
-			return turn(gameId, gamePlayerId);
+			return turn(gameId);
 		} catch (Exception e) {
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
@@ -339,7 +339,7 @@ public class GameController {
 			// Actualizamos los cambios en la base de datos
 			gamePlayerService.save(gamePlayer1);
 			gamePlayerService.save(gamePlayer2);
-			return turn(gameId, gamePlayerId);
+			return turn(gameId);
 		} catch(Exception E) {
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";

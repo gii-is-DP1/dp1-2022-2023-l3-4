@@ -273,6 +273,7 @@ public class GameService {
 		game.setRound(0);
 		game.setTurn(0);
 		game.setInitialHour(LocalDateTime.now());
+		game.setIsRunning(true);
 		List<GamePlayer> gamePlayers = new ArrayList<>();
 		game.setCards(new ArrayList<>());
 		game.setClassification(new HashMap<>());

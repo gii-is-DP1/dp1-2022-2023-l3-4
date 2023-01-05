@@ -92,13 +92,13 @@ public class Card extends BaseEntity implements Serializable {
 	public Card() {}
 
 	public void discard(){
-		if(getType().toString()=="ORGAN"){
+		if(getType().getType().toString()=="ORGAN"){
 			setVaccines(new ArrayList<>());
 			setVirus(new ArrayList<>());
 		}
-		else if(getType().toString()=="VIRUS") setCardVirus(null);
+		else if(getType().getType().equals(GenericCard.Type.VIRUS)) setCardVirus(null);
 		
-		else if(getType().toString()=="VACCINE") setCardVaccine(null);
+		else if(getType().getType().equals(GenericCard.Type.VACCINE)) setCardVaccine(null);
 		
 		setPlayed(true);
 		setBody(false);

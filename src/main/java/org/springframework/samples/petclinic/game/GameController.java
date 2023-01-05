@@ -222,7 +222,7 @@ public class GameController {
 				cardService.infect(c_organ, c_virus);
 				cardService.save(c_virus);
 				cardService.save(c_organ);
-				if(old_card!=null)cardService.save(c_organ);
+				if(old_card!=null)cardService.save(old_card);
 				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "TODO";
@@ -238,11 +238,18 @@ public class GameController {
 	public String playVaccine(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
+		Card old_virus = null;
 		if(c1.isPresent() && c2.isPresent()){
 			Card c_vaccine = c1.get();
 			Card c_organ = c2.get();
 			try{
+				if(c_organ.getVirus().size()==1){
+					old_virus=c_organ.getVirus().get(0);
+				}
 				cardService.vaccinate(c_organ, c_vaccine);
+				cardService.save(c_vaccine);
+				cardService.save(c_organ);
+				if(old_virus!=null) cardService.save(old_virus);
 				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "todo";

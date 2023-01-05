@@ -112,8 +112,6 @@ public class CardService {
 			if(organ.getVirus().size()==0){
 				if(organ.getVaccines().size()<2){
 					infectOrVaccinate(organ, vaccine);
-					cardRepository.save(vaccine);
-					cardRepository.save(organ);
 				}else{
 					throw new IllegalArgumentException("Este órgano ya está inmunizado");
 				}
@@ -123,9 +121,6 @@ public class CardService {
 				organ.setVirus(new ArrayList<>());
 				virus.discard();
 				vaccine.discard();
-				cardRepository.save(vaccine);
-				cardRepository.save(organ);
-				cardRepository.save(virus);
 			}
 			}else{
 				throw new IllegalArgumentException("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");

@@ -76,7 +76,7 @@ public class GameServiceTest {
 
     @Test
     //Jugar un corazón con el cuerpo vacío
-    public void testaddOrganPositive1() {
+    public void testAddOrganPositive1() {
         //setup
         gp1.setCards(cards);
         //test
@@ -86,7 +86,7 @@ public class GameServiceTest {
     }
     @Test
     //Jugar un corazón con un estómago ya en el cuerpo
-    public void testaddOrganPositive2() {
+    public void testAddOrganPositive2() {
         //setup
         cards.add(organ_stomach);
         gp1.setCards(cards);
@@ -98,7 +98,7 @@ public class GameServiceTest {
 
     @Test
     //Jugar un corazón con un estómago ya en el cuerpo de otra persona que también tiene un corazón en la mano
-    public void testaddOrganPositive3() {
+    public void testAddOrganPositive3() {
         //Setup
         gp1.setCards(cards);
         cards.clear();
@@ -113,7 +113,7 @@ public class GameServiceTest {
 
     @Test
     //Jugar un corazón teniendo un corazón en el cuerpo
-    public void testaddOrganNegative1() {
+    public void testAddOrganNegative1() {
         //Setup
         organ_heart2.setBody(true);
         cards.add(organ_heart2);
@@ -123,7 +123,7 @@ public class GameServiceTest {
 }
     @Test
     //Jugar un corazón a otro que ya tiene un corazón en el cuerpo
-    public void testaddOrganNegative2() {
+    public void testAddOrganNegative2() {
         //Setup
         gp1.setCards(cards);
         cards.clear();

@@ -111,6 +111,7 @@ public class CardService {
 		
 			}else{
 				Card virus = organ.getVirus().get(0);
+				organ.setVirus(new ArrayList<>());
 				virus.discard();
 				vaccine.discard();
 				cardRepository.save(vaccine);

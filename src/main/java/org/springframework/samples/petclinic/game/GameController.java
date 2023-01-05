@@ -185,23 +185,22 @@ public class GameController {
 		GamePlayer gp1 = authenticationService.getGamePlayer();
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		ModelMap model = new ModelMap();
-		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
+		if(c.isPresent() && gp2.isPresent()){
 				Card organ = c.get();
-				GamePlayer gplayer1 = gp1.get();
 				GamePlayer gplayer2 = gp2.get();
 				try{
-					gameService.playOrgan(organ, gplayer1, gplayer2, model);
+					gameService.addOrgan(organ, gplayer2, gplayer2, model);
 					cardService.save(organ);
-					gamePlayerService.save(gplayer1);
+					gamePlayerService.save(gp1);
 					gamePlayerService.save(gplayer2);
-					return turn(gameId,gamePlayerId);
+					return turn(gameId);
 				}catch(IllegalArgumentException e){
-					return muestraVista(gameId, gamePlayerId, model);
+					return muestraVista(gameId, model);
 				}			
 			}else{
 				model.put("message", "Movimiento inválido");
 				model.put("messageType", "info");
-				return muestraVista(gameId, gamePlayerId, model);
+				return muestraVista(gameId, model);
 			}
 
 				
@@ -224,7 +223,7 @@ public class GameController {
 				cardService.save(c_virus);
 				cardService.save(c_organ);
 				if(old_card!=null)cardService.save(c_organ);
-				return turn(gameId, gamePlayerId);
+				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "TODO";
 			}			

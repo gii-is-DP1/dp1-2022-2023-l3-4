@@ -161,9 +161,13 @@ public class GameService {
 			// Verificamos que la víctima tenga la carta que se quiere robar
 			if (victimPlayer.getCards().contains(stolenCard)) {
 				// Realizamos el robo de la carta
+				stolenCard.setGamePlayer(thiefPlayer);
+				thiefCard.discard();
 				victimPlayer.getCards().remove(stolenCard);
 				thiefPlayer.getCards().add(stolenCard);
-				thiefPlayer.getCards().remove(thiefCard);   
+				thiefPlayer.getCards().remove(thiefCard);
+				cardService.save(stolenCard);
+				cardService.save(thiefCard);
 			}
 	}
 

@@ -174,6 +174,8 @@ public class GameController {
 			return playVaccine(gameId, cardId, targetC);
 		} else if(card.getType().getType().equals(GenericCard.Type.VIRUS)) {
 			return playVirus(gameId, cardId, targetC);
+		} else if(card.getType().getType().equals(GenericCard.Type.THIEF)) {
+			return playThief(gameId, cardId, targetC);
 		}
 		
 		return muestraVista(gameId, model);
@@ -270,12 +272,12 @@ public class GameController {
 	}
 
 
-    public String playThief(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id, Integer stolenCardId) {
+    public String playThief(@PathVariable("gameId") int gameId, Integer c_id, Integer stolenCardId) {
 		// Obtenemos las cartas y jugadores involucrados en la acción
 		Card thiefCard = getCard(c_id);
-		GamePlayer thiefPlayer = getGamePlayer(gamePlayerId);
-		GamePlayer victimPlayer = getGamePlayer(g_id);
+		GamePlayer thiefPlayer = authenticationService.getGamePlayer();
 		Card stolenCard = getCard(stolenCardId);
+		GamePlayer victimPlayer = stolenCard.getGamePlayer();
 		// Verificamos que todas las cartas y jugadores existan
 		if (thiefCard != null && thiefPlayer != null && victimPlayer != null && stolenCard != null) {
 			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
@@ -284,7 +286,7 @@ public class GameController {
 			return turn(gameId);
 		} else {
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 	}
 	

@@ -19,7 +19,9 @@ package org.springframework.samples.petclinic.game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -27,13 +29,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
-import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.Hand;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * @author Juergen Hoeller
@@ -46,78 +50,57 @@ public class GameController {
 	private static final Logger log = LoggerFactory.getLogger(GameController.class);
 	private final GameService gameService;
 	private final RoomService roomService;
-	private final GenericCardService genericCardService;
 	private final GamePlayerService gamePlayerService;
 	private final CardService cardService;
 	private final AuthenticationService authenticationService;
 
+	public static final String RANKING = "statistics/ranking";
+
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
-	CardService cardService, GenericCardService genericCardService, RoomService roomService, AuthenticationService authenticationService) {
+	CardService cardService, RoomService roomService, AuthenticationService authenticationService) {
 		this.gameService = gameService;
 		this.gamePlayerService= gamePlayerService;
 		this.cardService=cardService;
-		this.genericCardService=genericCardService;
 		this.roomService = roomService;
 		this.authenticationService = authenticationService;
 	}
 
+	@GetMapping("/ranking/global")
+  public String getPlayersRanking(ModelMap model) {
+    Map<GamePlayer, Integer> gps = gameService.getRanking();
+    model.put("topGamers", gps);
+    return RANKING;
+  }
+
 	@GetMapping(value = "/game/start/{roomId}")
-	public String init(@PathVariable("roomId") Integer roomId) {
-
-		Game game = new Game();
-		game.setRound(0);
-		game.setTurn(0);
-		List<GamePlayer> gamePlayers = new ArrayList<>();
-		game.setCards(new ArrayList<>());
-		game.setClassification(new HashMap<>());
-		List<Player> players = new ArrayList<>(roomService.findRoomById(roomId).getPlayers());
-		
-		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
-			gp.setCards(new ArrayList<>());
-			gamePlayers.add(gp);
-			gamePlayerService.save(gp);
-		}
-
-		game.setGamePlayer(gamePlayers);
-		List<GenericCard> deck = genericCardService.findGCards();
-		for(GenericCard c: deck){
-			Card card = new Card();
-			card.setType(c);
-			card.setBody(false);
-			card.setPlayed(false);
-			card.setVaccines(new ArrayList<>());
-			card.setVirus(new ArrayList<>());
-			game.getCards().add(card);
-			cardService.save(card);
-		}
-		Collections.shuffle(game.getCards());
-		gameService.save(game);
-		gameService.reparteCartas(game.getId());
-
+	public String init(@PathVariable("roomId") Integer roomId, ModelMap model) {
+		Room room = roomService.findRoomById(roomId);
 		Player currentPlayer = authenticationService.getPlayer();
-
-		return "redirect:/games/"+ game.getId() +"/gamePlayer/"+gameService.findGamePlayerByPlayer(currentPlayer).getId();
-		
+		if(room.getHost().equals(currentPlayer)) {
+			Game game = gameService.startGame(room);
+			return "redirect:/games/"+ game.getId();
+		} else {
+			model.put("message", "Only the host of the room can start a game.");
+			model.put("messageType", "info");
+			return "welcome";
+		}
 	}
 	
 	//Listar juegos
 	@GetMapping(value="/games")
 	public String ListGames(ModelMap model){
-		List<Game> allGames=  gameService.ListGames();
+		List<Game> allGames=  gameService.listGames();
 		model.put("games", allGames);
 		return "games/listing";
 	}
-
 	
 	//Muestra vista Individual de cada jugador
-	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}")
-	public String muestraVista(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, ModelMap model){
-		GamePlayer gp_vista= gamePlayerService.findById(gamePlayerId).get();
-		Game game = gameService.findGames(gameId);
+	@GetMapping(value="/games/{gameId}")
+	public String muestraVista(@PathVariable("gameId") int gameId, ModelMap model){
+		GamePlayer gp_vista= authenticationService.getGamePlayer();
+		Game game = gameService.findGame(gameId);
 		model = generaTablero(model, gp_vista, game);
 		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
 		Boolean isYourTurn = currentTurnGamePlayer.equals(gp_vista);
@@ -131,7 +114,7 @@ public class GameController {
 		Map<GamePlayer, List<Card>> bodies = new HashMap<>(); 
 		for(GamePlayer gp: game.getGamePlayer()){
 			if(gp.equals(gamePlayer)){
-				model.put("hand", gp.getCards().stream().filter(x->!x.getBody()).collect(Collectors.toList()));
+				model.put("hand", gp.getHand());
 			}
 			bodies.put(gp, gp.getCards().stream().filter(x->x.getBody()).collect(Collectors.toList()));
 		}
@@ -140,79 +123,66 @@ public class GameController {
 	}
 
 	//Cambio de turno
-	public String turn(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId){
-			Game game = gameService.findGames(gameId); //Encontramos el juego
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			if(gamePlayer.isWinner())
+	public String turn(int gameId){
+			Game game = gameService.findGame(gameId); //Encontramos el juego
+			if(game.hasAnyWinners())
 			 { //Si ya alguien ganó, finalizar la partida
-				ModelMap model = new ModelMap();
-				return clasification(gameId, model);
+				return "redirect:/games/"+gameId+"/classification";
 			}else{
 				gameService.changeTurn(game);
-				return "redirect:/games/" + gameId + "/gamePlayer/" + gamePlayerId;
+				return "redirect:/games/" + gameId;
 			}
-
 		}
 
 	//Jugar
-	@GetMapping(value="/games/{gameId}/gamePlayer/{gamePlayerId}/play/{cardId}")
-	public String play(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, @PathVariable("cardId") Integer cardId, ModelMap model){
+	@GetMapping(value="/games/{gameId}/play/{cardId}")
+	public String play(@PathVariable("gameId") int gameId, @PathVariable("cardId") Integer cardId, ModelMap model){
 		Optional<Card> c = cardService.findCard(cardId);
-		Optional<GamePlayer> gp = gamePlayerService.findById(gamePlayerId);
-		Game game = gameService.findGames(gameId);
+		GamePlayer gp = authenticationService.getGamePlayer();
+		Game game = gameService.findGame(gameId);
 		
-		if(c.isPresent() && gp.isPresent()){
-			if(gp.get().getCards().contains(c.get())){
-				model = generaTablero(model, gp.get(), game);
-				switch(c.get().getType().toString()){
-					case("ORGAN"):
-					log.info("Elige el jugador a quien quieras dar este órgano");
-					case("VIRUS"):
-					log.info("Elige el órgano que quieras infectar");
-					case("VACCINE"):
-					log.info("Elige el órgano que quieras vacunar");
-					case("TRANSPLANT"):
-					log.info("Selecciona qué dos organos quieres intercambiar");
-				}
+		if(c.isPresent()){
+			if(gp.getCards().contains(c.get())){
+				model = generaTablero(model, gp, game);
 				return "/games/selecciona";
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
-				return muestraVista(gameId, gamePlayerId, model);
+				return muestraVista(gameId, model);
 			}
 		} else{
 			log.error("Movimiento no válido");
-			return muestraVista(gameId, gamePlayerId, model);
+			return muestraVista(gameId, model);
 		}
 	}
 
-	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toPlayer/{targetGamePlayerid}")
-	public String playOnBody(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+	@GetMapping("/games/{gameId}/play/{cardId}/toPlayer/{targetGamePlayerid}")
+	public String playOnBody(@PathVariable("gameId") Integer gameId, @PathVariable("cardId") Integer cardId,
 			@PathVariable("targetGamePlayerid") Integer targetGP, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
-			return playOrgan(gameId, sourceGP, targetGP, cardId);
+			return playOrgan(gameId, targetGP, cardId);
 		}
 		
-		return muestraVista(gameId, sourceGP, model);
+		return muestraVista(gameId, model);
 	}
 
-	@GetMapping("/games/{gameId}/gamePlayer/{sourceGamePlayerId}/play/{cardId}/toCard/{targetCardId}")
-	public String playOnCard(@PathVariable("gameId") Integer gameId, @PathVariable("sourceGamePlayerId") Integer sourceGP, @PathVariable("cardId") Integer cardId,
+	@GetMapping("/games/{gameId}/play/{cardId}/toCard/{targetCardId}")
+	public String playOnCard(@PathVariable("gameId") Integer gameId, @PathVariable("cardId") Integer cardId,
 			@PathVariable("targetCardId") Integer targetC, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.VACCINE)){
-			return playVaccine(gameId, sourceGP, cardId, targetC);
+			return playVaccine(gameId, cardId, targetC);
 		} else if(card.getType().getType().equals(GenericCard.Type.VIRUS)) {
-			return playVirus(gameId, sourceGP, cardId, targetC);
+			return playVirus(gameId, cardId, targetC);
 		}
 		
-		return muestraVista(gameId, sourceGP, model);
+		return muestraVista(gameId, model);
 	}
 
 	//Jugar un órgano
-	public String playOrgan(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id){
+	public String playOrgan(@PathVariable("gameId") int gameId, Integer g_id, Integer c_id){
 		Optional<Card> c = cardService.findCard(c_id);
-		Optional<GamePlayer> gp1 = gamePlayerService.findById(gamePlayerId);
+		GamePlayer gp1 = authenticationService.getGamePlayer();
 		Optional<GamePlayer> gp2 = gamePlayerService.findById(g_id);
 		ModelMap model = new ModelMap();
 		if(c.isPresent() && gp2.isPresent() && gp1.isPresent()){
@@ -238,7 +208,7 @@ public class GameController {
 	}	
 
 	//Jugar un virus
-	public String playVirus(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c1_id, Integer c2_id){
+	public String playVirus(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
 		Card old_card = null;
@@ -260,13 +230,13 @@ public class GameController {
 			}			
 		} else {
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 		
 	}
 
 	//Jugar una vacuna
-	public String playVaccine(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c1_id, Integer c2_id){
+	public String playVaccine(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
 		if(c1.isPresent() && c2.isPresent()){
@@ -274,13 +244,13 @@ public class GameController {
 			Card c_organ = c2.get();
 			try{
 				cardService.vaccinate(c_organ, c_vaccine);
-				return turn(gameId, gamePlayerId);
+				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "todo";
 			}			
 		}else{
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 		
 	}
@@ -296,48 +266,129 @@ public class GameController {
 			GamePlayer g2 = c_organ2.getGamePlayer();
 				try{
 					gameService.changeCards(g1,g2,c_organ1,c_organ2);
-					return turn(gameId, gamePlayerId);
+					return turn(gameId);
 				}catch(IllegalArgumentException e){
 					return "todo";
 				}
-	} else{
-		log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		} else{
+			log.error("Movimiento inválido");
+			return "/games/"+gameId;
+		}
 	}
+
+
+    public String playThief(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id, Integer stolenCardId) {
+		// Obtenemos las cartas y jugadores involucrados en la acción
+		Card thiefCard = getCard(c_id);
+		GamePlayer thiefPlayer = getGamePlayer(gamePlayerId);
+		GamePlayer victimPlayer = getGamePlayer(g_id);
+		Card stolenCard = getCard(stolenCardId);
+		// Verificamos que todas las cartas y jugadores existan
+		if (thiefCard != null && thiefPlayer != null && victimPlayer != null && stolenCard != null) {
+			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
+			gamePlayerService.save(thiefPlayer);
+			gamePlayerService.save(victimPlayer);
+			return turn(gameId);
+		} else {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	private Card getCard(Integer cardId) {
+		Optional<Card> optionalCard = cardService.findCard(cardId);
+		return optionalCard.orElse(null);
+	}
+	
+	private GamePlayer getGamePlayer(Integer gamePlayerId) {
+		Optional<GamePlayer> optionalGamePlayer = gamePlayerService.findById(gamePlayerId);
+		return optionalGamePlayer.orElse(null);
+	}
+	
+	
+	public String playInfect(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+		try {
+			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			gameService.infection(card, gamePlayer1, gamePlayer2);
+			gamePlayerService.save(gamePlayer1);
+			gamePlayerService.save(gamePlayer2);
+			return turn(gameId);
+		} catch(Exception E) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	public String playGlove(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c_id) {
+		try {
+			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			Game game = gameService.findGame(gameId);
+			gameService.glove(card, gamePlayer, game);
+			for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
+				gamePlayerService.save(otherGamePlayer);
+			}
+			return turn(gameId);
+		} catch (Exception e) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
+	}
+	
+	public String playMedicalError(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+		try {
+			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			gameService.medicalError(gamePlayer1, gamePlayer2);
+			// Finalizamos el turno
+			// Actualizamos los cambios en la base de datos
+			gamePlayerService.save(gamePlayer1);
+			gamePlayerService.save(gamePlayer2);
+			return turn(gameId);
+		} catch(Exception E) {
+			log.error("Movimiento inválido");
+			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+		}
 	}
 	
 	// Método para descartar cartas
-    public String discard(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId, @PathVariable Integer gameId) {
-        ModelMap model = new ModelMap();
-		if(gamePlayerService.findById(gamePlayerId).isPresent()){
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			try{
-				gameService.discard(cards, gamePlayer);
-				return turn(gameId, gamePlayerId); //Volvemos al método del turno
-			}catch(IllegalArgumentException e){
-				model.put("message", "No puedes descartar estas cartas");
-				model.put("messageType", "info");
-				return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-			}	
+	@GetMapping(value = "/games/{gameId}/discard")
+	public String discardView(@PathVariable("gameId") Integer gameId, ModelMap model){
+		Player player = authenticationService.getPlayer();
+		GamePlayer currentGamePlayer = gameService.findGamePlayerByPlayer(player);
+		Game game = gameService.findGame(gameId);
+		List<Card> hand = currentGamePlayer.getHand();
+		Hand emptyForm = new Hand();
+		
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(currentGamePlayer);
+		model.put("isYourTurn", isYourTurn);
+		model.put("hand", hand);
+		model.put("cardsForm", emptyForm);
+		return "games/discard";
+	}
+
+	@PostMapping(value = "/games/{gameId}/discard")
+    public String discard(Hand cardIds, @PathVariable("gameId") Integer gameId, ModelMap model, BindingResult br) {
+		GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
+		List<Card> cards = cardService.findAllCardsByIds(cardIds.getCards());
+		if(currentGamePlayer.getCards().containsAll(cards)){
+			gameService.discard(cards, currentGamePlayer);
+			return turn(gameId); //Volvemos al método del turno
 		}else{
-			model.put("message", "Movimiento inválido");
-			model.put("messageType", "info");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-		} 
-					
+			log.error("you can't discard those cards");
+			return muestraVista(gameId, model);
+		}				
     }
 
 	//Clasificación tras la finalización de la partida
-	@GetMapping(value= "/games/{gameId}/clasificacion")
-	public String clasification(@PathVariable("gameId") int gameId, ModelMap model) {
-		Game game = this.gameService.findGames(gameId);
-		game.endGame();
-		log.info("Clasificando");
-		Map<Integer,List<GamePlayer>> classification = gameService.clasificate(game.getGamePlayer());
-				game.setClassification(classification);
-				gameService.save(game);
-				model.put("clasificacion", classification);
-				return "rondas/clasificacion";
+	@GetMapping(value= "/games/{gameId}/classification")
+	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
+		Game game = this.gameService.findGame(gameId);
+		if(game.getIsRunning()) gameService.finishGame(game);
+		model.put("classification", game.getClassification());
+		return "games/classification";
 	}
-
 }

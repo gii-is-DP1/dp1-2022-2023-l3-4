@@ -15,12 +15,19 @@
  */
 package org.springframework.samples.petclinic.player;
 
+import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.friendRequest.FriendService;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.game.GameService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.user.User;
@@ -45,7 +52,9 @@ public class PlayerController {
 
     private PlayerService playerService;
     private StatisticsService statisticsService;
+    private GameService gameService;
     private AuthenticationService authenticationService;
+    private FriendService friendService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -54,10 +63,12 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as) {
+    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as, FriendService fs, GameService gs) {
         this.playerService = ps;
         this.statisticsService = ss;
         this.authenticationService = as;
+        this.friendService=fs;
+        this.gameService = gs;
     }
 
 
@@ -65,8 +76,18 @@ public class PlayerController {
         public String listPlayerStatistics(ModelMap model) {
         Player player = authenticationService.getPlayer();
         Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
+        GamePlayer gp = gameService.findGamePlayerByPlayer(player);
+        List<Game> games = gameService.listGames().stream().filter(x -> x.getGamePlayer().contains(gp)).collect(Collectors.toList());
+        List<Duration> durations = games.stream().map(x -> x.getDuration()).collect(Collectors.toList());
+        Duration totalTimePlayed = Duration.ZERO;
+        for (Duration d: durations) {
+            totalTimePlayed = totalTimePlayed.plus(d);
+        }
         model.put("statistics", playerStatistics);
         model.put("player", player);
+        model.put("gameplayer", gp);
+        model.put("games", games);
+        model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
         return USER_PROFILE;
   }
 
@@ -104,23 +125,27 @@ public class PlayerController {
 		return VIEW_FIND_PLAYER;
 	}
 
-    @GetMapping(value = "/find")
+    @PostMapping(value = "/createSearch")
 	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
-		// if (player.getUser().getUsername() == null) {
-            // User user=player.getUser();
-            // user.setUsername("");
-			// player.setUser(user);
-		// }
+        Player playerAuth = authenticationService.getPlayer();
+		if (player.getUser().getUsername() == null) {
+            User user=player.getUser();
+            user.setUsername("");
+			player.setUser(user);
+		}
 		// find player by userName
-		Collection<Player> players = playerService.getPlayersByUsername("");
+		Collection<Player> players = playerService.getPlayersByUsername(player.getUser().getUsername());
+        players.remove(playerAuth);
 		if (players.isEmpty()) {
 			// no player found
-			result.rejectValue("userName", "notFound", "not found");
-			return "player/createSearch";
+			result.rejectValue("User.username", "notFound", "not found");
+			return VIEW_FIND_PLAYER;
 		}
 
 		else {
-			// multiple roomss found
+			// multiple player found
+            Collection<Player> myFriends=friendService.findFriendsById(playerAuth.getId());
+            players.removeAll(myFriends);
 			model.put("players", players);
 			return VIEW_LIST_PLAYER;
 		}

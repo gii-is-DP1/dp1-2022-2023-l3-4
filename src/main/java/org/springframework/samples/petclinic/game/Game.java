@@ -59,11 +59,19 @@ public class Game extends BaseEntity {
 
 	public Integer getCurrentGamePlayerId(){
 		return getGamePlayer().get(getTurn()).getId();
-}
+	}
 	public void endGame(){
 		setIsRunning(false);
 		getDuration();
 		setDuration(Duration.between(getInitialHour(), LocalDateTime.now()));
+	}
+
+	public String humanReadableDuration() {
+		return getDuration().toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
+	}
+
+	public Boolean hasAnyWinners() {
+		return gamePlayer.stream().anyMatch(g -> g.isWinner());
 	}
 
 }

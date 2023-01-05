@@ -44,6 +44,11 @@ public class AchievementService {
   }
 
   @Transactional
+  public Achievement updateAchievement(Achievement achievement) {
+    return this.achievementRepository.save(achievement);
+  }
+
+  @Transactional
   public void removeAchievement(Integer id) {
     this.achievementRepository.deleteById(id);
   }

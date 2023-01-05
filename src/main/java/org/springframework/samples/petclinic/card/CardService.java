@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 
 import java.util.Optional;
 
@@ -40,10 +41,12 @@ import java.util.Optional;
 public class CardService {
 
 	private CardRepository cardRepository;
+	private GamePlayerService gamePlayerService;
 
 	@Autowired
-	public CardService(CardRepository cardRepository) {
+	public CardService(CardRepository cardRepository, GamePlayerService gamePlayerService) {
 		this.cardRepository = cardRepository;
+		this.gamePlayerService = gamePlayerService;
 	}
 
 	@Transactional(readOnly = true)	
@@ -87,7 +90,6 @@ public class CardService {
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
 		cardRepository.save(card);
-
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());
@@ -100,7 +102,7 @@ public class CardService {
 		}		
 	}
 
-	@Transactional
+  @Transactional
 	public void vaccinate(Card organ, Card vaccine){
 		if(organ.areCompatible(vaccine)){
 			if(organ.getVirus().size()==0){
@@ -114,6 +116,7 @@ public class CardService {
 		
 			}else{
 				Card virus = organ.getVirus().get(0);
+				organ.setVirus(new ArrayList<>());
 				virus.discard();
 				vaccine.discard();
 				cardRepository.save(vaccine);
@@ -143,11 +146,27 @@ public class CardService {
 				vaccine.discard();
 				virus.discard();
 				organ.setVaccines(new ArrayList<>());
-	}else{
-		throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
+	  }else{
+		  throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
+	  }
+  }else{
+	  throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
+  }
+ }
+ public List<Card> findAllCardsByIds(List<Integer> cardIds) {
+	return cardRepository.findCardsByIds(cardIds);
+}
+
+	@Transactional(readOnly = false)
+	public void addOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2) {
+		if(gplayer2.isThisOrganNotPresent(organ)){
+			gplayer1.getCards().remove(organ);
+			gamePlayerService.save(gplayer1);
+			organ.setGamePlayer(gplayer2);
+			organ.setBody(true);
+			save(organ);
+			gplayer2.getCards().add(organ);
+			gamePlayerService.save(gplayer2);
+		}
 	}
-}else{
-	throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
-}
-}
 }

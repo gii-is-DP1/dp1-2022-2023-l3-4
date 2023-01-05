@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.player.Player;
+// import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -30,7 +30,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findAll(); 
 	Optional<Game> findById(int id);
-    @Query("SELECT gp FROM GamePlayer gp WHERE gp.player = :player")
-    GamePlayer findGamePlayerByPlayer(@Param(value = "player") Player player);
+    @Query("SELECT gp FROM GamePlayer gp WHERE gp.player.id = :playerId")
+    GamePlayer findGamePlayerByPlayer(@Param(value = "playerId") Integer playerId);
     
 }

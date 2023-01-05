@@ -49,6 +49,11 @@
 				</petclinic:menuItem>
 				</sec:authorize>
 				
+				<petclinic:menuItem active="${name eq 'ranking'}" url="/ranking/global"
+					title="Top players">
+					<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+					<span>Ranking</span>
+				</petclinic:menuItem>
 
 			</ul>
 

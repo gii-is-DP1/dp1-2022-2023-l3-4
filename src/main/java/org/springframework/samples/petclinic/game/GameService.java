@@ -1,19 +1,32 @@
 
 package org.springframework.samples.petclinic.game;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
+import org.springframework.samples.petclinic.card.GenericCard;
+import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -21,20 +34,22 @@ public class GameService {
 	private GameRepository gameRepository;
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
+	private GenericCardService genericCardService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
+		this.genericCardService=genericCardService;
 	}
 
 	@Transactional(readOnly = true)
-	public List<Game> ListGames(){
+	public List<Game> listGames(){
 		return gameRepository.findAll();
 	}
 	@Transactional(readOnly = true)
-	public Game findGames(Integer i){
+	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
 	}
 
@@ -45,8 +60,13 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
+	public String humanReadableDuration(Duration d) {
+		return d.toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
+	}
+
+	@Transactional(readOnly = true)
 	public GamePlayer findGamePlayerByPlayer(Player player){
-		return gameRepository.findGamePlayerByPlayer(player);
+		return gameRepository.findGamePlayerByPlayer(player.getId());
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
 	public void rellenaBaraja(Integer gameId){
@@ -168,18 +188,71 @@ public class GameService {
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
-		public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
-			Map<Integer,List<GamePlayer>> classification = new HashMap<>();
-			for(GamePlayer gamePlayer : gamePlayers){
-				Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
-					if(healthyOrgans==4){
-						gamePlayer.setWinner(true);
-						classification.put(1, List.of(gamePlayer));
-					} else if(healthyOrgans==3){
-						if(classification.containsKey(2)){
-							classification.get(2).add(gamePlayer);
-						}else{
-							classification.put(2, List.of(gamePlayer));
+
+        public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
+			// Verificamos que la víctima tenga la carta que se quiere robar
+			if (victimPlayer.getCards().contains(stolenCard)) {
+				// Realizamos el robo de la carta
+				victimPlayer.getCards().remove(stolenCard);
+				thiefPlayer.getCards().add(stolenCard);
+				thiefPlayer.getCards().remove(thiefCard);   
+			}
+	}
+
+	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		List<Card> infectedCards = new ArrayList<>();
+		for (Card c : gamePlayer1.getCards()) {
+			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
+				infectedCards.add(c);
+			}
+		}
+		gamePlayer1.getCards().remove(card);
+		for (Card infectedCard : infectedCards) {
+		//Comprobar si se pueden infectar sus organos
+			List<Card> body = gamePlayer2.getBody();
+			for (Card c : body) {
+				if (c.getType().getColour() == infectedCard.getType().getColour() 
+				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
+					gamePlayer1.getCards().remove(infectedCard);
+					infectedCard.setGamePlayer(gamePlayer2);
+					c.getVirus().add(infectedCard);
+				}
+			}
+		}
+	}
+
+	public void glove(Card card, GamePlayer gamePlayer, Game game) {
+		gamePlayer.getCards().remove(card);
+		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
+			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
+				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
+			}
+		}
+	}
+
+	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
+		// Intercambiamos los cuerpos de los dos jugadores
+		List<Card> player1Cards = gamePlayer1.getBody();
+		List<Card> player2Cards = gamePlayer2.getBody();
+		gamePlayer1.getBody().removeAll(player1Cards);
+		gamePlayer1.getBody().addAll(player2Cards);
+		gamePlayer2.getBody().removeAll(player2Cards);
+		gamePlayer2.getBody().addAll(player1Cards);
+
+	}
+		
+	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
+		Map<Integer,List<GamePlayer>> classification = new HashMap<>();
+		for(GamePlayer gamePlayer : gamePlayers){
+			Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
+			if(healthyOrgans==4){
+				gamePlayer.setWinner(true);
+				classification.put(1, List.of(gamePlayer));
+			} else if(healthyOrgans==3){
+				if(classification.containsKey(2)){
+					classification.get(2).add(gamePlayer);
+				}else{
+					classification.put(2, List.of(gamePlayer));
 						}
 					} else if(healthyOrgans==2){
 						if(classification.containsKey(3)){
@@ -187,8 +260,105 @@ public class GameService {
 						}else{
 							classification.put(3, List.of(gamePlayer));
 						}
-					}
+					} else if(healthyOrgans==1){
+						if(classification.containsKey(4)){
+							classification.get(4).add(gamePlayer);
+						}else{
+							classification.put(4, List.of(gamePlayer));
+						}
+					} else {
+						if(classification.containsKey(5)){
+							classification.get(5).add(gamePlayer);
+						}else{
+							classification.put(5, List.of(gamePlayer));
+						}
+					} 
 				}
 				return classification;
 		}
+
+	public Map<GamePlayer, Integer> getRanking() {
+		List<GamePlayer> gpWinners = new ArrayList<>();
+		for (Game g: listGames()) {
+			GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
+			gpWinners.add(gp);
+		}
+
+		Map<GamePlayer, Integer> gpWins = new HashMap<>();
+		for (GamePlayer gp: gpWinners) {
+			if (gpWins.containsKey(gp)) {
+				gpWins.put(gp, gpWins.get(gp) + 1);
+			} else {
+				gpWins.put(gp, 1);
+			}
+		}
+
+		gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
+		return gpWins;
+		// return new ArrayList<>(gpWins.keySet());
+
+	}
+	
+	@Transactional(readOnly = false)
+	public Game startGame(Room room) {
+		Game game = new Game();
+		game.setRound(0);
+		game.setTurn(0);
+		game.setInitialHour(LocalDateTime.now());
+		game.setIsRunning(true);
+		List<GamePlayer> gamePlayers = new ArrayList<>();
+		game.setCards(new ArrayList<>());
+		game.setClassification(new HashMap<>());
+		List<Player> players = new ArrayList<>(room.getPlayers());
+		
+		for(Player p: players) {
+			GamePlayer gp = new GamePlayer();
+			gp.setPlayer(p);
+			gp.setCards(new ArrayList<>());
+			gamePlayers.add(gp);
+			gamePlayerService.save(gp);
+		}
+
+		game.setGamePlayer(gamePlayers);
+		List<GenericCard> deck = genericCardService.findGCards();
+		for(GenericCard c: deck){
+			Card card = new Card();
+			card.setType(c);
+			card.setBody(false);
+			card.setPlayed(false);
+			card.setVaccines(new ArrayList<>());
+			card.setVirus(new ArrayList<>());
+			game.getCards().add(card);
+			cardService.save(card);
+		}
+		Collections.shuffle(game.getCards());
+		save(game);
+		reparteCartas(game.getId());
+
+		return game;
+	}
+
+	@Transactional(readOnly = false)
+	public void discard(List<Card> cards, GamePlayer gamePlayer) {
+		if(gamePlayer.getCards().containsAll(cards)){
+			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
+					gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
+					card.discard();
+					cardService.save(card);	//Se guarda la carta	
+			}  
+			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+		}else{
+			
+		}
+	}
+
+	@Transactional(readOnly = false)
+	public void finishGame(Game game) {
+		game.endGame();
+		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
+		game.setClassification(classification);
+		save(game);
+	}
+
 }
+

@@ -5,14 +5,13 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="request">
-    <h2>Friends</h2>
+    <h2>Friends Request</h2>
 
-
+    <div class="col-md-6">
     <table id="requestTable" class="table table-striped">
         <thead>
         <tr>
             <th>Request:</th>
-            <th>Estado</th>
             <th></th>
         </tr>
         </thead>
@@ -21,9 +20,6 @@
             <tr>
                 <td>
                     <c:out value="${request.playerSend.user.username}"/>
-                </td>
-                <td>
-                    <c:if test="${request.status==null}">Amigos</c:if>
                 </td>
                 <td>
                     <a href="myFriendsRequest/${request.id}/accept">
@@ -38,5 +34,31 @@
         </c:forEach>
         </tbody>
     </table>
+    </div>
+
+    <div class="col-md-6">
+        <table id="myRequestTable" class="table table-striped">
+            <thead>
+            <tr>
+                <th>My Request:</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach items="${mySendRequest}" var="request">
+                <tr>
+                    <td>
+                        <c:out value="${request.playerRec.user.username}"/>
+                    </td>
+                    <td>
+                        <c:if test="${request.status==null}">Pending</c:if>
+                        <c:if test="${request.status==true}">Aproved</c:if>
+                        <c:if test="${request.status==false}">Denied</c:if>
+                    </td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
+        </div>
 
 </petclinic:layout>

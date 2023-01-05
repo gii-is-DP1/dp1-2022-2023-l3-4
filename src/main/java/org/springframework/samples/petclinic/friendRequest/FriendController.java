@@ -1,8 +1,12 @@
 package org.springframework.samples.petclinic.friendRequest;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.MethodInvocationRecorder.Recorded.ToCollectionConverter;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
@@ -46,7 +50,9 @@ public class FriendController {
 	public String friendsRequestListing(ModelMap model) {
         Player playerAuth= authService.getPlayer();
         Collection<Friend> myRequest=friendService.findMyRecRequestById(playerAuth.getId());
+        Collection<Friend> mySendRequest=friendService.findSendRequestById(playerAuth.getId());
         model.put("myRequest",myRequest);
+        model.put("mySendRequest",mySendRequest);
 		return VIEWS_MY_REQUEST;
 	}
 
@@ -80,11 +86,17 @@ public class FriendController {
     @GetMapping("/request/{playerId}")
 	public String friendRequest(@PathVariable("playerId") int playerId) {
         Player playerSend = authService.getPlayer();
-        Friend request = new Friend();
-        request.setStatus(null);
-        request.setPlayerSend(playerSend);
-        request.setPlayerRec(playerService.findPlayerById(playerId));
-        this.friendService.savePlayer(request);
+        Player playerRec=playerService.findPlayerById(playerId);
+        Collection<Friend> myRequest=friendService.findAllMyRequestById(playerSend.getId());
+        Friend repeat=friendService.findByPlayersId(playerRec.getId(), playerSend.getId());
+        if(repeat==null){
+            Friend request = new Friend();
+            request.setStatus(null);
+            request.setPlayerSend(playerSend);
+            request.setPlayerRec(playerRec);
+            this.friendService.savePlayer(request);
+            
+        }
 		return "redirect:/friend/myFriends";
 	}
 

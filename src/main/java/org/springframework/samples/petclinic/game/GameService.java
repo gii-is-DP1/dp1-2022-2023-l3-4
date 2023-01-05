@@ -202,15 +202,25 @@ public class GameService {
 		}
 	}
 
-	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
+	public void medicalError(Card medicalError, GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
 		// Intercambiamos los cuerpos de los dos jugadores
+		medicalError.discard();
 		List<Card> player1Cards = gamePlayer1.getBody();
 		List<Card> player2Cards = gamePlayer2.getBody();
+		for(Card c: player1Cards) {
+			c.setGamePlayer(gamePlayer2);
+			cardService.save(c);
+		}
+		
+		for(Card c: player2Cards) {
+			c.setGamePlayer(gamePlayer1);
+			cardService.save(c);
+		}
 		gamePlayer1.getBody().removeAll(player1Cards);
 		gamePlayer1.getBody().addAll(player2Cards);
 		gamePlayer2.getBody().removeAll(player2Cards);
 		gamePlayer2.getBody().addAll(player1Cards);
-
+		cardService.save(medicalError);
 	}
 		
 	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){

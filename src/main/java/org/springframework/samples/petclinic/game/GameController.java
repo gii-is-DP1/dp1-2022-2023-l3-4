@@ -161,6 +161,8 @@ public class GameController {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.ORGAN)){
 			return playOrgan(gameId, targetGP, cardId);
+		} else if(card.getType().getType().equals(GenericCard.Type.ERROR)) {
+			return playMedicalError(gameId, targetGP, cardId);
 		}
 		
 		return muestraVista(gameId, model);
@@ -272,7 +274,7 @@ public class GameController {
 	}
 
 
-    public String playThief(@PathVariable("gameId") int gameId, Integer c_id, Integer stolenCardId) {
+    public String playThief(int gameId, Integer c_id, Integer stolenCardId) {
 		// Obtenemos las cartas y jugadores involucrados en la acción
 		Card thiefCard = getCard(c_id);
 		GamePlayer thiefPlayer = authenticationService.getGamePlayer();
@@ -332,11 +334,12 @@ public class GameController {
 		}
 	}
 	
-	public String playMedicalError(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+	public String playMedicalError(int gameId, Integer g_id, Integer c_id) {
 		try {
-			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer1 = authenticationService.getGamePlayer();
 			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
-			gameService.medicalError(gamePlayer1, gamePlayer2);
+			Card medicalError = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			gameService.medicalError(medicalError, gamePlayer1, gamePlayer2);
 			// Finalizamos el turno
 			// Actualizamos los cambios en la base de datos
 			gamePlayerService.save(gamePlayer1);
@@ -344,7 +347,7 @@ public class GameController {
 			return turn(gameId);
 		} catch(Exception E) {
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 	}
 	

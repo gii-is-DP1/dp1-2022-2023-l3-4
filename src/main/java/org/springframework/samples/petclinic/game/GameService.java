@@ -145,9 +145,7 @@ public class GameService {
 					else if(c_organ2.getVirus().size()==1){
 						Card virus2 = c_organ2.getVirus().get(0);
 						cardService.changeGamePlayer(virus2, g2, g1);
-					}
-					gamePlayerService.save(g1);
-					gamePlayerService.save(g2);				
+					}			
 				
 			}else{
 				throw new IllegalArgumentException("No pueden quedar cuerpos con órganos repetidos");

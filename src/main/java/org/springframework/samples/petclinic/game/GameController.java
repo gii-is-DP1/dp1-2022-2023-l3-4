@@ -265,6 +265,8 @@ public class GameController {
 			GamePlayer g2 = c_organ2.getGamePlayer();
 				try{
 					gameService.changeCards(g1,g2,c_organ1,c_organ2);
+					gamePlayerService.save(g1);
+					gamePlayerService.save(g2);	
 					return turn(gameId);
 				}catch(IllegalArgumentException e){
 					return "todo";

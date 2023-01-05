@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,15 @@ public class GameServiceTest {
     Card organ_heart1 = new Card(0, false, gp1, generic_heart);
     Card organ_heart2 = new Card(1, false, gp2, generic_heart);
     Card organ_stomach = new Card(1, true, gp2, generic_stomach);
+    
+    //Elementos comunes a playTransplant
+    GenericCard generic_brain =new GenericCard(3,Colour.BLUE, Type.ORGAN);
+    GenericCard generic_BVaccine =new GenericCard(2,Colour.BLUE, Type.VACCINE);
+    GenericCard generic_BVaccine2 =new GenericCard(3,Colour.BLUE, Type.VACCINE);
+    Card organ_brain = new Card(1, true, gp2, generic_brain);
+    Card vax_brain = new Card(2, false, gp2, generic_BVaccine);
+    Card vax_brain2 = new Card(3, false, gp2, generic_BVaccine2);
+
     List<Card> cards = new ArrayList<>();
     ModelMap m = new ModelMap();
 
@@ -105,6 +116,82 @@ public class GameServiceTest {
         assertThrows(IllegalArgumentException.class , ()-> gs.addOrgan(organ_heart1, gp1, gp2, m));
     }
 
- 
+    @Test
+    //Jugar una carta de trasplante sobre un cerebro.
+    public void testTransplantPositive1() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test
+        gs.changeCards(gp1, gp2, organ_heart1, organ_brain);
+        assertEquals(true, gp1.getBody().get(0).getType().getColour()==GenericCard.Colour.BLUE);
+        assertEquals(true, gp2.getBody().get(0).getType().getColour()==GenericCard.Colour.RED);
+    }
+
+    @Test
+    //Jugar una carta de trasplante sobre un cerebro vacunado.
+    public void testTransplantPositive2() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        List<Card> vax = new ArrayList<>();
+        vax.add(vax_brain);
+        organ_brain.setVaccines(vax);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test
+        gs.changeCards(gp1, gp2, organ_heart1, organ_brain);
+        assertEquals(true, gp1.getBody().get(0).getType().getColour()==GenericCard.Colour.BLUE);
+        assertEquals(true, gp2.getBody().get(0).getType().getColour()==GenericCard.Colour.RED);
+    }
+
+    @Test
+    //Jugar una carta de trasplante sobre un corazón teniendo ya uno.
+    public void testTransplantNegative1() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_heart2.setBody(true);
+        organ_heart2.setGamePlayer(gp2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_heart2);
+        gp2.setCards(cards2);
+        //test 
+        assertThrows(IllegalArgumentException.class , ()-> gs.changeCards(gp1,gp2,organ_heart1,organ_heart2));
+    }
+
+    @Test
+    //Jugar una carta de trasplante sobre un cerebro inmunizado.
+    public void testTransplantNegative2() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        List<Card> vax = new ArrayList<>();
+        vax.add(vax_brain);
+        vax.add(vax_brain2);
+        organ_brain.setVaccines(vax);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test 
+        assertThrows(IllegalArgumentException.class , ()-> gs.changeCards(gp1,gp2,organ_heart1,organ_heart2));
+    }
 
 }

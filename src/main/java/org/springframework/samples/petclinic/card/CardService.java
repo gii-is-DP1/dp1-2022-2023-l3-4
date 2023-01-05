@@ -89,7 +89,6 @@ public class CardService {
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
-		cardRepository.save(card);
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());

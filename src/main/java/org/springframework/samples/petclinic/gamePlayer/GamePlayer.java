@@ -30,8 +30,7 @@ import lombok.Setter;
 @Table(name = "gamePlayers")
 public class GamePlayer extends BaseEntity {
 	private Boolean winner;
-	private Boolean host;
-
+    
     @OneToOne
     private Player player;
     

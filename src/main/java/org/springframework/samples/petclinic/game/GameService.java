@@ -270,6 +270,7 @@ public class GameService {
 	@Transactional(readOnly = false)
 	public Game startGame(Room room) {
 		Game game = new Game();
+		game.setRoom(room);
 		game.setRound(0);
 		game.setTurn(0);
 		game.setInitialHour(LocalDateTime.now());

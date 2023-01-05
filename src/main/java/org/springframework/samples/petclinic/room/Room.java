@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.player.Player;
 
@@ -23,18 +24,18 @@ import lombok.Setter;
 public class Room extends BaseEntity{
 
     
-    Integer totalGamesPlayer;
+    private Integer totalGamesPlayer;
 
     @Min(2)
     @Max(6)
-    Integer numMaxPlayers;
+    private Integer numMaxPlayers;
 
     @NotEmpty
     @Size(min=1,max=20)
-    String roomName;
+    private String roomName;
 
     @NotNull
-    Boolean isPrivate;
+    private Boolean isPrivate;
 
     @OneToMany(mappedBy="room")
     private Collection<Player> players;
@@ -42,5 +43,8 @@ public class Room extends BaseEntity{
     @OneToOne(optional = false)
     private Player host;
 
-    String password;
+    private String password;
+
+    @OneToMany(mappedBy = "room")
+    private Collection<Game> games;
 }

@@ -28,7 +28,7 @@ public class GameServiceTest {
     @Autowired
     GameService gs;
 
-    //Elementos comunes a playOrgan
+    //Elementos comunes a addOrgan
     GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
     GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
     GamePlayer gp1 = new GamePlayer(0);
@@ -47,29 +47,29 @@ public class GameServiceTest {
 
     @Test
     //Jugar un corazón con el cuerpo vacío
-    public void testPlayOrganPositive1() {
+    public void testaddOrganPositive1() {
         //setup
         gp1.setCards(cards);
         //test
-        gs.playOrgan(organ_heart1, gp1, gp1, m);
+        gs.addOrgan(organ_heart1, gp1, gp1, m);
         assertEquals(1, gp1.getBody().size());
         assertEquals(0, gp1.getHand().size());
     }
     @Test
     //Jugar un corazón con un estómago ya en el cuerpo
-    public void testPlayOrganPositive2() {
+    public void testaddOrganPositive2() {
         //setup
         cards.add(organ_stomach);
         gp1.setCards(cards);
         //test
-        gs.playOrgan(organ_heart1, gp1, gp1, m);
+        gs.addOrgan(organ_heart1, gp1, gp1, m);
         assertEquals(2, gp1.getBody().size());
         assertEquals(0, gp1.getHand().size());
     }
 
     @Test
     //Jugar un corazón con un estómago ya en el cuerpo de otra persona que también tiene un corazón en la mano
-    public void testPlayOrganPositive3() {
+    public void testaddOrganPositive3() {
         //Setup
         gp1.setCards(cards);
         cards.clear();
@@ -77,24 +77,24 @@ public class GameServiceTest {
         cards.add(organ_stomach);
         gp2.setCards(cards);
         //test
-        gs.playOrgan(organ_heart1, gp1, gp2, m);
+        gs.addOrgan(organ_heart1, gp1, gp2, m);
         assertEquals(2, gp2.getBody().size());
         assertEquals(1, gp2.getHand().size());
     }
 
     @Test
     //Jugar un corazón teniendo un corazón en el cuerpo
-    public void testPlayOrganNegative1() {
+    public void testaddOrganNegative1() {
         //Setup
         organ_heart2.setBody(true);
         cards.add(organ_heart2);
         gp1.setCards(cards);
         //test
-        assertThrows(IllegalArgumentException.class , ()-> gs.playOrgan(organ_heart1, gp1, gp1, m));
+        assertThrows(IllegalArgumentException.class , ()-> gs.addOrgan(organ_heart1, gp1, gp1, m));
 }
     @Test
     //Jugar un corazón a otro que ya tiene un corazón en el cuerpo
-    public void testPlayOrganNegative2() {
+    public void testaddOrganNegative2() {
         //Setup
         gp1.setCards(cards);
         cards.clear();
@@ -102,7 +102,7 @@ public class GameServiceTest {
         cards.add(organ_heart2);
         gp2.setCards(cards);
         //test
-        assertThrows(IllegalArgumentException.class , ()-> gs.playOrgan(organ_heart1, gp1, gp2, m));
+        assertThrows(IllegalArgumentException.class , ()-> gs.addOrgan(organ_heart1, gp1, gp2, m));
     }
 
  

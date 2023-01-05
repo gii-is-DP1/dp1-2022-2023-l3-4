@@ -107,7 +107,7 @@ public class GameService {
 			
 			}
 
-			public void playOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2, ModelMap model){
+			public void addOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2, ModelMap model){
 				if(gplayer2.isThisOrganNotPresent(organ)){
 					gplayer1.getCards().remove(organ);
 					organ.setGamePlayer(gplayer2);
@@ -121,21 +121,6 @@ public class GameService {
 					throw new IllegalArgumentException();		
 				}			
 		}
-
-		public void discard(List<Card> cards, GamePlayer gamePlayer){
-			if(gamePlayer.getCards().containsAll(cards)){
-				for(Card card: cards){	//Recorremos las cartas que quiere descartar					
-						card.discard();
-						cardService.save(card);	//Se guarda la carta	
-			}  
-				gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
-				
-			}else{
-				throw new IllegalArgumentException();
-
-			}		
-		}
-			
 
 
 			public void changeCards(GamePlayer g1, GamePlayer g2, Card c_organ1, Card c_organ2){

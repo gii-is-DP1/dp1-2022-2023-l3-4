@@ -157,16 +157,4 @@ public class CardService {
 	return cardRepository.findCardsByIds(cardIds);
 }
 
-	@Transactional(readOnly = false)
-	public void addOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2) {
-		if(gplayer2.isThisOrganNotPresent(organ)){
-			gplayer1.getCards().remove(organ);
-			gamePlayerService.save(gplayer1);
-			organ.setGamePlayer(gplayer2);
-			organ.setBody(true);
-			save(organ);
-			gplayer2.getCards().add(organ);
-			gamePlayerService.save(gplayer2);
-		}
-	}
 }

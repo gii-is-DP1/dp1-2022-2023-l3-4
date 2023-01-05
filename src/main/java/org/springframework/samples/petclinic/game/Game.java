@@ -2,13 +2,13 @@
 package org.springframework.samples.petclinic.game;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -17,7 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
-
+import org.springframework.samples.petclinic.room.Room;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +42,10 @@ public class Game extends BaseEntity {
 	private Integer round;
 	private Integer turn;
 	private Duration duration;
+	
+	@ManyToOne(optional = false)
+	private Room room;
+	
 	@Transient
 	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 
@@ -61,11 +65,19 @@ public class Game extends BaseEntity {
 
 	public Integer getCurrentGamePlayerId(){
 		return getGamePlayer().get(getTurn()).getId();
-}
+	}
 	public void endGame(){
 		setIsRunning(false);
 		getDuration();
 		setDuration(Duration.between(getInitialHour(), LocalDateTime.now()));
+	}
+
+	public String humanReadableDuration() {
+		return getDuration().toString().substring(2).replaceAll("(\\d[HMS])(?!$)", "$1 ").toLowerCase();
+	}
+
+	public Boolean hasAnyWinners() {
+		return gamePlayer.stream().anyMatch(g -> g.isWinner());
 	}
 
 }

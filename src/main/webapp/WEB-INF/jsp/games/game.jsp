@@ -11,7 +11,7 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                        <c:out value="${body.key.player.firstName}'s body"/>
+                        <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
                     </td>
                 </tr>
                 <tr>
@@ -46,13 +46,13 @@
             </c:forEach>
             <tr>
                 <td>
-                    Your hand
+                    <h2>Your hand</h2>
                 </td>
             </tr>
             <tr>
                 <td>
                     <c:forEach items="${hand}" var="card">
-                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/gamePlayer/${gamePlayerId}/play/${card.id}/"></c:if>
+                        <c:if test="${isYourTurn}"><a href="/games/${gameId}/play/${card.id}/"></c:if>
                             <img src="<spring:url value='/resources/images/cards/${card.type.image}.png'/>" alt="" width="65" height="95"/>
                         <c:if test="${isYourTurn}"></a></c:if>
 
@@ -61,8 +61,15 @@
             </tr>
         </tbody>
     </table>
-    <a href="/games/{gameId}/gamePlayer/{gamePlayerId}/decision/1" class="btn btn-primary">Descartar</a>  
-
-
+    <c:if test="${isYourTurn}">
+        <div class="container" style="padding-left: 480px; padding-top: 20px;"><a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  </div>
+    </c:if>
+    <c:if test="${not isYourTurn}">
+        <script type="text/javascript">
+        function actualizar(){location.reload(true);}
+        //Función para actualizar cada 5 segundos(5000 milisegundos)
+        setInterval("actualizar()",4000);
+        </script>
+    </c:if>
 
 </virus:layout>

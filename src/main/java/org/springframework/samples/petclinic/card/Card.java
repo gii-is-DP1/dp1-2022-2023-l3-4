@@ -26,6 +26,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -91,14 +94,51 @@ public class Card extends BaseEntity implements Serializable {
 
 	public Card() {}
 
+	public Card(Integer id, Boolean body, GamePlayer gp, GenericCard type){
+		// Card organ = new Card();
+		// organ.setId(id);
+		// organ.setBody(body);
+		// organ.setPlayed(false);
+		// organ.setVaccines(new ArrayList<>());
+		// organ.setVirus(new ArrayList<>());
+		// organ.setGamePlayer(gp);
+		// organ.setType(type);
+		this.id = id;
+		this.body = body;
+		this.played = false;
+		this.vaccines = new ArrayList<>();
+		this.virus = new ArrayList<>();
+		this.type = type;
+	}
+	public Card createVirus(Integer id, GamePlayer gp, GenericCard type, Card cardVirus){
+		Card virus = new Card();
+		virus.setId(id);
+		virus.setBody(false);
+		virus.setPlayed(false);
+		virus.setCardVirus(cardVirus);
+		virus.setGamePlayer(gp);
+		virus.setType(type);
+		return virus;
+	}
+	public Card createVaccine(Integer id, GamePlayer gp, GenericCard type, Card cardVaccine){
+		Card vaccine = new Card();
+		vaccine.setId(id);
+		vaccine.setBody(false);
+		vaccine.setPlayed(false);
+		vaccine.setCardVaccine(cardVirus);
+		vaccine.setGamePlayer(gp);
+		vaccine.setType(type);
+		return vaccine;
+	}
+
 	public void discard(){
-		if(getType().toString()=="ORGAN"){
+		if(getType().getType().toString()=="ORGAN"){
 			setVaccines(new ArrayList<>());
 			setVirus(new ArrayList<>());
 		}
-		else if(getType().toString()=="VIRUS") setCardVirus(null);
+		else if(getType().getType().equals(GenericCard.Type.VIRUS)) setCardVirus(null);
 		
-		else if(getType().toString()=="VACCINE") setCardVaccine(null);
+		else if(getType().getType().equals(GenericCard.Type.VACCINE)) setCardVaccine(null);
 		
 		setPlayed(true);
 		setBody(false);

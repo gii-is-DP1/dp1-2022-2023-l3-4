@@ -82,4 +82,6 @@ public class GenericCardService {
 			gCardRepository.save(c);
 		}
 	}
+
+
 }

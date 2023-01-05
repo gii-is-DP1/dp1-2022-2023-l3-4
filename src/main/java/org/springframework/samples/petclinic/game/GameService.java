@@ -188,9 +188,15 @@ public class GameService {
 					gamePlayer1.getCards().remove(infectedCard);
 					infectedCard.setGamePlayer(gamePlayer2);
 					c.getVirus().add(infectedCard);
+					infectedCard.setCardVirus(c);
+					cardService.save(c);
+					cardService.save(infectedCard);
+					break;
 				}
 			}
 		}
+		card.discard();
+		cardService.save(card);
 	}
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {

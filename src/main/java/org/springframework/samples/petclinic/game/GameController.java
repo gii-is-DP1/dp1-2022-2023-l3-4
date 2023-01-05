@@ -163,8 +163,9 @@ public class GameController {
 			return playOrgan(gameId, targetGP, cardId);
 		} else if(card.getType().getType().equals(GenericCard.Type.ERROR)) {
 			return playMedicalError(gameId, targetGP, cardId);
+		} else if(card.getType().getType().equals(GenericCard.Type.INFECTION)) {
+			return playInfect(gameId, targetGP, cardId);
 		}
-		
 		return muestraVista(gameId, model);
 	}
 
@@ -315,16 +316,10 @@ public class GameController {
 		return optionalCard.orElse(null);
 	}
 	
-	private GamePlayer getGamePlayer(Integer gamePlayerId) {
-		Optional<GamePlayer> optionalGamePlayer = gamePlayerService.findById(gamePlayerId);
-		return optionalGamePlayer.orElse(null);
-	}
-	
-	
-	public String playInfect(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer g_id, Integer c_id) {
+	public String playInfect(int gameId, Integer g_id, Integer c_id) {
 		try {
 			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
-			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer1 = authenticationService.getGamePlayer();
 			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
 			gameService.infection(card, gamePlayer1, gamePlayer2);
 			gamePlayerService.save(gamePlayer1);
@@ -332,7 +327,7 @@ public class GameController {
 			return turn(gameId);
 		} catch(Exception E) {
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 	}
 	

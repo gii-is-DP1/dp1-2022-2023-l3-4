@@ -188,16 +188,7 @@ public class GameService {
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
-
-        public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
-			// Verificamos que la víctima tenga la carta que se quiere robar
-			if (victimPlayer.getCards().contains(stolenCard)) {
-				// Realizamos el robo de la carta
-				victimPlayer.getCards().remove(stolenCard);
-				thiefPlayer.getCards().add(stolenCard);
-				thiefPlayer.getCards().remove(thiefCard);   
-			}
-	}
+	
 
 	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
 		List<Card> infectedCards = new ArrayList<>();

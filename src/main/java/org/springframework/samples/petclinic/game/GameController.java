@@ -285,7 +285,7 @@ public class GameController {
 		Card stolenCard = getCard(stolenCardId);
 		// Verificamos que todas las cartas y jugadores existan
 		if (thiefCard != null && thiefPlayer != null && victimPlayer != null && stolenCard != null) {
-			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
+			cardService.changeGamePlayer(stolenCard, thiefPlayer, victimPlayer);
 			gamePlayerService.save(thiefPlayer);
 			gamePlayerService.save(victimPlayer);
 			return turn(gameId);
@@ -295,7 +295,7 @@ public class GameController {
 		}
 	}
 	
-	private Card getCard(Integer cardId) {
+	Card getCard(Integer cardId) {
 		Optional<Card> optionalCard = cardService.findCard(cardId);
 		return optionalCard.orElse(null);
 	}

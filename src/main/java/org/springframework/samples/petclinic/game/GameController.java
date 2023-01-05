@@ -143,8 +143,12 @@ public class GameController {
 		
 		if(c.isPresent()){
 			if(gp.getCards().contains(c.get())){
-				model = generaTablero(model, gp, game);
-				return "/games/selecciona";
+				if (c.get().getType().getType().equals(GenericCard.Type.GLOVES)) {
+					return playGlove(gameId, cardId);
+				} else {
+					model = generaTablero(model, gp, game);
+					return "/games/selecciona";
+				}
 			}else{
 				log.error("Debes jugar una carta que esté en tu mano");
 				return muestraVista(gameId, model);
@@ -331,19 +335,19 @@ public class GameController {
 		}
 	}
 	
-	public String playGlove(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c_id) {
+	public String playGlove(int gameId, Integer c_id) {
 		try {
 			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
-			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			GamePlayer gamePlayer = authenticationService.getGamePlayer();
 			Game game = gameService.findGame(gameId);
 			gameService.glove(card, gamePlayer, game);
 			for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 				gamePlayerService.save(otherGamePlayer);
 			}
-			return turn(gameId);
+			return "redirect:/games/" + gameId;
 		} catch (Exception e) {
 			log.error("Movimiento inválido");
-			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
+			return "/games/"+gameId;
 		}
 	}
 	

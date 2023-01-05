@@ -201,11 +201,21 @@ public class GameService {
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {
 		gamePlayer.getCards().remove(card);
+		card.discard();
+		cardService.save(card);
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
+				for(Card c: otherGamePlayer.getHand()) {
+					c.discard();
+					cardService.save(c);
+				}
 				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
 			}
 		}
+		for (Integer i=0; i<game.getGamePlayer().size(); i++) {
+			changeTurn(game);
+		}
+		
 	}
 
 	public void medicalError(Card medicalError, GamePlayer gamePlayer1, GamePlayer gamePlayer2) {

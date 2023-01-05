@@ -1,21 +1,21 @@
 package org.springframework.samples.petclinic.gamePlayer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import org.springframework.samples.petclinic.card.Card;
-import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
 import org.springframework.samples.petclinic.player.Player;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,10 +38,24 @@ public class GamePlayer extends BaseEntity {
     @OneToOne
     private Player player;
     
-    
 
-    @OneToMany(mappedBy = "gamePlayer")
+    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer")
+    @JsonIgnore
     private List<Card> cards;
+
+
+    public GamePlayer(){
+        
+    }
+    public GamePlayer(Integer id){
+        Player p= new Player();
+        p.setId(0);
+        this.player=p;
+        this.id = id;
+        this.cards= new ArrayList<>();
+        this.host=false;
+        this.winner=false;
+    }
 
     public List<Card> getBody(){
         return getCards().stream().filter(x->x.getBody()).collect(Collectors.toList());

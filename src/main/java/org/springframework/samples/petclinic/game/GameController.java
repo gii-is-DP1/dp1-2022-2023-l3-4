@@ -219,44 +219,45 @@ public class GameController {
 				Card organ = c.get();
 				GamePlayer gplayer1 = gp1.get();
 				GamePlayer gplayer2 = gp2.get();
-				if(gplayer2.isThisOrganNotPresent(organ)){
-					gplayer1.getCards().remove(organ);
-					gamePlayerService.save(gplayer1);
-					organ.setGamePlayer(gplayer2);
-					organ.setBody(true);
+				try{
+					gameService.playOrgan(organ, gplayer1, gplayer2, model);
 					cardService.save(organ);
-					gplayer2.getCards().add(organ);
+					gamePlayerService.save(gplayer1);
 					gamePlayerService.save(gplayer2);
 					return turn(gameId,gamePlayerId);
-				}else{
-					log.error("No puede poner dos órganos del mismo color en un cuerpo");
-					
-					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
-					model.put("messageType", "info");
+				}catch(IllegalArgumentException e){
 					return muestraVista(gameId, gamePlayerId, model);
 				}			
-		}else{
-			log.error("Movimiento inválido");
-			model.put("message", "Movimiento inválido");
-			model.put("messageType", "info");
-			return muestraVista(gameId, gamePlayerId, model);
-		}
+			}else{
+				model.put("message", "Movimiento inválido");
+				model.put("messageType", "info");
+				return muestraVista(gameId, gamePlayerId, model);
+			}
+
+				
 	}	
 
 	//Jugar un virus
 	public String playVirus(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
+		Card old_card = null;
 		if(c1.isPresent() && c2.isPresent()){
 			Card c_virus = c1.get();
 			Card c_organ = c2.get();
 			try{
+				if(c_organ.getVirus().size()==1 || c_organ.getVaccines().size()==1){
+					old_card = (c_organ.getVirus().size()==1)?c_organ.getVirus().get(0): c_organ.getVaccines().get(0);
+				}
+
 				cardService.infect(c_organ, c_virus);
+				cardService.save(c_virus);
+				cardService.save(c_organ);
+				if(old_card!=null)cardService.save(c_organ);
 				return turn(gameId, gamePlayerId);
 			}catch(IllegalArgumentException e){
 				return "TODO";
-			}
-			
+			}			
 		} else {
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
@@ -276,8 +277,7 @@ public class GameController {
 				return turn(gameId, gamePlayerId);
 			}catch(IllegalArgumentException e){
 				return "todo";
-			}
-			
+			}			
 		}else{
 			log.error("Movimiento inválido");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
@@ -308,22 +308,20 @@ public class GameController {
 	
 	// Método para descartar cartas
     public String discard(@PathVariable List<Card> cards, @PathVariable Integer gamePlayerId, @PathVariable Integer gameId) {
-        if(gamePlayerService.findById(gamePlayerId).isPresent()){
+        ModelMap model = new ModelMap();
+		if(gamePlayerService.findById(gamePlayerId).isPresent()){
 			GamePlayer gamePlayer = gamePlayerService.findById(gamePlayerId).get();
-			if(gamePlayer.getCards().containsAll(cards)){
-				for(Card card: cards){	//Recorremos las cartas que quiere descartar					
-						gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
-						card.setPlayed(true); //Se cambia el estado de la carta a jugada
-						cardService.save(card);	//Se guarda la carta	
-			}  
-				gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+			try{
+				gameService.discard(cards, gamePlayer);
 				return turn(gameId, gamePlayerId); //Volvemos al método del turno
-			}else{
-				log.error("you can't discard those cards");
+			}catch(IllegalArgumentException e){
+				model.put("message", "No puedes descartar estas cartas");
+				model.put("messageType", "info");
 				return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
-			}				
+			}	
 		}else{
-			log.error("this player is not available");
+			model.put("message", "Movimiento inválido");
+			model.put("messageType", "info");
 			return "/games/"+gameId+"/gamePlayer/"+gamePlayerId+"/decision";
 		} 
 					

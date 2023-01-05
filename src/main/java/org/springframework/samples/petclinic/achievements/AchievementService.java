@@ -1,6 +1,8 @@
 package org.springframework.samples.petclinic.achievements;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +35,7 @@ public class AchievementService {
 
   @Transactional(rollbackFor = DuplicatedAchievementNameException.class)
   public Achievement saveAchievement(Achievement achievement) throws DuplicatedAchievementNameException {
-    List<String> achNames = getAllAchievements().stream().map(x -> x.getName()).toList();
+    List<String> achNames = getAllAchievements().stream().map(x -> x.getName()).collect(Collectors.toList());
     if (achNames.contains(achievement.getName())) {
       throw new DuplicatedAchievementNameException();
     } else {

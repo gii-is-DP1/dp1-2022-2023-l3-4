@@ -57,7 +57,7 @@ public class CardService {
 
 	}
 
-  @Transactional(readOnly = true)
+  	@Transactional(readOnly = true)
 		public Optional<Card> findCard(Integer i){
 			return cardRepository.findById(i);
 		}
@@ -67,12 +67,17 @@ public class CardService {
 			return cardRepository.save(card);	
 		}
 
+	@Transactional(readOnly=true)
+		public List<Card> getBodyFromAGamePlayer(Integer gamePlayerId){
+			return cardRepository.getBodyFromAGamePlayer(gamePlayerId);
+		}
+
 	@Transactional(readOnly = true)
-	public void shuffle(List<Card> cards){
-		Collections.shuffle(cards);
-			for(Card c: cards){
-				c.setPlayed(false);
-				cardRepository.save(c);
+		public void shuffle(List<Card> cards){
+			Collections.shuffle(cards);
+				for(Card c: cards){
+					c.setPlayed(false);
+					cardRepository.save(c);
 			}
 	}
 
@@ -131,19 +136,13 @@ public class CardService {
 					organ.discard();
 					virus1.discard();
 					virus.discard();
-					cardRepository.save(virus1);
 				
-				}
-				cardRepository.save(virus);
-				cardRepository.save(organ);			
+				}		
 			} else if(organ.getVaccines().size()==1){
 				Card vaccine = organ.getVaccines().get(0);
 				vaccine.discard();
 				virus.discard();
 				organ.setVaccines(new ArrayList<>());
-				cardRepository.save(virus);
-				cardRepository.save(organ);
-				cardRepository.save(vaccine);
 	}else{
 		throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
 	}

@@ -12,6 +12,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
@@ -85,6 +86,37 @@ public class GameService {
 			}
 			
 			}
+
+			public void playOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2, ModelMap model){
+				if(gplayer2.isThisOrganNotPresent(organ)){
+					gplayer1.getCards().remove(organ);
+					organ.setGamePlayer(gplayer2);
+					organ.setBody(true);
+					gplayer2.getCards().add(organ);
+					
+					
+				}else{
+					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
+					model.put("messageType", "info");
+					throw new IllegalArgumentException();		
+				}			
+		}
+
+		public void discard(List<Card> cards, GamePlayer gamePlayer){
+			if(gamePlayer.getCards().containsAll(cards)){
+				for(Card card: cards){	//Recorremos las cartas que quiere descartar					
+						card.discard();
+						cardService.save(card);	//Se guarda la carta	
+			}  
+				gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
+				
+			}else{
+				throw new IllegalArgumentException();
+
+			}		
+		}
+			
+
 
 			public void changeCards(GamePlayer g1, GamePlayer g2, Card c_organ1, Card c_organ2){
 				if(c_organ1.getType().getType().toString()=="ORGAN"

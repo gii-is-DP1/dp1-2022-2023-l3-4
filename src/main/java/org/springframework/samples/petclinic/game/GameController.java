@@ -312,7 +312,7 @@ public class GameController {
 			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
 			GamePlayer gamePlayer1 = gamePlayerService.findById(gamePlayerId).orElseThrow(() -> new Exception("Jugador no encontrado"));
 			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
-			gameService.infection(card, gamePlayer1, gamePlayer2);
+			gameService.infection(gamePlayer1, gamePlayer2);
 			gamePlayerService.save(gamePlayer1);
 			gamePlayerService.save(gamePlayer2);
 			return turn(gameId);

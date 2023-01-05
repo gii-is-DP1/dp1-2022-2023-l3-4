@@ -173,14 +173,13 @@ public class GameService {
 
 	
 
-	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
 		List<Card> infectedCards = new ArrayList<>();
 		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
+			if (c.getType().getType() == Type.VIRUS) {
 				infectedCards.add(c);
 			}
 		}
-		gamePlayer1.getCards().remove(card);
 		for (Card infectedCard : infectedCards) {
 		//Comprobar si se pueden infectar sus organos
 			List<Card> body = gamePlayer2.getBody();
@@ -189,7 +188,17 @@ public class GameService {
 				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
 					gamePlayer1.getCards().remove(infectedCard);
 					infectedCard.setGamePlayer(gamePlayer2);
+					gamePlayer2.getCards().add(infectedCard);
 					c.getVirus().add(infectedCard);
+				} else if(c.getType().getColour() == infectedCard.getType().getColour() 
+				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==1 && c.getVaccines().size()==0) {
+					gamePlayer1.getCards().remove(infectedCard);
+					gamePlayer2.getBody().remove(c);
+					gamePlayer2.getCards().remove(c.getVirus().get(0));
+				} else if(c.getType().getColour() == infectedCard.getType().getColour() 
+				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==1) {
+					gamePlayer1.getCards().remove(infectedCard);
+					gamePlayer2.getCards().remove(c.getVaccines().get(0));
 				}
 			}
 		}

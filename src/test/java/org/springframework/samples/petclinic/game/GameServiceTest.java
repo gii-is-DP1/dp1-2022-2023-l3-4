@@ -51,6 +51,14 @@ public class GameServiceTest {
     Card vax_brain = new Card(2, false, gp2, generic_BVaccine);
     Card vax_brain2 = new Card(3, false, gp2, generic_BVaccine2);
 
+    //Elementos comunes a playInfection
+    GenericCard generic_HVirus = new GenericCard(3,Colour.RED, Type.VIRUS);
+    GenericCard generic_BVirus = new GenericCard(4,Colour.BLUE, Type.VIRUS);
+    GenericCard generic_brain2 =new GenericCard(5,Colour.BLUE, Type.ORGAN);
+    Card virus_heart = new Card(2, false, gp1, generic_HVirus);
+    Card virus_brain = new Card(3, false, gp1, generic_BVirus);
+    Card organ_brain2 = new Card(4, true, gp1, generic_brain2);
+
     List<Card> cards = new ArrayList<>();
     ModelMap m = new ModelMap();
 
@@ -272,6 +280,77 @@ public class GameServiceTest {
         gp2.setCards(cards2);
         //test 
         assertThrows(IllegalArgumentException.class , ()-> cs.changeGamePlayer(organ_brain, gp2, gp1));
+    }
+
+    @Test
+    //Jugar una carta de contagio con un virus de corazón.
+    public void testInfectionPositive1() {
+        //Setup
+        organ_heart1.setBody(true);
+        List<Card> virus = new ArrayList<>();
+        virus.add(virus_heart);
+        organ_heart1.setVirus(virus);
+        cards.add(virus_heart);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_heart2.setBody(true);
+        organ_heart2.setGamePlayer(gp2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_heart2);
+        gp2.setCards(cards2);
+        //test
+        gs.infection(gp1, gp2);
+        assertEquals(true, gp2.getBody().get(0).getVirus().size()==1);
+    }
+
+    @Test
+    //Jugar una carta de contagio con un virus de corazón y uno de cerebro.
+    public void testInfectionPositive2() {
+        //Setup
+        organ_heart1.setBody(true);
+        List<Card> virus = new ArrayList<>();
+        List<Card> virus2 = new ArrayList<>();
+        virus.add(virus_heart);
+        virus2.add(virus_brain);
+        organ_heart1.setVirus(virus);
+        organ_brain2.setVirus(virus2);
+        cards.add(virus_heart);
+        cards.add(virus_brain);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain2.setGamePlayer(gp1);
+        organ_heart2.setBody(true);
+        organ_brain.setBody(true);
+        organ_heart2.setGamePlayer(gp2);
+        organ_brain.setGamePlayer(gp2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_heart2);
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test
+        gs.infection(gp1, gp2);
+        assertEquals(true, gp2.getBody().get(0).getVirus().size()==1 && gp2.getBody().get(1).getVirus().size()==1);
+    }
+
+    @Test
+    //Jugar una carta de contagio con un virus de corazón.
+    public void testInfectionNegative1() {
+        //Setup
+        organ_heart1.setBody(true);
+        List<Card> virus = new ArrayList<>();
+        virus.add(virus_heart);
+        organ_heart1.setVirus(virus);
+        cards.add(virus_heart);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_heart2.setBody(true);
+        organ_heart2.setGamePlayer(gp2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_heart2);
+        gp2.setCards(cards2);
+        //test
+        gs.infection(gp1, gp2);
+        assertEquals(true, gp2.getBody().get(0).getVirus().size()==1);
     }
 
 }

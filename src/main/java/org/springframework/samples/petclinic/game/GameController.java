@@ -178,6 +178,24 @@ public class GameController {
 			return playVirus(gameId, cardId, targetC);
 		} else if(card.getType().getType().equals(GenericCard.Type.THIEF)) {
 			return playThief(gameId, cardId, targetC);
+		} else if(card.getType().getType().equals(GenericCard.Type.TRANSPLANT)) {
+			GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
+			Game game = gameService.findGame(gameId);
+			model.put("selectAgain", true);
+			model.put("target1", targetC);
+			model = generaTablero(model, currentGamePlayer, game);
+			return "games/selecciona";
+		}
+		
+		return muestraVista(gameId, model);
+	}
+
+	@GetMapping("/games/{gameId}/play/{cardId}/toCard/{target1}/and/{target2}")
+	public String playOnAnotherCard(@PathVariable("gameId") Integer gameId, @PathVariable("cardId") Integer cardId,
+			@PathVariable("target1") Integer targetC, @PathVariable("target2") Integer targetC2, ModelMap model) {
+		Card card = cardService.findCard(cardId).get();
+		if(card.getType().getType().equals(GenericCard.Type.TRANSPLANT)) {
+			return playTransplant(gameId, targetC, targetC2);
 		}
 		
 		return muestraVista(gameId, model);
@@ -253,7 +271,7 @@ public class GameController {
 	}
 
 	//Jugar transplante (Añadir restricción de no quedarse con dos órganos iguales en el cuerpo)
-	public String playTransplant(@PathVariable("gameId") int gameId, @PathVariable("gamePlayerId") int gamePlayerId, Integer c1_id, Integer c2_id){
+	public String playTransplant(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
 		if(c1.isPresent() && c2.isPresent()){

@@ -7,21 +7,39 @@
 <virus:layout pageName="game">
     <table align="center">
         <tbody>
-            <h1>Select a body or a card</h1>
+            <c:if test="${empty selectAgain}">
+                <h1>Select a body or a card</h1>
+            </c:if>
+            <c:if test="${selectAgain}">
+                <h1>Select another card</h1>
+            </c:if>
+            
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                      <a href="/games/${gameId}/play/${cardId}/toPlayer/${body.key.id}">
-                        <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
-                      </a>
+                        <c:if test="${empty selectAgain}">
+                            <a href="/games/${gameId}/play/${cardId}/toPlayer/${body.key.id}">
+                            <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
+                            </a>
+                        </c:if>
+                        <c:if test="${selectAgain}">
+                            <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
+                        </c:if>
                     </td>
                 </tr>
                 <tr>
                     <c:forEach items="${body.value}" var="bodycard">
                         <td>
-                            <a href="/games/${gameId}/play/${cardId}/toCard/${bodycard.id}">
-                            <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
-                            </a>
+                            <c:if test="${empty selectAgain}">
+                                <a href="/games/${gameId}/play/${cardId}/toCard/${bodycard.id}">
+                                    <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
+                                </a>
+                            </c:if>
+                            <c:if test="${selectAgain}">
+                                <a href="/games/${gameId}/play/${cardId}/toCard/${target1}/and/${bodycard.id}">
+                                    <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
+                                </a>
+                            </c:if>
                         </td>
                     </c:forEach>
                 </tr>

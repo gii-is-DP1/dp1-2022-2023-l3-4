@@ -7,27 +7,28 @@
 <virus:layout pageName="game">
     <table align="center">
         <tbody>
+            <h1>Select a body or a card</h1>
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
                       <a href="/games/${gameId}/play/${cardId}/toPlayer/${body.key.id}">
-                        <c:out value="${body.key.player.firstName}'s body"/>
+                        <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
                       </a>
                     </td>
                 </tr>
-                <c:forEach items="${body.value}" var="bodycard">
-                    <tr>
+                <tr>
+                    <c:forEach items="${body.value}" var="bodycard">
                         <td>
                             <a href="/games/${gameId}/play/${cardId}/toCard/${bodycard.id}">
                             <img src="<spring:url value='/resources/images/cards/${bodycard.type.image}.png'/>" alt="There is no body here"/>
                             </a>
                         </td>
-                    </tr>
-                </c:forEach>
+                    </c:forEach>
+                </tr>
             </c:forEach>
             <tr>
                 <td>
-                    Your hand
+                    <h2>Your hand</h2>
                 </td>
             </tr>
             <tr>

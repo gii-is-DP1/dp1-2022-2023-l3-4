@@ -11,7 +11,7 @@
             <c:forEach items="${bodies}" var="body">
                 <tr>
                     <td>
-                        <c:out value="${body.key.player.firstName}'s body"/>
+                        <h2><c:out value="${body.key.player.firstName}'s body"/></h2>
                     </td>
                 </tr>
                 <tr>
@@ -46,7 +46,7 @@
             </c:forEach>
             <tr>
                 <td>
-                    Your hand
+                    <h2>Your hand</h2>
                 </td>
             </tr>
             <tr>
@@ -64,6 +64,12 @@
     <c:if test="${isYourTurn}">
         <div class="container" style="padding-left: 480px; padding-top: 20px;"><a href="/games/${gameId}/discard" class="btn btn-primary">Discard</a>  </div>
     </c:if>
-
+    <c:if test="${not isYourTurn}">
+        <script type="text/javascript">
+        function actualizar(){location.reload(true);}
+        //Función para actualizar cada 5 segundos(5000 milisegundos)
+        setInterval("actualizar()",4000);
+        </script>
+    </c:if>
 
 </virus:layout>

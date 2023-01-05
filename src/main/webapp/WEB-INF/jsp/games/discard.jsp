@@ -10,7 +10,7 @@
         <form:form modelAttribute="cardsForm">
             <tr>
                 <td>
-                    Select the cards you want to discard
+                    <h1>Select the cards you want to discard</h1>
                 </td>
             </tr>
             <tr>
@@ -30,7 +30,5 @@
             </tr>
         </form:form>
     </table>
-
-
 
 </virus:layout>

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 
@@ -86,10 +87,13 @@ public class CardService {
 
 	@Transactional
 	public void changeGamePlayer(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		if((gamePlayer2.isThisOrganNotPresent(card) && card.getVaccines().size()<2) || card.getType().getType()==Type.VACCINE){
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
-		cardRepository.save(card);
+		} else {
+			throw new IllegalArgumentException("No puedes robar un órgano que ya tienes o que esté inmunizado.");
+		}
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());

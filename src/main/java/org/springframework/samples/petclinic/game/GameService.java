@@ -145,9 +145,7 @@ public class GameService {
 					else if(c_organ2.getVirus().size()==1){
 						Card virus2 = c_organ2.getVirus().get(0);
 						cardService.changeGamePlayer(virus2, g2, g1);
-					}
-					gamePlayerService.save(g1);
-					gamePlayerService.save(g2);				
+					}			
 				
 			}else{
 				throw new IllegalArgumentException("No pueden quedar cuerpos con órganos repetidos");
@@ -188,32 +186,33 @@ public class GameService {
 			}
 	}
 
-	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
 		List<Card> infectedCards = new ArrayList<>();
 		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
+			if (c.getType().getType() == Type.VIRUS) {
 				infectedCards.add(c);
 			}
 		}
-		gamePlayer1.getCards().remove(card);
-		for (Card infectedCard : infectedCards) {
+		
 		//Comprobar si se pueden infectar sus organos
 			List<Card> body = gamePlayer2.getBody();
 			for (Card c : body) {
-				if (c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
-					gamePlayer1.getCards().remove(infectedCard);
-					infectedCard.setGamePlayer(gamePlayer2);
-					c.getVirus().add(infectedCard);
-					infectedCard.setCardVirus(c);
-					cardService.save(c);
-					cardService.save(infectedCard);
-					break;
+				for (Card infectedCard : infectedCards) {
+					if (c.getVaccines().size()==0) {
+						if (c.getType().getColour() == infectedCard.getType().getColour() 
+							&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0) {
+						gamePlayer1.getCards().remove(infectedCard);
+						infectedCard.setGamePlayer(gamePlayer2);
+						gamePlayer2.getCards().add(infectedCard);
+						c.getVirus().add(infectedCard);
+						} else {
+							throw new IllegalArgumentException("No se puede infectar un órgano no libre.");
+						}
+					} else {
+						throw new IllegalArgumentException("No se puede infectar un órgano inmunizado.");
 				}
 			}
 		}
-		card.discard();
-		cardService.save(card);
 	}
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {

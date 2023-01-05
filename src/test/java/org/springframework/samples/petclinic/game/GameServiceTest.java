@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
@@ -29,6 +30,9 @@ public class GameServiceTest {
 
     @Autowired
     GameService gs;
+
+    @Autowired
+    CardService cs;
 
     //Elementos comunes a addOrgan
     GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
@@ -192,6 +196,82 @@ public class GameServiceTest {
         gp2.setCards(cards2);
         //test 
         assertThrows(IllegalArgumentException.class , ()-> gs.changeCards(gp1,gp2,organ_heart1,organ_heart2));
+    }
+
+    @Test
+    //Jugar una carta de robo sobre un cerebro.
+    public void testThiefPositive1() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test
+        cs.changeGamePlayer(organ_brain, gp2, gp1);
+        assertEquals(true, gp1.getBody().get(1).getType().getColour()==GenericCard.Colour.BLUE);
+    }
+
+    @Test
+    //Jugar una carta de robo sobre un cerebro vacunado.
+    public void testThiefPositive2() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        List<Card> vax = new ArrayList<>();
+        vax.add(vax_brain);
+        organ_brain.setVaccines(vax);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test
+        cs.changeGamePlayer(organ_brain, gp2, gp1);
+        assertEquals(true, gp1.getBody().get(1).getType().getColour()==GenericCard.Colour.BLUE);
+    }
+
+    @Test
+    //Jugar una carta de robo sobre un corazón teniendo ya uno.
+    public void testThiefNegative1() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_heart2.setBody(true);
+        organ_heart2.setGamePlayer(gp2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_heart2);
+        gp2.setCards(cards2);
+        //test 
+        assertThrows(IllegalArgumentException.class , ()-> cs.changeGamePlayer(organ_heart2, gp2, gp1));
+    }
+
+    @Test
+    //Jugar una carta de robo sobre un cerebro inmunizado.
+    public void testThiefNegative2() {
+        //Setup
+        organ_heart1.setBody(true);
+        gp1.setCards(cards);
+        organ_heart1.setGamePlayer(gp1);
+        organ_brain.setBody(true);
+        List<Card> vax = new ArrayList<>();
+        vax.add(vax_brain);
+        vax.add(vax_brain2);
+        organ_brain.setVaccines(vax);
+        organ_brain.setGamePlayer(gp2);
+        gp2.getBody().remove(organ_heart2);
+        List<Card> cards2 = new ArrayList<>();
+        cards2.add(organ_brain);
+        gp2.setCards(cards2);
+        //test 
+        assertThrows(IllegalArgumentException.class , ()-> cs.changeGamePlayer(organ_brain, gp2, gp1));
     }
 
 }

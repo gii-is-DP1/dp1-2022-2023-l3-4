@@ -193,25 +193,23 @@ public class GameService {
 				infectedCards.add(c);
 			}
 		}
-		for (Card infectedCard : infectedCards) {
+		
 		//Comprobar si se pueden infectar sus organos
 			List<Card> body = gamePlayer2.getBody();
 			for (Card c : body) {
-				if (c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
-					gamePlayer1.getCards().remove(infectedCard);
-					infectedCard.setGamePlayer(gamePlayer2);
-					gamePlayer2.getCards().add(infectedCard);
-					c.getVirus().add(infectedCard);
-				} else if(c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==1 && c.getVaccines().size()==0) {
-					gamePlayer1.getCards().remove(infectedCard);
-					gamePlayer2.getBody().remove(c);
-					gamePlayer2.getCards().remove(c.getVirus().get(0));
-				} else if(c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==1) {
-					gamePlayer1.getCards().remove(infectedCard);
-					gamePlayer2.getCards().remove(c.getVaccines().get(0));
+				for (Card infectedCard : infectedCards) {
+					if (c.getVaccines().size()==0) {
+						if (c.getType().getColour() == infectedCard.getType().getColour() 
+							&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0) {
+						gamePlayer1.getCards().remove(infectedCard);
+						infectedCard.setGamePlayer(gamePlayer2);
+						gamePlayer2.getCards().add(infectedCard);
+						c.getVirus().add(infectedCard);
+						} else {
+							throw new IllegalArgumentException("No se puede infectar un órgano no libre.");
+						}
+					} else {
+						throw new IllegalArgumentException("No se puede infectar un órgano inmunizado.");
 				}
 			}
 		}

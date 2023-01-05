@@ -311,7 +311,7 @@ public class GameController {
 		GamePlayer victimPlayer = stolenCard.getGamePlayer();
 		// Verificamos que todas las cartas y jugadores existan
 		if (thiefCard != null && thiefPlayer != null && victimPlayer != null && stolenCard != null) {
-			cardService.changeGamePlayer(stolenCard, thiefPlayer, victimPlayer);
+			gameService.thief(thiefCard, thiefPlayer, victimPlayer, stolenCard);
 			gamePlayerService.save(thiefPlayer);
 			gamePlayerService.save(victimPlayer);
 			return turn(gameId);

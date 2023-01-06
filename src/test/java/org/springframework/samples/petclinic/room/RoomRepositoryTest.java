@@ -28,7 +28,7 @@ public class RoomRepositoryTest {
     public void testFindByRoomName(){
         Room room = roomRepository.findByRoomName("sala1");
         assertNotNull(room, "El repositorio ha devuelto una lista nula");
-        assertEquals("sala1", room.roomName, "El nombre de la sala buscada no coincide con la devuelta del repositrio");
+        assertEquals("sala1", room.getRoomName(), "El nombre de la sala buscada no coincide con la devuelta del repositrio");
     }
 
 }

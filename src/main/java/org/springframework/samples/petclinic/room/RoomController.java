@@ -90,7 +90,7 @@ public class RoomController {
 	@GetMapping(value = "/edit")
 	public String initEditForm( ModelMap model) {
 		Player player = authService.getPlayer();
-		Room room =roomService.findRoomByHost(player).get();
+		Room room =roomService.findRoomByHost(player);
 		model.put("room", room);
 		model.put("player", player);
 		return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
@@ -99,7 +99,7 @@ public class RoomController {
 	@PostMapping(value = "/edit")
 	public String processEditForm(@Valid Room room, BindingResult result, ModelMap model) throws PlayerHostsExistingRoomException {	
 		Player player = authService.getPlayer();
-		Room roomOld = roomService.findRoomByHost(player).get();
+		Room roomOld = roomService.findRoomByHost(player);
 		if (result.hasErrors()) {
 			model.put("room", room);
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
@@ -161,7 +161,7 @@ public class RoomController {
 		Room roomPlayer=player.getRoom();
 		Room room=this.roomService.findRoomById(roomId);
 		//Si no eres host de una room o ya perteneces a esa sala
-		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){
+		if(roomService.findRoomByHost(player)==null||room.getId()==player.getRoom().getId()){
 			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&(player.getRoom()==null||!(room.getId()==roomPlayer.getId()))) {
 				model.put("player", player);
 				model.put("room", new Room());
@@ -191,6 +191,8 @@ public class RoomController {
 
 	}
 	
+
+	
 	@GetMapping("/delete/{roomId}")
 	public String deleteRoom(@PathVariable("roomId") int roomId, ModelMap model){
 		Player player = authService.getPlayer();
@@ -201,7 +203,8 @@ public class RoomController {
 				p.setRoom(null);
 				playerService.savePlayer(p);
 			});
-			roomService.deleteRoom(roomId);
+			roomService.deleteRoom(room.getId());
+
 			return "redirect:/";
 		} else {
 			return "redirect:/";
@@ -214,11 +217,11 @@ public class RoomController {
 	@GetMapping("/myRoom")
         public String showMyRoom() {
 			Player player = authService.getPlayer();
-			Optional<Room> room=roomService.findRoomByHost(player);
-			if(room.isEmpty()){
+			Room room=roomService.findRoomByHost(player);
+			if(room==null){
 				return "redirect:/room/new";
 			}else{
-				return "redirect:/room/"+room.get().getId();
+				return "redirect:/room/"+room.getId();
 			}
       	  
   }

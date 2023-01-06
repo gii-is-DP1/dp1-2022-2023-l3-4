@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -16,7 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
-
+import org.springframework.samples.petclinic.room.Room;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +43,10 @@ public class Game extends BaseEntity {
 	private Integer round;
 	private Integer turn;
 	private Duration duration;
+	
+	@ManyToOne(optional = false)
+	private Room room;
+	
 	@Transient
 	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 

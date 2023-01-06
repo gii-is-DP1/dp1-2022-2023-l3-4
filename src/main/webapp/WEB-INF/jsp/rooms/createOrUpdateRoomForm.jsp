@@ -17,8 +17,7 @@
                     <petclinic:inputField label="Room Name" name="roomName"/>
                     <petclinic:inputField label="Num max player" name="numMaxPlayers"/>
                     <label for="isPrivate">is Private?</label>
-                    <form:checkbox path="isPrivate"/>
-                    <input type="button" id="more_fields" onclick="add_password();" value="Add Password" />
+                    <form:checkbox path="isPrivate" onclick="add_password();"/>
                     <div id="room_fileds">
                         <div class="content" id="wrapper"> 
                         </div>

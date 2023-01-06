@@ -23,7 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 
 import java.util.Optional;
 
@@ -40,10 +42,12 @@ import java.util.Optional;
 public class CardService {
 
 	private CardRepository cardRepository;
+	private GamePlayerService gamePlayerService;
 
 	@Autowired
-	public CardService(CardRepository cardRepository) {
+	public CardService(CardRepository cardRepository, GamePlayerService gamePlayerService) {
 		this.cardRepository = cardRepository;
+		this.gamePlayerService = gamePlayerService;
 	}
 
 	@Transactional(readOnly = true)	
@@ -57,7 +61,7 @@ public class CardService {
 
 	}
 
-  @Transactional(readOnly = true)
+  	@Transactional(readOnly = true)
 		public Optional<Card> findCard(Integer i){
 			return cardRepository.findById(i);
 		}
@@ -67,21 +71,29 @@ public class CardService {
 			return cardRepository.save(card);	
 		}
 
+	@Transactional(readOnly=true)
+		public List<Card> getBodyFromAGamePlayer(Integer gamePlayerId){
+			return cardRepository.getBodyFromAGamePlayer(gamePlayerId);
+		}
+
 	@Transactional(readOnly = true)
-	public void shuffle(List<Card> cards){
-		Collections.shuffle(cards);
-			for(Card c: cards){
-				c.setPlayed(false);
-				cardRepository.save(c);
+		public void shuffle(List<Card> cards){
+			Collections.shuffle(cards);
+				for(Card c: cards){
+					c.setPlayed(false);
+					cardRepository.save(c);
 			}
 	}
 
 	@Transactional
 	public void changeGamePlayer(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		if((gamePlayer2.isThisOrganNotPresent(card) && card.getVaccines().size()<2) || card.getType().getType()==Type.VACCINE){
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
-		cardRepository.save(card);
+		} else {
+			throw new IllegalArgumentException("No puedes robar un órgano que ya tienes o que esté inmunizado.");
+		}
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		virus_vaccine.setGamePlayer(organ.getGamePlayer());
@@ -100,19 +112,15 @@ public class CardService {
 			if(organ.getVirus().size()==0){
 				if(organ.getVaccines().size()<2){
 					infectOrVaccinate(organ, vaccine);
-					cardRepository.save(vaccine);
-					cardRepository.save(organ);
 				}else{
 					throw new IllegalArgumentException("Este órgano ya está inmunizado");
 				}
 		
 			}else{
 				Card virus = organ.getVirus().get(0);
+				organ.setVirus(new ArrayList<>());
 				virus.discard();
 				vaccine.discard();
-				cardRepository.save(vaccine);
-				cardRepository.save(organ);
-				cardRepository.save(virus);
 			}
 			}else{
 				throw new IllegalArgumentException("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");
@@ -130,19 +138,13 @@ public class CardService {
 					organ.discard();
 					virus1.discard();
 					virus.discard();
-					cardRepository.save(virus1);
 				
-				}
-				cardRepository.save(virus);
-				cardRepository.save(organ);			
+				}		
 			} else if(organ.getVaccines().size()==1){
 				Card vaccine = organ.getVaccines().get(0);
 				vaccine.discard();
 				virus.discard();
 				organ.setVaccines(new ArrayList<>());
-				cardRepository.save(virus);
-				cardRepository.save(organ);
-				cardRepository.save(vaccine);
 	  }else{
 		  throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
 	  }
@@ -153,4 +155,5 @@ public class CardService {
  public List<Card> findAllCardsByIds(List<Integer> cardIds) {
 	return cardRepository.findCardsByIds(cardIds);
 }
+
 }

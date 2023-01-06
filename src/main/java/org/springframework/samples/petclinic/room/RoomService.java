@@ -33,8 +33,8 @@ public class RoomService {
 	}
 
 	@Transactional
-	public Optional<Room> findRoomByHost(Player player) throws DataAccessException{
-		return roomRepository.findRoomByHost(player);
+	public Optional<Room> findActiveRoomByHost(Player player) throws DataAccessException{
+		return roomRepository.findActiveRoomByHost(player);
 	}
 
     @Transactional(readOnly = true)
@@ -44,9 +44,10 @@ public class RoomService {
 
 	@Transactional(rollbackFor = DuplicatedNameRoomException.class)
 	public void saveRoom(Room room) throws DataAccessException, DuplicatedNameRoomException, PlayerHostsExistingRoomException {
+
 			if(roomRepository.findByRoomName(room.getRoomName())!=null){
 				throw new DuplicatedNameRoomException();
-			}else if(roomRepository.findRoomByHost(room.getHost()).isPresent()) {
+			}else if(roomRepository.findActiveRoomByHost(room.getHost()).isPresent()) {
 				throw new PlayerHostsExistingRoomException();
 			}else
 				roomRepository.save(room);
@@ -54,7 +55,11 @@ public class RoomService {
 
 	@Transactional()
 	public void updateRoom(Room room) throws DuplicatedNameRoomException{
-			if(roomRepository.findByRoomName(room.getRoomName())!=null && roomRepository.findByRoomName(room.getRoomName()).getHost()!=room.getHost()){
+
+		Room existRoom=roomRepository.findByRoomName(room.roomName);
+			if(existRoom!=null && 
+			existRoom.getActive()&&
+			existRoom.getHost()!=room.getHost()){
 					throw new DuplicatedNameRoomException();
 			}else
 				roomRepository.save(room);

@@ -24,6 +24,7 @@ import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
@@ -119,6 +120,22 @@ public class GameService {
 			
 			}
 
+			public void addOrgan(Card organ, GamePlayer gplayer1, GamePlayer gplayer2, ModelMap model){
+				if(gplayer2.isThisOrganNotPresent(organ)){
+					gplayer1.getCards().remove(organ);
+					organ.setGamePlayer(gplayer2);
+					organ.setBody(true);
+					gplayer2.getCards().add(organ);
+					
+					
+				}else{
+					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
+					model.put("messageType", "info");
+					throw new IllegalArgumentException();		
+				}			
+		}
+
+
 			public void changeCards(GamePlayer g1, GamePlayer g2, Card c_organ1, Card c_organ2){
 				if(c_organ1.getType().getType().toString()=="ORGAN"
 				&& c_organ2.getType().getType().toString()=="ORGAN"){
@@ -174,9 +191,13 @@ public class GameService {
 			// Verificamos que la víctima tenga la carta que se quiere robar
 			if (victimPlayer.getCards().contains(stolenCard)) {
 				// Realizamos el robo de la carta
+				stolenCard.setGamePlayer(thiefPlayer);
+				thiefCard.discard();
 				victimPlayer.getCards().remove(stolenCard);
 				thiefPlayer.getCards().add(stolenCard);
-				thiefPlayer.getCards().remove(thiefCard);   
+				thiefPlayer.getCards().remove(thiefCard);
+				cardService.save(stolenCard);
+				cardService.save(thiefCard);
 			}
 	}
 
@@ -197,29 +218,55 @@ public class GameService {
 					gamePlayer1.getCards().remove(infectedCard);
 					infectedCard.setGamePlayer(gamePlayer2);
 					c.getVirus().add(infectedCard);
+					infectedCard.setCardVirus(c);
+					cardService.save(c);
+					cardService.save(infectedCard);
+					break;
 				}
 			}
 		}
+		card.discard();
+		cardService.save(card);
 	}
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {
 		gamePlayer.getCards().remove(card);
+		card.discard();
+		cardService.save(card);
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
+				for(Card c: otherGamePlayer.getHand()) {
+					c.discard();
+					cardService.save(c);
+				}
 				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
 			}
 		}
+		for (Integer i=0; i<game.getGamePlayer().size(); i++) {
+			changeTurn(game);
+		}
+		
 	}
 
-	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
+	public void medicalError(Card medicalError, GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
 		// Intercambiamos los cuerpos de los dos jugadores
+		medicalError.discard();
 		List<Card> player1Cards = gamePlayer1.getBody();
 		List<Card> player2Cards = gamePlayer2.getBody();
+		for(Card c: player1Cards) {
+			c.setGamePlayer(gamePlayer2);
+			cardService.save(c);
+		}
+		
+		for(Card c: player2Cards) {
+			c.setGamePlayer(gamePlayer1);
+			cardService.save(c);
+		}
 		gamePlayer1.getBody().removeAll(player1Cards);
 		gamePlayer1.getBody().addAll(player2Cards);
 		gamePlayer2.getBody().removeAll(player2Cards);
 		gamePlayer2.getBody().addAll(player1Cards);
-
+		cardService.save(medicalError);
 	}
 		
 	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
@@ -288,6 +335,7 @@ public class GameService {
 		game.setRound(0);
 		game.setTurn(0);
 		game.setInitialHour(LocalDateTime.now());
+		game.setIsRunning(true);
 		List<GamePlayer> gamePlayers = new ArrayList<>();
 		game.setCards(new ArrayList<>());
 		game.setClassification(new HashMap<>());

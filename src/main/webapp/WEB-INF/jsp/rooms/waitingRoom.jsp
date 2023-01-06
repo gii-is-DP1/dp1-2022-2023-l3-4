@@ -7,6 +7,14 @@
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
 <virus:layout pageName="room">
+
+//Función actualizar
+<script type="text/javascript">
+function actualizar(){location.reload(true);}
+//Función para actualizar cada 5 segundos(5000 milisegundos)
+setInterval("actualizar()",5000);
+</script>
+
     <div class="row">
       <tr >
         <h2>Room Name:  <b><c:out value="${room.roomName}"/></b></h2>

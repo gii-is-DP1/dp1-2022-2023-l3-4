@@ -65,6 +65,46 @@
 					<li><a href="<c:url value="/login" />">Login</a></li>
 					<li><a href="<c:url value="/users/new" />">Register</a></li>
 				</sec:authorize>
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<li class="dropdown"><a  class="dropdown-toggle"
+						data-toggle="dropdown"> 
+						<span class="glyphicon glyphicon-user"></span>
+							<strong>Game</strong> <span
+							class="glyphicon glyphicon-chevron-down"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li>
+								<div class="navbar-login">
+									<div class="row">
+										
+											<p class="text-center">
+												<a href="<c:url value="/runningGames" />">
+												<span class="glyphicon glyphicon-user icon-size">Running Game</span>
+												</a>
+											</p>
+										
+	
+									</div>
+								</div>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<div class="navbar-login">
+									<div class="row">
+										
+											<p class="text-center">
+												<a href="<c:url value="/terminateGames" />">
+												<span class="glyphicon glyphicon-user icon-size">Terminate Game</span>
+												</a>
+											</p>
+										
+	
+									</div>
+								</div>
+							</li>
+
+						</ul></li>
+				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a  class="dropdown-toggle"
 						data-toggle="dropdown"> 

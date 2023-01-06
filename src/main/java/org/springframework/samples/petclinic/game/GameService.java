@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.game;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,6 +48,18 @@ public class GameService {
 	public List<Game> listGames(){
 		return gameRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public Collection<Game> listRunningGames(){
+		return gameRepository.findRunningGames();
+	}
+
+	
+	@Transactional(readOnly = true)
+	public Collection<Game> listTerminateGames(){
+		return gameRepository.findTerminategGames();
+	}
+
 	@Transactional(readOnly = true)
 	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
@@ -271,6 +284,7 @@ public class GameService {
 	public Game startGame(Room room) {
 		Game game = new Game();
 		game.setRoom(room);
+		game.setIsRunning(true);
 		game.setRound(0);
 		game.setTurn(0);
 		game.setInitialHour(LocalDateTime.now());

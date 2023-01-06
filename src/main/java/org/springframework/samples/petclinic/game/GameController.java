@@ -55,6 +55,8 @@ public class GameController {
 	private final AuthenticationService authenticationService;
 
 	public static final String RANKING = "statistics/ranking";
+	public static final String RUNNING_GAMES_LISTING = "games/runningGameListing";
+	public static final String TERMINATE_GAMES_LISTING = "games/terminateGameListing";
 
 
 	@Autowired
@@ -88,12 +90,19 @@ public class GameController {
 		}
 	}
 	
-	//Listar juegos
-	@GetMapping(value="/games")
-	public String ListGames(ModelMap model){
-		List<Game> allGames=  gameService.listGames();
-		model.put("games", allGames);
-		return "games/listing";
+	//Listados de partidas para el administrador
+	@GetMapping(value="/runningGames")
+	public String listRunningGames(ModelMap model){
+		Collection<Game> runningGames=  gameService.listRunningGames();
+		model.put("games", runningGames);
+		return RUNNING_GAMES_LISTING;
+	}
+
+	@GetMapping(value="/terminateGames")
+	public String terminateRunningGames(ModelMap model){
+		Collection<Game> terminateGames=  gameService.listTerminateGames();
+		model.put("games", terminateGames);
+		return TERMINATE_GAMES_LISTING;
 	}
 	
 	//Muestra vista Individual de cada jugador
@@ -384,4 +393,7 @@ public class GameController {
 		model.put("classification", game.getClassification());
 		return "games/classification";
 	}
+
+
+
 }

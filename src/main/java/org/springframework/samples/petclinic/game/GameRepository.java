@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.game;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,5 +33,10 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 	Optional<Game> findById(int id);
     @Query("SELECT gp FROM GamePlayer gp WHERE gp.player.id = :playerId")
     GamePlayer findGamePlayerByPlayer(@Param(value = "playerId") Integer playerId);
+
+    @Query("SELECT g FROM Game g WHERE g.isRunning = true")
+    public Collection<Game> findRunningGames();
     
+    @Query("SELECT g FROM Game g WHERE g.isRunning = false")
+    public Collection<Game> findTerminategGames();
 }

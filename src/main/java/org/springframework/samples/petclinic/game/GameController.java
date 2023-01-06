@@ -54,10 +54,8 @@ public class GameController {
 	private final CardService cardService;
 	private final AuthenticationService authenticationService;
 
-	public static final String RANKING = "statistics/ranking";
 	public static final String RUNNING_GAMES_LISTING = "games/runningGameListing";
 	public static final String TERMINATE_GAMES_LISTING = "games/terminateGameListing";
-
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
@@ -68,13 +66,6 @@ public class GameController {
 		this.roomService = roomService;
 		this.authenticationService = authenticationService;
 	}
-
-	@GetMapping("/ranking/global")
-  public String getPlayersRanking(ModelMap model) {
-    Map<GamePlayer, Integer> gps = gameService.getRanking();
-    model.put("topGamers", gps);
-    return RANKING;
-  }
 
 	@GetMapping(value = "/game/start/{roomId}")
 	public String init(@PathVariable("roomId") Integer roomId, ModelMap model) {

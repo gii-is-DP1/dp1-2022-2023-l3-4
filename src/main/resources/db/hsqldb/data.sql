@@ -8,6 +8,7 @@ INSERT INTO users(username,password,enabled) VALUES ('frabenrui1','z3bas',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('lucperrom','laquesea',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('juaanjimdel','laquesea2',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('p','p',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p1','p1',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
 INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
 INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');
@@ -52,18 +53,21 @@ INSERT INTO players(id,first_name,last_name,username,description,status,profile_
 INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (3,'Lucia','Perez Romero','lucperrom','A ganar',TRUE,'');
 INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (4,'Juan Antonio','Jiménez del Villar','juaanjimdel','Nadie puede ganarme',TRUE,'');
 INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (5,'p','p','p','pp',TRUE,'');
+INSERT INTO players(id,first_name,last_name,username,description,status,profile_image) VALUES (6,'p1','p1','p1','pp1',TRUE,'');
 
 -- GamePlayer
 
--- INSERT INTO game_players VALUES (1,null,TRUE,1), (2,null,null,2);
+INSERT INTO game_players(id,host,winner,player_id) VALUES (1,null,TRUE,1), (2,null,null,2);
+-- , (3,null,TRUE,3), (4,null,TRUE,4);
 
 -- Games
 
--- INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
+INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
+-- INSERT INTO games VALUES (2,500000000000,'2022-05-16 20:20:20',FALSE,null,null);
 
 -- GamePlayerGames
 
--- INSERT INTO games_game_player VALUES (1,1), (1,2);
+INSERT INTO games_game_player VALUES (1,1), (1,2); --(2,3), (2,4);
 
 -- PlayerAchievements
 
@@ -71,6 +75,11 @@ INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
 
 -- Statitics
 INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (1, 1, 10, 5, 30);
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (2, 2, 10, 4, 30);
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (3, 3, 10, 3, 30);
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (4, 4, 10, 2, 30);
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (5, 5, 10, 1, 30);
+INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (6, 6, 10, 0, 30);
 
 --Friends
 

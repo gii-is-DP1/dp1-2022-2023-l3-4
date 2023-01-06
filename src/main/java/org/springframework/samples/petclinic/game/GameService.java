@@ -326,8 +326,7 @@ public class GameService {
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
+			GamePlayer gp = findGamePlayerByPlayer(p);
 			gp.setCards(new ArrayList<>());
 			gamePlayers.add(gp);
 			gamePlayerService.save(gp);
@@ -371,6 +370,10 @@ public class GameService {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
+		game.getCards().stream().forEach(c -> {
+			c.discard();
+			cardService.save(c);
+		} );
 		save(game);
 	}
 

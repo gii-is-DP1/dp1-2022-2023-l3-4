@@ -55,7 +55,11 @@ INSERT INTO players(id,first_name,last_name,username,description,status,profile_
 
 -- GamePlayer
 
--- INSERT INTO game_players VALUES (1,null,TRUE,1), (2,null,null,2);
+INSERT INTO game_players(id, player_id) VALUES (1,1);
+INSERT INTO game_players(id, player_id) VALUES (2,2);
+INSERT INTO game_players(id, player_id) VALUES (3,3);
+INSERT INTO game_players(id, player_id) VALUES (4,4);
+INSERT INTO game_players(id, player_id) VALUES (5,5);
 
 -- Games
 

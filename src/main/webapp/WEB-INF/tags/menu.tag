@@ -27,19 +27,24 @@
 					<span>Home</span>
 				</petclinic:menuItem>
 
+
+
+				<sec:authorize access="hasAnyAuthority('player')">
+
 				<petclinic:menuItem active="${name eq 'room'}" url="/room/myRoom"
 					title="this is my room">
 					<span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
 					<span>My room</span>
 				</petclinic:menuItem>
 
-				<sec:authorize access="isAuthenticated()">
 				<petclinic:menuItem active="${name eq 'friend'}" url="/friend/myFriends"
 					title="this is my friends">
 					<span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
 					<span>Friends</span>
 				</petclinic:menuItem>
+
 				</sec:authorize>
+
 
 				<sec:authorize access="hasAnyAuthority('admin')">
 				<petclinic:menuItem active="${name eq 'achievement'}" url="/statistics/achievements/"

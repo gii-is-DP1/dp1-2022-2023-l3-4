@@ -18,9 +18,8 @@ public interface RoomRepository extends CrudRepository<Room,Integer>{
 	public Room findByRoomName(@Param("roomName") String roomName);
 
     @Query("SELECT room FROM Room room WHERE room.host =:player")
-    public Collection<Room> findRoomByHost(@Param("player") Player player);
+    public Room findRoomByHost(@Param("player") Player player);
     
-    @Query("SELECT room FROM Room room WHERE room.host =:player AND room.active =true")
-    public Optional<Room> findActiveRoomByHost(@Param("player") Player player);
+
 
 }

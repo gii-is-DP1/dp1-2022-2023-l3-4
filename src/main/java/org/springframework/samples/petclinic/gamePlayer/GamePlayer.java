@@ -52,7 +52,6 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        this.host=false;
         this.winner=false;
     }
 

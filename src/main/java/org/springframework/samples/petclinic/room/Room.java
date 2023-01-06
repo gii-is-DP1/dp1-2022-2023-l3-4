@@ -38,8 +38,6 @@ public class Room extends BaseEntity{
     @NotNull
     private Boolean isPrivate;
 
-    Boolean active;
-
     @OneToMany(mappedBy="room")
     private Collection<Player> players;
 

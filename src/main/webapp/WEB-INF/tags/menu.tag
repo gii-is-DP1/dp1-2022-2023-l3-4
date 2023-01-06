@@ -55,21 +55,11 @@
 					<span>Ranking</span>
 				</petclinic:menuItem>
 
-			</ul>
-
-
-
-
-			<ul class="nav navbar-nav navbar-right">
-				<sec:authorize access="!isAuthenticated()">
-					<li><a href="<c:url value="/login" />">Login</a></li>
-					<li><a href="<c:url value="/users/new" />">Register</a></li>
-				</sec:authorize>
 				<sec:authorize access="hasAnyAuthority('admin')">
 				<li class="dropdown"><a  class="dropdown-toggle"
 						data-toggle="dropdown"> 
-						<span class="glyphicon glyphicon-user"></span>
-							<strong>Game</strong> <span
+						<span class="glyphicon glyphicon-asterisk"></span>
+							Game <span
 							class="glyphicon glyphicon-chevron-down"></span>
 					</a>
 						<ul class="dropdown-menu">
@@ -79,7 +69,7 @@
 										
 											<p class="text-center">
 												<a href="<c:url value="/runningGames" />">
-												<span class="glyphicon glyphicon-user icon-size">Running Game</span>
+												<span class="glyphicon glyphicon-play icon-size">Running Game</span>
 												</a>
 											</p>
 										
@@ -94,7 +84,7 @@
 										
 											<p class="text-center">
 												<a href="<c:url value="/terminateGames" />">
-												<span class="glyphicon glyphicon-user icon-size">Terminate Game</span>
+												<span class="glyphicon glyphicon-pause icon-size">Terminate Game</span>
 												</a>
 											</p>
 										
@@ -105,6 +95,18 @@
 
 						</ul></li>
 				</sec:authorize>
+
+			</ul>
+
+
+
+
+			<ul class="nav navbar-nav navbar-right">
+				<sec:authorize access="!isAuthenticated()">
+					<li><a href="<c:url value="/login" />">Login</a></li>
+					<li><a href="<c:url value="/users/new" />">Register</a></li>
+				</sec:authorize>
+
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a  class="dropdown-toggle"
 						data-toggle="dropdown"> 

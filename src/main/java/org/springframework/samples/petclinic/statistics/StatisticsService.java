@@ -1,5 +1,7 @@
 package org.springframework.samples.petclinic.statistics;
 
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
@@ -14,6 +16,11 @@ public class StatisticsService {
   @Autowired
   public StatisticsService(StatisticsRepository statisticsRepository) {
     this.statisticsRepository = statisticsRepository;
+  }
+  
+  @Transactional(readOnly = true)
+  public List<Statistics> findAll() {
+    return statisticsRepository.findAll();
   }
 
   @Transactional(readOnly = true)
@@ -52,6 +59,14 @@ public class StatisticsService {
     Integer currentPoints = playerStats.getPoints();
     playerStats.setPoints(currentPoints + points);
     statisticsRepository.save(playerStats); 
+  }
+
+  public List<Statistics> getRanking() {
+
+    List<Statistics> stats = findAll();
+    Collections.sort(stats, Comparator.comparing(x -> x.getNumPlayedGames()));
+    return stats;
+
   }
 
 }

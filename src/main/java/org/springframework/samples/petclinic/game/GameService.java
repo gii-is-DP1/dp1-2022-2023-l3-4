@@ -1,13 +1,10 @@
 
 package org.springframework.samples.petclinic.game;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.card.Card;
@@ -180,28 +177,6 @@ public class GameService {
 					} 
 				}
 				return classification;
-		}
-
-		public Map<GamePlayer, Integer> getRanking() {
-			List<GamePlayer> gpWinners = new ArrayList<>();
-			for (Game g: listGames()) {
-				GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
-				gpWinners.add(gp);
-			}
-
-			Map<GamePlayer, Integer> gpWins = new HashMap<>();
-			for (GamePlayer gp: gpWinners) {
-				if (gpWins.containsKey(gp)) {
-					gpWins.put(gp, gpWins.get(gp) + 1);
-				} else {
-					gpWins.put(gp, 1);
-				}
-			}
-
-			gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
-			return gpWins;
-			// return new ArrayList<>(gpWins.keySet());
-
 		}
 
 }

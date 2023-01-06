@@ -72,6 +72,9 @@ INSERT INTO game_players(id, player_id) VALUES (5,5);
 -- Room
 INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,1);
 
+-- Room
+INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,1);
+
 -- Games
 
 INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (1,6000000000,'2022-02-01 15:15:15',FALSE,4,1);

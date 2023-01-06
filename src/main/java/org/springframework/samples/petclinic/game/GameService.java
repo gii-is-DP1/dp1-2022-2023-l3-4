@@ -51,6 +51,11 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
+	public List<Game> findGamesByGameplayer(GamePlayer gamePlayer) {
+		return gameRepository.findGamesByGameplayer(gamePlayer);
+	}
+
+	@Transactional(readOnly = true)
 	public Collection<Game> listRunningGames(){
 		return gameRepository.findRunningGames();
 	}

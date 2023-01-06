@@ -33,8 +33,7 @@ import lombok.Setter;
 @Table(name = "gamePlayers")
 public class GamePlayer extends BaseEntity {
 	private Boolean winner;
-	private Boolean host;
-
+    
     @OneToOne
     private Player player;
     
@@ -53,7 +52,6 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        this.host=false;
         this.winner=false;
     }
 

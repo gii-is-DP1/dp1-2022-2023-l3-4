@@ -36,7 +36,7 @@ public class GamePlayer extends BaseEntity {
 	private Boolean winner;
 	private Boolean host;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player player;
     

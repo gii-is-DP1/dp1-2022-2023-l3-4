@@ -47,6 +47,9 @@ public class PlayerControllerTest {
     private GameService gameService;
 
     @MockBean
+    private GameService gameService;
+
+    @MockBean
     private AuthenticationService authenticationService;
 
     @MockBean

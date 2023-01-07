@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -48,13 +49,15 @@ public class UserController {
 
 	private UserService userService;
 	private PlayerService playerService;
+	private GamePlayerService gamePlayerService;
 	private StatisticsService statisticsService;
 	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
 		this.userService = userService;
 		this.playerService = playerService;
+		this.gamePlayerService = gamePlayerService;
 		this.statisticsService = statisticsService;
 		this.authoritiesService = authoritiesService;
 	}
@@ -77,8 +80,9 @@ public class UserController {
 			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
-			//creating player, user, and authority
+			//creating player, gamePlayer, user, and authority
 			this.playerService.savePlayer(player);
+			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 			this.userService.saveUser(player.getUser());
 			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
 			statisticsService.saveStatisticsForNewPlayer(player);

@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -53,7 +54,7 @@ public class Game extends BaseEntity {
 	private List<Card> cards;
 
 	@Size(min=2, max=6)
-	@OneToMany
+	@ManyToMany
 	private List<GamePlayer> gamePlayer;
 
 	public List<Card> baraja(){

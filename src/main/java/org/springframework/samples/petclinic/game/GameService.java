@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
@@ -44,6 +46,16 @@ public class GameService {
 	public List<Game> listGames(){
 		return gameRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public List<Game> findGamesByGameplayer(GamePlayer gamePlayer) {
+		return gameRepository.findGamesByGameplayer(gamePlayer);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Game> findGamesByGameplayerPaged(GamePlayer gamePlayer, Pageable page) {
+		return gameRepository.findGamesByGameplayerPaged(gamePlayer, page);
+	}	
 
 	@Transactional(readOnly = true)
 	public Collection<Game> listRunningGames(){
@@ -314,8 +326,7 @@ public class GameService {
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
+			GamePlayer gp = findGamePlayerByPlayer(p);
 			gp.setCards(new ArrayList<>());
 			gamePlayers.add(gp);
 			gamePlayerService.save(gp);
@@ -359,13 +370,19 @@ public class GameService {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
-		Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
+    game.getCards().stream().forEach(c -> {
+			c.discard();
+			cardService.save(c);
+		} );
+
+    Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
 		wonPlayer.setNumWonGames(wonPlayer.getNumWonGames() + 1);
 		try {
 			statisticsService.save(wonPlayer);
 		} catch (Exception e) {
 			throw new WonPlayedGamesException();
 		}
+    
 		save(game);
 	}
 }

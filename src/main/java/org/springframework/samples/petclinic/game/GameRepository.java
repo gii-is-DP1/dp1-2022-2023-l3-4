@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -39,4 +41,10 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
     
     @Query("SELECT g FROM Game g WHERE g.isRunning = false")
     public Collection<Game> findTerminategGames();
+
+    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer")
+    List<Game> findGamesByGameplayer(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer")
+    Page<Game> findGamesByGameplayerPaged(@Param(value = "gamePlayer") GamePlayer gamePlayer, Pageable page);
 }

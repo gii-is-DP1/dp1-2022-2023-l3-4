@@ -200,7 +200,7 @@ public class GameController {
 			@PathVariable("target1") Integer targetC, @PathVariable("target2") Integer targetC2, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.TRANSPLANT)) {
-			return playTransplant(gameId, targetC, targetC2);
+			return playTransplant(gameId, targetC, targetC2, cardId);
 		}
 		
 		return muestraVista(gameId, model);
@@ -289,18 +289,24 @@ public class GameController {
 	}
 
 	//Jugar transplante (Añadir restricción de no quedarse con dos órganos iguales en el cuerpo)
-	public String playTransplant(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
+	public String playTransplant(int gameId, Integer c1_id, Integer c2_id, Integer transplantId){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
-		if(c1.isPresent() && c2.isPresent()){
+		Optional<Card> transplantCard = cardService.findCard(transplantId);
+		if(c1.isPresent() && c2.isPresent() && transplantCard.isPresent()){
 			Card c_organ1 = c1.get();
 			Card c_organ2 = c2.get();
+			Card transplant = transplantCard.get();
 			GamePlayer g1 = c_organ1.getGamePlayer();
 			GamePlayer g2 = c_organ2.getGamePlayer();
 				try{
 					gameService.changeCards(g1,g2,c_organ1,c_organ2);
 					gamePlayerService.save(g1);
 					gamePlayerService.save(g2);	
+					cardService.save(c_organ1);	
+					cardService.save(c_organ2);
+					transplant.discard();
+					cardService.save(transplant);
 					return turn(gameId);
 				}catch(IllegalArgumentException e){
 					return "todo";

@@ -158,6 +158,26 @@
                       </td>
                     </tr>
                   </c:forEach>
+                  <tr>
+                    <td>
+                      <c:if test="${currentPage < totalPages - 1 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage + 1}" htmlEscape="true"/>'>
+                          <button>
+                            Next page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                    <td>
+                      <c:if test="${currentPage > 0 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage - 1}" htmlEscape="true"/>'>
+                          <button>
+                            Previous page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                  </tr>
                 </tbody>
             </c:when>
             <c:otherwise>

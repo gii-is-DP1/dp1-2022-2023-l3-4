@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
@@ -46,6 +48,11 @@ public class GameService {
 	public List<Game> findGamesByGameplayer(GamePlayer gamePlayer) {
 		return gameRepository.findGamesByGameplayer(gamePlayer);
 	}
+
+	@Transactional(readOnly = true)
+	public Page<Game> findGamesByGameplayerPaged(GamePlayer gamePlayer, Pageable page) {
+		return gameRepository.findGamesByGameplayerPaged(gamePlayer, page);
+	}	
 
 	@Transactional(readOnly = true)
 	public Collection<Game> listRunningGames(){

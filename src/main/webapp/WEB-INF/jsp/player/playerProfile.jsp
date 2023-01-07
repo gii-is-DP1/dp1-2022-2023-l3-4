@@ -126,7 +126,7 @@
           <c:choose>
             <c:when test="${games.size() > 0}">
                 <thead>
-                  <th>Game</th><th>Initial Hour</th><th>Duration</th><th></th>
+                  <th>Game</th><th>Initial Hour</th><th>Duration</th><th>Players</th><th>Rounds</th><th></th>
                 </thead>
                 <tbody>
                   <c:forEach items="${games}" var="game">
@@ -141,8 +141,14 @@
                         <c:out value="${game.humanReadableDuration()}"/>
                       </td>
                       <td>
+                        <c:out value="${game.gamePlayer.size()}"/>
+                      </td>
+                      <td>
+                        <c:out value="${game.round}"/>
+                      </td>
+                      <td>
                         <c:choose>
-                          <c:when test="${game.gamePlayer.get(game.gamePlayer.indexOf(gameplayer)).isWinner()}">
+                          <c:when test="${game.classification.get(1).get(0).equals(gamePlayer)}">
                             WIN
                           </c:when>
                           <c:otherwise>
@@ -152,6 +158,26 @@
                       </td>
                     </tr>
                   </c:forEach>
+                  <tr>
+                    <td>
+                      <c:if test="${currentPage < totalPages - 1 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage + 1}" htmlEscape="true"/>'>
+                          <button>
+                            Next page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                    <td>
+                      <c:if test="${currentPage > 0 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage - 1}" htmlEscape="true"/>'>
+                          <button>
+                            Previous page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                  </tr>
                 </tbody>
             </c:when>
             <c:otherwise>

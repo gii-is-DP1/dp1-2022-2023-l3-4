@@ -116,9 +116,12 @@ public class PlayerController {
     @PostMapping(value="/me/edit")
     public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
-        if (bindingResult.hasErrors()) {
-            model.put("message", "The name cannot be empty");
-            model.put("messageType", "info");
+        if (bindingResult.hasFieldErrors("firstName")) {
+            bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
+        } else if (bindingResult.hasFieldErrors("lastName")) {
+            bindingResult.rejectValue("lastName", "Last name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {

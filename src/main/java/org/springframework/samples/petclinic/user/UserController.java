@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.player.PlayerService;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
@@ -61,7 +62,7 @@ public class UserController {
 	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService, AuthenticationService authenticationService) {
 		this.userService = userService;
 		this.playerService = playerService;
 		this.gamePlayerService = gamePlayerService;

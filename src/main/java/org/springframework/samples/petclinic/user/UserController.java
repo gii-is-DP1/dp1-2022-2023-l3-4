@@ -20,12 +20,14 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +44,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
+	private static final String USERS = "users/listPageableUsers";
 
 	private UserService userService;
 	private PlayerService playerService;
@@ -82,5 +85,13 @@ public class UserController {
 			return "redirect:/";
 		}
 	}
+
+	@GetMapping("/users")
+	public String findAll(ModelMap model) {
+		Page<User> pg = userService.findAll(PageRequest.of(0, 5));
+		model.put("pages", pg);
+		return USERS;
+	} 
+
 
 }

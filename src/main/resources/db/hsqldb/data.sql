@@ -57,17 +57,17 @@ INSERT INTO players(id,first_name,last_name,username,description,status,profile_
 
 -- GamePlayer
 
-INSERT INTO game_players(id,host,winner,player_id) VALUES (1,null,TRUE,1), (2,null,null,2);
+INSERT INTO game_players(id,winner,player_id) VALUES (1,TRUE,1), (2,null,2);
 -- , (3,null,TRUE,3), (4,null,TRUE,4);
 
 -- Games
 
-INSERT INTO games VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
+-- INSERT INTO games(id,duration,initial_hour,is_running,turn,round) VALUES (1,600000000000,'2022-02-01 15:15:15',FALSE,null,null);
 -- INSERT INTO games VALUES (2,500000000000,'2022-05-16 20:20:20',FALSE,null,null);
 
 -- GamePlayerGames
 
-INSERT INTO games_game_player VALUES (1,1), (1,2); --(2,3), (2,4);
+-- INSERT INTO games_game_player VALUES (1,1), (1,2); --(2,3), (2,4);
 
 -- PlayerAchievements
 

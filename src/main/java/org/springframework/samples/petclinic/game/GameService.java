@@ -14,12 +14,12 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.Statistics;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -28,13 +28,15 @@ public class GameService {
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
 	private GenericCardService genericCardService;
+	private StatisticsService statisticsService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService, StatisticsService statisticsService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 		this.genericCardService=genericCardService;
+		this.statisticsService=statisticsService;
 	}
 
 	@Transactional(readOnly = true)
@@ -356,6 +358,7 @@ public class GameService {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
+		Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
 		save(game);
 	}
 

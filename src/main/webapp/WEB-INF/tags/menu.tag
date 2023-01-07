@@ -54,11 +54,13 @@
 				</petclinic:menuItem>
 				</sec:authorize>
 				
+				<sec:authorize access="hasAnyAuthority('player')">
 				<petclinic:menuItem active="${name eq 'ranking'}" url="/ranking/global"
 					title="Top players">
 					<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
 					<span>Ranking</span>
 				</petclinic:menuItem>
+				</sec:authorize>
 
 				<sec:authorize access="hasAnyAuthority('admin')">
 				<li class="dropdown"><a  class="dropdown-toggle"

@@ -360,8 +360,11 @@ public class GameService {
 		game.setClassification(classification);
 		Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
                 wonPlayer.setNumWonGames(wonPlayer.getNunWonGames() + 1))
-                statisticsService.save(wonPlayer);
-		save(game);
+                try {
+                 statisticsService.save(wonPlayer);
+		} catch (Exception e) {
+                  throw new WonPlayedGameException();
+                save(game);
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -354,18 +355,18 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) {
+	public void finishGame(Game game) throws WonPlayedGamesException {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
 		Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
-                wonPlayer.setNumWonGames(wonPlayer.getNunWonGames() + 1))
-                try {
-                 statisticsService.save(wonPlayer);
+		wonPlayer.setNumWonGames(wonPlayer.getNumWonGames() + 1);
+		try {
+			statisticsService.save(wonPlayer);
 		} catch (Exception e) {
-                  throw new WonPlayedGamesException();
-                save(game);
+			throw new WonPlayedGamesException();
+		}
+		save(game);
 	}
-
 }
 

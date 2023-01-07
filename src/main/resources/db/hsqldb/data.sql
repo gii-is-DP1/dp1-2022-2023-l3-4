@@ -9,6 +9,12 @@ INSERT INTO users(username,password,enabled) VALUES ('lucperrom','laquesea',TRUE
 INSERT INTO users(username,password,enabled) VALUES ('juaanjimdel','laquesea2',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('p','p',TRUE);
 INSERT INTO users(username,password,enabled) VALUES ('p1','p1',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p2','p2',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p3','p3',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p4','p4',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p5','p5',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p6','p6',TRUE);
+INSERT INTO users(username,password,enabled) VALUES ('p7','p7',TRUE);
 INSERT INTO authorities(id,username,authority) VALUES (2,'owner1','owner');
 INSERT INTO authorities(id,username,authority) VALUES (11,'josgarber6','player');
 INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player');

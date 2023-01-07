@@ -35,6 +35,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.room.RoomService;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -421,9 +422,15 @@ public class GameController {
 
 	//Clasificación tras la finalización de la partida
 	@GetMapping(value= "/games/{gameId}/classification")
-	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
+	public String classification(@PathVariable("gameId") int gameId, ModelMap model) throws WonPlayedGamesException {
 		Game game = this.gameService.findGame(gameId);
-		if(game.getIsRunning()) gameService.finishGame(game);
+		if(game.getIsRunning()) {
+			try {
+				gameService.finishGame(game);
+			} catch (Exception e) {
+				throw new WonPlayedGamesException();
+			}
+		}
 		model.put("classification", game.getClassification());
 		return "games/classification";
 	}

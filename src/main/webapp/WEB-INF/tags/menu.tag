@@ -103,6 +103,13 @@
 						</ul></li>
 				</sec:authorize>
 
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<petclinic:menuItem active="${name eq 'user'}" url="/users"
+					title="Users">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					<span>Users</span>
+				</petclinic:menuItem>
+				</sec:authorize>
 			</ul>
 
 

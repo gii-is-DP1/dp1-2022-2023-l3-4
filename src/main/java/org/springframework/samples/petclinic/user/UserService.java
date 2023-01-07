@@ -47,11 +47,19 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
+	@Transactional(readOnly = true)
 	public Optional<User> findUser(String username) {
 		return userRepository.findById(username);
 	}
 
+	@Transactional(readOnly = true)
 	public Page<User> findAll(Pageable pageable) {
 		return userRepository.findAll(pageable);
+	}
+
+	@Transactional
+	public void deleteUser(String username) {
+		User user = findUser(username).get();
+		userRepository.delete(user);
 	}
 }

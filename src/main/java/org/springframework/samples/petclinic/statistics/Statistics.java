@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.statistics;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -30,7 +31,7 @@ public class Statistics extends BaseEntity {
   @Min(0)
   private Integer points;
   
-  @OneToOne(optional = false)
+  @OneToOne(optional = false, cascade = CascadeType.ALL)
   @JoinColumn(name = "player_id", referencedColumnName = "id")
   private Player player;
   

@@ -363,7 +363,7 @@ public class GameService {
                 try {
                  statisticsService.save(wonPlayer);
 		} catch (Exception e) {
-                  throw new WonPlayedGameException();
+                  throw new WonPlayedGamesException();
                 save(game);
 	}
 

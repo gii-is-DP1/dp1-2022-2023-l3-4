@@ -35,6 +35,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.room.RoomService;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,10 +55,8 @@ public class GameController {
 	private final CardService cardService;
 	private final AuthenticationService authenticationService;
 
-	public static final String RANKING = "statistics/ranking";
 	public static final String RUNNING_GAMES_LISTING = "games/runningGameListing";
 	public static final String TERMINATE_GAMES_LISTING = "games/terminateGameListing";
-
 
 	@Autowired
 	public GameController(GameService gameService,GamePlayerService gamePlayerService, 
@@ -68,13 +67,6 @@ public class GameController {
 		this.roomService = roomService;
 		this.authenticationService = authenticationService;
 	}
-
-	@GetMapping("/ranking/global")
-  public String getPlayersRanking(ModelMap model) {
-    Map<GamePlayer, Integer> gps = gameService.getRanking();
-    model.put("topGamers", gps);
-    return RANKING;
-  }
 
 	@GetMapping(value = "/game/start/{roomId}")
 	public String init(@PathVariable("roomId") Integer roomId, ModelMap model) {
@@ -209,7 +201,7 @@ public class GameController {
 			@PathVariable("target1") Integer targetC, @PathVariable("target2") Integer targetC2, ModelMap model) {
 		Card card = cardService.findCard(cardId).get();
 		if(card.getType().getType().equals(GenericCard.Type.TRANSPLANT)) {
-			return playTransplant(gameId, targetC, targetC2);
+			return playTransplant(gameId, targetC, targetC2, cardId);
 		}
 		
 		return muestraVista(gameId, model);
@@ -258,7 +250,7 @@ public class GameController {
 				cardService.infect(c_organ, c_virus);
 				cardService.save(c_virus);
 				cardService.save(c_organ);
-				if(old_card!=null)cardService.save(c_organ);
+				if(old_card!=null)cardService.save(old_card);
 				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "TODO";
@@ -274,11 +266,18 @@ public class GameController {
 	public String playVaccine(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
+		Card old_virus = null;
 		if(c1.isPresent() && c2.isPresent()){
 			Card c_vaccine = c1.get();
 			Card c_organ = c2.get();
 			try{
+				if(c_organ.getVirus().size()==1){
+					old_virus=c_organ.getVirus().get(0);
+				}
 				cardService.vaccinate(c_organ, c_vaccine);
+				cardService.save(c_vaccine);
+				cardService.save(c_organ);
+				if(old_virus!=null) cardService.save(old_virus);
 				return turn(gameId);
 			}catch(IllegalArgumentException e){
 				return "todo";
@@ -291,16 +290,24 @@ public class GameController {
 	}
 
 	//Jugar transplante (Añadir restricción de no quedarse con dos órganos iguales en el cuerpo)
-	public String playTransplant(@PathVariable("gameId") int gameId, Integer c1_id, Integer c2_id){
+	public String playTransplant(int gameId, Integer c1_id, Integer c2_id, Integer transplantId){
 		Optional<Card> c1 = cardService.findCard(c1_id);
 		Optional<Card> c2 = cardService.findCard(c2_id);
-		if(c1.isPresent() && c2.isPresent()){
+		Optional<Card> transplantCard = cardService.findCard(transplantId);
+		if(c1.isPresent() && c2.isPresent() && transplantCard.isPresent()){
 			Card c_organ1 = c1.get();
 			Card c_organ2 = c2.get();
+			Card transplant = transplantCard.get();
 			GamePlayer g1 = c_organ1.getGamePlayer();
 			GamePlayer g2 = c_organ2.getGamePlayer();
 				try{
 					gameService.changeCards(g1,g2,c_organ1,c_organ2);
+					gamePlayerService.save(g1);
+					gamePlayerService.save(g2);	
+					cardService.save(c_organ1);	
+					cardService.save(c_organ2);
+					transplant.discard();
+					cardService.save(transplant);
 					return turn(gameId);
 				}catch(IllegalArgumentException e){
 					return "todo";
@@ -340,7 +347,7 @@ public class GameController {
 			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
 			GamePlayer gamePlayer1 = authenticationService.getGamePlayer();
 			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
-			gameService.infection(card, gamePlayer1, gamePlayer2);
+			gameService.infection(gamePlayer1, gamePlayer2);
 			gamePlayerService.save(gamePlayer1);
 			gamePlayerService.save(gamePlayer2);
 			return turn(gameId);
@@ -417,7 +424,13 @@ public class GameController {
 	@GetMapping(value= "/games/{gameId}/classification")
 	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGame(gameId);
-		if(game.getIsRunning()) gameService.finishGame(game);
+		if(game.getIsRunning())
+			try {
+				gameService.finishGame(game);
+			} catch (WonPlayedGamesException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		model.put("classification", game.getClassification());
 		return "games/classification";
 	}

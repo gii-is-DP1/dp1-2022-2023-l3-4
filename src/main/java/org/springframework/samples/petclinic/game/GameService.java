@@ -2,17 +2,11 @@
 package org.springframework.samples.petclinic.game;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
@@ -22,12 +16,13 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.Statistics;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -36,19 +31,31 @@ public class GameService {
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
 	private GenericCardService genericCardService;
+	private StatisticsService statisticsService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService, StatisticsService statisticsService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 		this.genericCardService=genericCardService;
+		this.statisticsService=statisticsService;
 	}
 
 	@Transactional(readOnly = true)
 	public List<Game> listGames(){
 		return gameRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public List<Game> findGamesByGameplayer(GamePlayer gamePlayer) {
+		return gameRepository.findGamesByGameplayer(gamePlayer);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Game> findGamesByGameplayerPaged(GamePlayer gamePlayer, Pageable page) {
+		return gameRepository.findGamesByGameplayerPaged(gamePlayer, page);
+	}	
 
 	@Transactional(readOnly = true)
 	public Collection<Game> listRunningGames(){
@@ -163,9 +170,7 @@ public class GameService {
 					else if(c_organ2.getVirus().size()==1){
 						Card virus2 = c_organ2.getVirus().get(0);
 						cardService.changeGamePlayer(virus2, g2, g1);
-					}
-					gamePlayerService.save(g1);
-					gamePlayerService.save(g2);				
+					}			
 				
 			}else{
 				throw new IllegalArgumentException("No pueden quedar cuerpos con órganos repetidos");
@@ -206,32 +211,33 @@ public class GameService {
 			}
 	}
 
-	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
 		List<Card> infectedCards = new ArrayList<>();
 		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
+			if (c.getType().getType() == Type.VIRUS) {
 				infectedCards.add(c);
 			}
 		}
-		gamePlayer1.getCards().remove(card);
-		for (Card infectedCard : infectedCards) {
+		
 		//Comprobar si se pueden infectar sus organos
 			List<Card> body = gamePlayer2.getBody();
 			for (Card c : body) {
-				if (c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
-					gamePlayer1.getCards().remove(infectedCard);
-					infectedCard.setGamePlayer(gamePlayer2);
-					c.getVirus().add(infectedCard);
-					infectedCard.setCardVirus(c);
-					cardService.save(c);
-					cardService.save(infectedCard);
-					break;
+				for (Card infectedCard : infectedCards) {
+					if (c.getVaccines().size()==0) {
+						if (c.getType().getColour() == infectedCard.getType().getColour() 
+							&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0) {
+						gamePlayer1.getCards().remove(infectedCard);
+						infectedCard.setGamePlayer(gamePlayer2);
+						gamePlayer2.getCards().add(infectedCard);
+						c.getVirus().add(infectedCard);
+						} else {
+							throw new IllegalArgumentException("No se puede infectar un órgano no libre.");
+						}
+					} else {
+						throw new IllegalArgumentException("No se puede infectar un órgano inmunizado.");
 				}
 			}
 		}
-		card.discard();
-		cardService.save(card);
 	}
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {
@@ -309,28 +315,6 @@ public class GameService {
 				}
 				return classification;
 		}
-
-	public Map<GamePlayer, Integer> getRanking() {
-		List<GamePlayer> gpWinners = new ArrayList<>();
-		for (Game g: listGames()) {
-			GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
-			gpWinners.add(gp);
-		}
-
-		Map<GamePlayer, Integer> gpWins = new HashMap<>();
-		for (GamePlayer gp: gpWinners) {
-			if (gpWins.containsKey(gp)) {
-				gpWins.put(gp, gpWins.get(gp) + 1);
-			} else {
-				gpWins.put(gp, 1);
-			}
-		}
-
-		gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
-		return gpWins;
-		// return new ArrayList<>(gpWins.keySet());
-
-	}
 	
 	@Transactional(readOnly = false)
 	public Game startGame(Room room) {
@@ -347,8 +331,7 @@ public class GameService {
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
+			GamePlayer gp = findGamePlayerByPlayer(p);
 			gp.setCards(new ArrayList<>());
 			gamePlayers.add(gp);
 			gamePlayerService.save(gp);
@@ -388,12 +371,25 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) {
+	public void finishGame(Game game) throws WonPlayedGamesException {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
+		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
+    	game.getCards().stream().forEach(c -> {
+			c.setGamePlayer(null);
+			cardService.save(c);
+		} );
+
+    Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
+		wonPlayer.setNumWonGames(wonPlayer.getNumWonGames() + 1);
+		try {
+			statisticsService.save(wonPlayer);
+		} catch (Exception e) {
+			throw new WonPlayedGamesException();
+		}
+    
 		save(game);
 	}
-
 }
 

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.springframework.samples.petclinic.card.Card;
@@ -30,11 +31,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "gamePlayers")
+@Table(name = "game_players")
 public class GamePlayer extends BaseEntity {
 	private Boolean winner;
-    
+	private Boolean host;
+
     @OneToOne
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player player;
     
 
@@ -52,6 +55,7 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
+        this.host=false;
         this.winner=false;
     }
 

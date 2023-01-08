@@ -370,7 +370,8 @@ public class GameService {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
-    game.getCards().stream().forEach(c -> {
+		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
+    	game.getCards().stream().forEach(c -> {
 			c.discard();
 			cardService.save(c);
 		} );

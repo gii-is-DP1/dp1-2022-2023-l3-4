@@ -64,22 +64,22 @@ INSERT INTO game_players(id, player_id) VALUES (4,4);
 INSERT INTO game_players(id, player_id) VALUES (5,5);
 
 -- Room
-INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,1);
+INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,5);
 
 -- Games
 
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (1,6000000000,'2022-02-01 15:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (2,6000000000,'2022-02-01 16:15:15',FALSE,3,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (3,6000000000,'2022-02-01 17:15:15',FALSE,5,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (4,6000000000,'2022-02-01 18:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (5,6000000000,'2022-02-01 19:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (6,6000000000,'2022-02-01 20:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (7,6000000000,'2022-02-02 15:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (8,6000000000,'2022-02-02 16:15:15',FALSE,3,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (9,6000000000,'2022-02-02 17:15:15',FALSE,5,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (10,6000000000,'2022-02-02 18:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (11,6000000000,'2022-02-02 19:15:15',FALSE,4,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id) VALUES (12,6000000000,'2022-02-02 20:15:15',FALSE,4,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (1,6000000000,'2022-02-01 15:15:15',FALSE,4,1,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (2,6000000000,'2022-02-01 16:15:15',FALSE,3,1,2);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (3,6000000000,'2022-02-01 17:15:15',FALSE,5,1,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (4,6000000000,'2022-02-01 18:15:15',FALSE,4,1,2);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (5,6000000000,'2022-02-01 19:15:15',FALSE,4,1,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (6,6000000000,'2022-02-01 20:15:15',FALSE,4,1,3);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (7,6000000000,'2022-02-02 15:15:15',FALSE,4,1,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (8,6000000000,'2022-02-02 16:15:15',FALSE,3,1,2);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (9,6000000000,'2022-02-02 17:15:15',FALSE,5,1,3);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (10,6000000000,'2022-02-02 18:15:15',FALSE,4,1,1);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (11,6000000000,'2022-02-02 19:15:15',FALSE,4,1,2);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (12,6000000000,'2022-02-02 20:15:15',FALSE,4,1,2);
 
 
 -- GamePlayerGames

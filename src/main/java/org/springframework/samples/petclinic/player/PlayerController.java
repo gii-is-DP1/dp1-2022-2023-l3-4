@@ -30,8 +30,6 @@ import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.statistics.Statistics;
-import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
@@ -54,7 +52,6 @@ public class PlayerController {
 
 
     private PlayerService playerService;
-    private StatisticsService statisticsService;
     private GameService gameService;
     private AuthenticationService authenticationService;
     private FriendService friendService;
@@ -66,9 +63,8 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as, FriendService fs, GameService gs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs) {
         this.playerService = ps;
-        this.statisticsService = ss;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
@@ -78,7 +74,6 @@ public class PlayerController {
     @GetMapping("/me")
         public String listPlayerStatistics(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
         Player player = authenticationService.getPlayer();
-        Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
         Pageable pageable = null;
         if(page == null || page == 0) {
             pageable = PageRequest.of(0, 10, Sort.by(Order.desc("initialHour")));
@@ -87,10 +82,13 @@ public class PlayerController {
         }
 
         GamePlayer gp = authenticationService.getGamePlayer();
+        Integer numGamesPlayed = gameService.getNumGamesPlayed(gp);
+        Integer numGamesWon = gameService.getNumGamesWon(gp);
         Page<Game> games = gameService.findGamesByGameplayerPaged(gp, pageable);
         Duration totalTimePlayed = games.stream().map(x -> x.getDuration()).reduce((x,y) -> x.plus(y)).orElse(Duration.ZERO);
        
-        model.put("statistics", playerStatistics);
+        model.put("numGamesPlayed",numGamesPlayed);
+        model.put("numGamesWon",numGamesWon);
         model.put("player", player);
         model.put("gameplayer", gp);
         model.put("games", games.getContent());

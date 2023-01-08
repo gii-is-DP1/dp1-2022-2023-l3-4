@@ -25,9 +25,6 @@ public class StatisticsControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
-
-  @MockBean
-  private StatisticsService statisticsService;
   
   @MockBean
   private AuthenticationService authenticationService;

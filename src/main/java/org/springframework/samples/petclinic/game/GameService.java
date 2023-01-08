@@ -91,8 +91,21 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
+	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
+		Game game = findGame(gameId);
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(g);
+		return isYourTurn;
+	}
+
+	@Transactional(readOnly = true)
 	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
+	}
+
+	@Transactional(readOnly = true)
+	public Game getRunningGame(Room room) {
+		return gameRepository.findAnyRunningGame(room);
 	}
 
 	@Transactional
@@ -158,9 +171,7 @@ public class GameService {
 					
 					
 				}else{
-					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
-					model.put("messageType", "info");
-					throw new IllegalArgumentException();		
+					throw new IllegalArgumentException("You can't add two " + organ.getType().getColour() + " organs to a body");		
 				}			
 		}
 
@@ -190,15 +201,15 @@ public class GameService {
 					}			
 				
 			}else{
-				throw new IllegalArgumentException("No pueden quedar cuerpos con órganos repetidos");
+				throw new IllegalArgumentException("A body can't have repeated organs.");
 			}
 
 			}else{
-				throw new IllegalArgumentException("No se pueden intercambiar órganos imnunizados");
+				throw new IllegalArgumentException("You can't exchange immunized organs.");
 				
 			}
 	} else{
-		throw new IllegalArgumentException("Solo se pueden intercambiar órganos");
+		throw new IllegalArgumentException("You can only exchange organs.");
 	}
 			}
 
@@ -248,10 +259,10 @@ public class GameService {
 						gamePlayer2.getCards().add(infectedCard);
 						c.getVirus().add(infectedCard);
 						} else {
-							throw new IllegalArgumentException("No se puede infectar un órgano no libre.");
+							throw new IllegalArgumentException("You can't infect an already infected organ.");
 						}
 					} else {
-						throw new IllegalArgumentException("No se puede infectar un órgano inmunizado.");
+						throw new IllegalArgumentException("You can't infect an immunized organ.");
 				}
 			}
 		}

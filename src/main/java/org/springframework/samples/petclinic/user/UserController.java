@@ -146,9 +146,6 @@ public class UserController {
 
 		String message;
     try {
-			Player playerToDelete = playerService.getPlayerByUsername(username);
-			GamePlayer gpToDelete = gamePlayerService.getGamePlayerByPlayer(playerToDelete);
-			gamePlayerService.deleteGamePlayer(gpToDelete);
       userService.deleteUser(username);
       message = "User " + username + " succesfully deleted";
     } catch (EmptyResultDataAccessException e) {

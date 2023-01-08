@@ -62,7 +62,7 @@ public class UserController {
 	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService, AuthenticationService authenticationService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService) {
 		this.userService = userService;
 		this.playerService = playerService;
 		this.gamePlayerService = gamePlayerService;

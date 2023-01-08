@@ -23,6 +23,7 @@
         <tr>
             <th>User Name:</th>
             <th></th>
+            <th> Status</th>
         </tr>
         </thead>
         <tbody>
@@ -35,6 +36,10 @@
                     <a href="${playerAuth.id}/delete/${friend.id}">
                         <input type="button" value="Delete" class="btn btn-danger" />
                     </a>
+                </td>
+                <td>
+                    <c:if test="${friend.status==true}">Online</c:if>
+                        <c:if test="${friend.status==false}">Offline</c:if>
                 </td>
             </tr>
         </c:forEach>

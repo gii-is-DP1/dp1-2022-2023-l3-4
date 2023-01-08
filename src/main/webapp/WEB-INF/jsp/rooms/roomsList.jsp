@@ -37,7 +37,7 @@
                 </td>
                 <td>
                     <form>
-                        <option id="roomPassword">${room.password}</option> 
+                        <option id="roomPassword" value="${room.password}"></option> 
                         <c:choose>
                         <c:when test="${room.isPrivate}">
                             <label for="pswd">Enter your password: </label> 
@@ -55,8 +55,6 @@
                         function checkPswd() {
                             var confirmPassword = document.getElementById("roomPassword").value;
                             var password = document.getElementById("pswd").value;
-                            console.log(password);
-                            console.log(confirmPassword);
                             if (password == confirmPassword) {
                                 window.location.href="/room/${room.id}";
                             }

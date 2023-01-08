@@ -23,9 +23,7 @@
             </tr>
             <tr>
                 <td>
-                    <c:if test="${isYourTurn}">
-                        <button class="btn btn-default" type="submit">Discard</button>
-                    </c:if>
+                  <button class="btn btn-default" type="submit">Discard</button>
                 </td>
             </tr>
         </form:form>

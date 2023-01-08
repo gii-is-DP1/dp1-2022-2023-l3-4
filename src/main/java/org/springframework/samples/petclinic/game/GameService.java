@@ -16,12 +16,13 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.Statistics;
+import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -30,13 +31,15 @@ public class GameService {
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
 	private GenericCardService genericCardService;
+	private StatisticsService statisticsService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService, StatisticsService statisticsService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 		this.genericCardService=genericCardService;
+		this.statisticsService=statisticsService;
 	}
 
 	@Transactional(readOnly = true)
@@ -363,16 +366,24 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) {
+	public void finishGame(Game game) throws WonPlayedGamesException {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
-		game.getCards().stream().forEach(c -> {
+    game.getCards().stream().forEach(c -> {
 			c.discard();
 			cardService.save(c);
 		} );
+
+    Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
+		wonPlayer.setNumWonGames(wonPlayer.getNumWonGames() + 1);
+		try {
+			statisticsService.save(wonPlayer);
+		} catch (Exception e) {
+			throw new WonPlayedGamesException();
+		}
+    
 		save(game);
 	}
-
 }
 

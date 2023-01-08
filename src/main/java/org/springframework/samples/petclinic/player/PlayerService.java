@@ -19,6 +19,9 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.game.GameService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayerService {
 
     private PlayerRepository playerRepository;
+    private GamePlayerService gamePlayerService;
+    private GameService gameService;
     
 
     @Autowired
-    public PlayerService(PlayerRepository playerRepository){
+    public PlayerService(PlayerRepository playerRepository, GamePlayerService gamePlayerService, GameService gameService){
         this.playerRepository = playerRepository;
+        this.gamePlayerService = gamePlayerService;
+        this.gameService = gameService;
     }
 
     @Transactional
@@ -69,6 +76,11 @@ public class PlayerService {
 
     @Transactional
     public void deletePlayer(Player player) {
+        GamePlayer gp = gameService.findGamePlayerByPlayer(player);
+        if (gp != null) {
+            gp.setPlayer(null);
+            gamePlayerService.deleteGamePlayer(gp);
+        }
         playerRepository.delete(player);
     }
 

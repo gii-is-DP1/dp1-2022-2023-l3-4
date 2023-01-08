@@ -73,7 +73,7 @@ INSERT INTO game_players(id, player_id) VALUES (5,5);
 INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,5);
 
 -- Room
-INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,1);
+-- INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,'prueba',FALSE,1);
 
 -- Games
 

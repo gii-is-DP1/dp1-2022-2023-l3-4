@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
 import org.springframework.samples.petclinic.player.Player;
@@ -45,6 +46,8 @@ public class GamePlayer extends BaseEntity {
     @JsonIgnore
     private List<Card> cards;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
+    private Set<Game> games;
 
     public GamePlayer(){
         
@@ -55,8 +58,8 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        this.host=false;
-        this.winner=false;
+        // this.host=false;
+        // this.winner=false;
     }
 
     public List<Card> getBody(){

@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
@@ -61,15 +60,13 @@ public class UserController {
 	private PlayerService playerService;
 	private GamePlayerService gamePlayerService;
 	private AuthoritiesService authoritiesService;
-	private AuthenticationService authenticationService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService, AuthenticationService authenticationService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService) {
 		this.userService = userService;
 		this.playerService = playerService;
 		this.gamePlayerService = gamePlayerService;
 		this.authoritiesService = authoritiesService;
-		this.authenticationService = authenticationService;
 	}
 
 	@InitBinder
@@ -94,7 +91,8 @@ public class UserController {
 			this.playerService.savePlayer(player);
 			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 			this.userService.saveUser(player.getUser());
-			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			return "redirect:/";
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+			return "redirect:/";
 		}
 	}
 
@@ -149,9 +147,9 @@ public class UserController {
 
 		String message;
     try {
-			Player playerToDelete = playerService.getPlayerByUsername(username);
-			GamePlayer gpToDelete = gamePlayerService.getGamePlayerByPlayer(playerToDelete);
-			gamePlayerService.deleteGamePlayer(gpToDelete);
+			// Player playerToDelete = playerService.getPlayerByUsername(username);
+			// GamePlayer gpToDelete = gamePlayerService.getGamePlayerByPlayer(playerToDelete);
+			// gamePlayerService.deleteGamePlayer(gpToDelete);
       userService.deleteUser(username);
       message = "User " + username + " succesfully deleted";
     } catch (EmptyResultDataAccessException e) {
@@ -159,7 +157,7 @@ public class UserController {
     }
     model.put("message", message);
     model.put("messageType", "info");
-    return "redirect:/user";
+    return "redirect:/users";
 	}
 
 

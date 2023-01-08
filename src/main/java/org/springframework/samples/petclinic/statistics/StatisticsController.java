@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class StatisticsController {
-
-  private StatisticsService statisticsService;
   private AuthenticationService authenticationService;
   private GameService gameService;
   public static final String STATISTICS_LISTING = "player/playerProfile";
@@ -25,8 +23,7 @@ public class StatisticsController {
   public static final String RANKING = "statistics/ranking";
 
   @Autowired
-  public StatisticsController(StatisticsService ss, AuthenticationService as, GameService gs) {
-    this.statisticsService = ss;
+  public StatisticsController(AuthenticationService as, GameService gs) {
     this.authenticationService = as;
     this.gameService = gs;
   }
@@ -47,9 +44,9 @@ public class StatisticsController {
 
   @GetMapping("/ranking/global")
   public String getPlayersRanking(ModelMap model) {
-    List<Statistics> stats = statisticsService.getRanking();
-    List<Statistics> top3 = stats.subList(0, 3);
-    List<Statistics> restOfPlayers = stats.subList(3, stats.size());
+    List<PlayerCount> stats = gameService.getRanking();
+    List<PlayerCount> top3 = stats.subList(0, 3);
+    List<PlayerCount> restOfPlayers = stats.subList(3, stats.size());
     model.put("top3", top3);
     model.put("rops", restOfPlayers);
 
@@ -76,12 +73,12 @@ public class StatisticsController {
     model.put("minDuration", gameService.humanReadableDuration(minDuration));
 
     // Total Games Played
-    Integer totalGamesPlayed = statisticsService.findAll().stream().mapToInt(x -> x.getNumPlayedGames()).sum();
+    Integer totalGamesPlayed = gameService.getTotalGamesPlayed();
     model.put("games", totalGamesPlayed);
 
     // Average games played
-    Double avgGamesPlayed = statisticsService.findAll().stream().mapToInt(x -> x.getNumPlayedGames()).average().getAsDouble();
-    model.put("avgGames", avgGamesPlayed.toString().replace(".0", ""));
+    //Double avgGamesPlayed = statisticsService.findAll().stream().mapToInt(x -> x.getNumPlayedGames()).average().getAsDouble();
+    //model.put("avgGames", avgGamesPlayed.toString().replace(".0", ""));
 
     // Maximum games played
     List<LocalDateTime> gamesDay = gameService.listGames().stream().map(x -> x.getInitialHour()).collect(Collectors.toList());

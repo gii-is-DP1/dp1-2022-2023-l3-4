@@ -18,9 +18,7 @@
           <tbody>
             <c:forEach items="${top3}" var="top">
               <tr>
-                <td>
-                  <c:out value="${top.id}"/>
-                </td>
+                <td><c:out value="${top3.indexOf(top) + 1}"/></td>
                 <td>
                   <c:if test="${top.player.profileImage == ''}"></c:if>
                   <c:if test="${top.player.profileImage != ''}">
@@ -35,7 +33,7 @@
                   <c:out value="${top.numWonGames}"/>
                 </td>
                 <td>
-                  <a href="/request/${top.player.id}">Anyadir amigo</a>
+                  <a href="/request/${top.player.id}">Add Friend</a>
                 </td>
               </tr>
             </c:forEach>
@@ -43,7 +41,7 @@
             <c:forEach items="${rops}" var="rop">
               <tr>
                 <td>
-                  <c:out value="${rop.id + 1}"/>
+                  <c:out value="${rops.indexOf(rop) + 1}"/>
                 </td>
                 <td>
                   <c:if test="${rop.player.profileImage == ''}"></c:if>
@@ -59,7 +57,7 @@
                   <c:out value="${rop.numWonGames}"/>
                 </td>
                 <td>
-                  <a href="/request/${top.player.id}">Anyadir amigo</a>
+                  <a href="/request/${top.player.id}">Add Friend</a>
                 </td>
               </tr>
             </c:forEach>

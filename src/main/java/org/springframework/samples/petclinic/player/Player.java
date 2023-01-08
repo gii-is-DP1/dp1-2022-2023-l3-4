@@ -55,7 +55,7 @@ public class Player extends Person {
 	@Column(name = "profile_image")
 	private String profileImage;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "username", referencedColumnName = "username")
 	private User user;
 

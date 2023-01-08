@@ -30,6 +30,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
@@ -153,6 +154,10 @@ public class UserController {
 
 		String message;
     try {
+			// Player playerToDelete = playerService.getPlayerByUsername(username);
+			// GamePlayer gpToDelete = gamePlayerService.getGamePlayerByPlayer(playerToDelete);
+			// gamePlayerService.deleteGamePlayer(gpToDelete);
+			// playerService.deletePlayer(playerToDelete);
       userService.deleteUser(username);
       message = "User " + username + " succesfully deleted";
     } catch (EmptyResultDataAccessException e) {

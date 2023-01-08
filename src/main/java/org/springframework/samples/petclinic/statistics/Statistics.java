@@ -31,7 +31,7 @@ public class Statistics extends BaseEntity {
   @Min(0)
   private Integer points;
   
-  @OneToOne(optional = false, cascade = CascadeType.ALL)
+  @OneToOne(optional = true, cascade = CascadeType.ALL)
   @JoinColumn(name = "player_id", referencedColumnName = "id")
   private Player player;
   

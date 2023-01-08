@@ -32,6 +32,11 @@ public class GamePlayerService {
 		return gamePlayerRepository.findById(i);
 	}
 
+	@Transactional(readOnly = true)
+	public GamePlayer getGamePlayerByPlayer(Player player) {
+		return gamePlayerRepository.getGamePlayerByPlayer(player);
+	}
+
 	@Transactional
 	public GamePlayer save(GamePlayer gamePlayer){
 		return gamePlayerRepository.save(gamePlayer);
@@ -39,10 +44,15 @@ public class GamePlayerService {
 
 	public GamePlayerService() {}
 
-    public GamePlayer saveGamePlayerForNewPlayer(@Valid Player player) {
+	public GamePlayer saveGamePlayerForNewPlayer(@Valid Player player) {
 		GamePlayer gamePlayer = new GamePlayer();
 		gamePlayer.setPlayer(player);
 		return save(gamePlayer);
-    }
+	}
+
+	@Transactional
+	public void deleteGamePlayer(GamePlayer gamePlayer) {
+		gamePlayerRepository.delete(gamePlayer);
+	}
 	
 }

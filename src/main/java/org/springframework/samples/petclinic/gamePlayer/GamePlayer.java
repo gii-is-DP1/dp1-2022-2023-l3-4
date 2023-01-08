@@ -36,12 +36,12 @@ public class GamePlayer extends BaseEntity {
 	private Boolean winner;
 	private Boolean host;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player player;
     
 
-    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer")
+    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
     @JsonIgnore
     private List<Card> cards;
 

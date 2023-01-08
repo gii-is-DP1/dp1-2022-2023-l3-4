@@ -67,5 +67,10 @@ public class PlayerService {
         return playerRepository.findById(id).get();
     }
 
+    @Transactional
+    public void deletePlayer(Player player) {
+        playerRepository.delete(player);
+    }
+
 
 }

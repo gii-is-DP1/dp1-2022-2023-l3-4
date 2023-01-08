@@ -7,8 +7,6 @@ import java.util.*;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.game.Game;
-import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class GamePlayerService {
 
 	private GamePlayerRepository gamePlayerRepository;
-	private GameService gameService;
 
 
 	@Autowired
-	public GamePlayerService(GamePlayerRepository gamePlayerRepository, GameService gameService) {
+	public GamePlayerService(GamePlayerRepository gamePlayerRepository) {
 		this.gamePlayerRepository = gamePlayerRepository;
-		this.gameService = gameService;
 	}
 	@Transactional(readOnly = true)
 	public List<GamePlayer> findAll(){

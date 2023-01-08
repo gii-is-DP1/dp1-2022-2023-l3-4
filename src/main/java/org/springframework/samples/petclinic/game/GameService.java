@@ -62,6 +62,11 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
+	public Collection<Game> findGameByRoomId(Integer roomId){
+		return gameRepository.findGameByRoomId(roomId);
+	}
+
+	@Transactional(readOnly = true)
 	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
 	}

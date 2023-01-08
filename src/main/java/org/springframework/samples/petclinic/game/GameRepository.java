@@ -39,4 +39,7 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
     
     @Query("SELECT g FROM Game g WHERE g.isRunning = false")
     public Collection<Game> findTerminategGames();
+
+    @Query("SELECT g FROM Game g WHERE g.room.id = :roomId")
+    Collection<Game> findGameByRoomId(@Param(value = "roomId") Integer roomId);
 }

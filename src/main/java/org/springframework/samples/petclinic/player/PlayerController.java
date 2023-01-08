@@ -17,9 +17,6 @@ package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -41,7 +38,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,9 +112,12 @@ public class PlayerController {
     @PostMapping(value="/me/edit")
     public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
-        if (bindingResult.hasErrors()) {
-            model.put("message", "The name cannot be empty");
-            model.put("messageType", "info");
+        if (bindingResult.hasFieldErrors("firstName")) {
+            bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
+        } else if (bindingResult.hasFieldErrors("lastName")) {
+            bindingResult.rejectValue("lastName", "Last name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {

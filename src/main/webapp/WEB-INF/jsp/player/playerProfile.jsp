@@ -126,7 +126,7 @@
           <c:choose>
             <c:when test="${games.size() > 0}">
                 <thead>
-                  <th>Game</th><th>Initial Hour</th><th>Duration</th><th>Players</th><th>Rounds</th><th></th>
+                  <th>Game</th><th>Date</th><th>Duration</th><th>Players</th><th>Rounds</th><th>Cards</th><th></th>
                 </thead>
                 <tbody>
                   <c:forEach items="${games}" var="game">
@@ -147,8 +147,13 @@
                         <c:out value="${game.round}"/>
                       </td>
                       <td>
+                        Organs: <c:out value="${game.numOrgansPlayed()}"/>
+                        Vaccines: <c:out value="${game.numVaccinesPlayed()}"/>
+                        Virus: <c:out value="${game.numVirusPlayed()}"/>
+                      </td>
+                      <td>
                         <c:choose>
-                          <c:when test="${game.classification.get(1).get(0).equals(gamePlayer)}">
+                          <c:when test="${game.winner.equals(gameplayer)}">
                             WIN
                           </c:when>
                           <c:otherwise>

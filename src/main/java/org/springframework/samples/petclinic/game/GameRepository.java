@@ -45,6 +45,6 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
     @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer")
     List<Game> findGamesByGameplayer(@Param(value = "gamePlayer") GamePlayer gamePlayer);
 
-    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer")
+    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer AND g.isRunning = false")
     Page<Game> findGamesByGameplayerPaged(@Param(value = "gamePlayer") GamePlayer gamePlayer, Pageable page);
 }

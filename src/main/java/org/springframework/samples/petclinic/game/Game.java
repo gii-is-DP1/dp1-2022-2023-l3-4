@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -16,6 +15,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.room.Room;
@@ -57,6 +57,9 @@ public class Game extends BaseEntity {
 	@ManyToMany
 	private List<GamePlayer> gamePlayer;
 
+	@ManyToOne(optional = true)
+	private GamePlayer winner;
+
 	public List<Card> baraja(){
 		return getCards().stream().filter(x->!x.getBody() && !x.getPlayed() && x.getGamePlayer()==null).collect(Collectors.toList());
 	}
@@ -79,6 +82,41 @@ public class Game extends BaseEntity {
 
 	public Boolean hasAnyWinners() {
 		return gamePlayer.stream().anyMatch(g -> g.isWinner());
+	}
+
+	public Integer numOrgansPlayed() {
+		if(getCards()==null || getCards().size()==0){
+			return 0;
+		} else {
+			return (int) getCards().stream()
+			.filter(c -> c.getBody())
+			.filter(c -> c.getType().getType().equals(GenericCard.Type.ORGAN))
+			.count();
+		}
+	}
+
+	public Integer numVaccinesPlayed() {
+		if(getCards()==null || getCards().size()==0) {
+			return 0;
+		} else {
+			return (int) getCards().stream()
+			.filter(c -> c.getPlayed())
+			.filter(c -> c.getType().getType().equals(GenericCard.Type.ORGAN))
+			.flatMap(c -> c.getVaccines().stream())
+			.count();
+		}
+	}
+
+	public Integer numVirusPlayed() {
+		if(getCards()==null || getCards().size()==0) {
+			return 0;
+		} else {
+			return (int) getCards().stream()
+			.filter(c -> c.getPlayed())
+			.filter(c -> c.getType().getType().equals(GenericCard.Type.ORGAN))
+			.flatMap(c -> c.getVirus().stream())
+			.count();
+		}
 	}
 
 }

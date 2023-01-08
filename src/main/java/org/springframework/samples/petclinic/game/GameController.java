@@ -472,13 +472,13 @@ public class GameController {
 	@GetMapping(value= "/games/{gameId}/classification")
 	public String classification(@PathVariable("gameId") int gameId, ModelMap model) throws WonPlayedGamesException {
 		Game game = this.gameService.findGame(gameId);
-		if(game.getIsRunning()) {
+		if(game.getIsRunning())
 			try {
 				gameService.finishGame(game);
-			} catch (Exception e) {
-				throw new WonPlayedGamesException();
+			} catch (WonPlayedGamesException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}
 		model.put("classification", game.getClassification());
 		return "games/classification";
 	}

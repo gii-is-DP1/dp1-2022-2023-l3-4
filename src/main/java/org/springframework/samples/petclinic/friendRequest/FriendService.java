@@ -72,4 +72,9 @@ public class FriendService {
     public void deleteFriendById(Integer requestId) throws DataAccessException{
         friendRepository.deleteById(requestId);
     }
+
+    @Transactional
+    public void deleteFriend(Friend friend) throws DataAccessException{
+        friendRepository.delete(friend);
+    }
 }

@@ -344,7 +344,7 @@ public class GameController {
 	
 	public String playInfect(int gameId, Integer g_id, Integer c_id) {
 		try {
-			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
 			GamePlayer gamePlayer1 = authenticationService.getGamePlayer();
 			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
 			gameService.infection(gamePlayer1, gamePlayer2);

@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 
 import java.util.Optional;
 
@@ -42,12 +41,10 @@ import java.util.Optional;
 public class CardService {
 
 	private CardRepository cardRepository;
-	private GamePlayerService gamePlayerService;
 
 	@Autowired
-	public CardService(CardRepository cardRepository, GamePlayerService gamePlayerService) {
+	public CardService(CardRepository cardRepository) {
 		this.cardRepository = cardRepository;
-		this.gamePlayerService = gamePlayerService;
 	}
 
 	@Transactional(readOnly = true)	

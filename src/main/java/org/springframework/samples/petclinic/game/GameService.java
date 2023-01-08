@@ -97,14 +97,6 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
-	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
-		Game game = findGame(gameId);
-		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
-		Boolean isYourTurn = currentTurnGamePlayer.equals(g);
-		return isYourTurn;
-	}
-
-	@Transactional(readOnly = true)
 	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
 	}

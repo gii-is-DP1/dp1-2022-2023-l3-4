@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.statistics.PlayerCount;
 // import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Repository;
@@ -63,5 +64,8 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     @Query("SELECT COUNT(g) FROM Game g WHERE g.isRunning = false")
     Integer totalGamesPlayed();
+
+    @Query("SELECT g FROM Game g WHERE g.room = :room AND g.isRunning = true")
+    Game findAnyRunningGame(@Param(value = "room") Room room);
 
 }

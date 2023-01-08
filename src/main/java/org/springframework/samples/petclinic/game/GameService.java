@@ -372,7 +372,7 @@ public class GameService {
 		game.setClassification(classification);
 		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
     	game.getCards().stream().forEach(c -> {
-			c.discard();
+			c.setGamePlayer(null);
 			cardService.save(c);
 		} );
 

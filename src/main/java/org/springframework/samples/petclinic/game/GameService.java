@@ -2,13 +2,7 @@
 package org.springframework.samples.petclinic.game;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -94,6 +88,14 @@ public class GameService {
 	@Transactional(readOnly = true)
 	public Collection<Game> findGameByRoomId(Integer roomId){
 		return gameRepository.findGameByRoomId(roomId);
+	}
+
+	@Transactional(readOnly = true)
+	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
+		Game game = findGame(gameId);
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(g);
+		return isYourTurn;
 	}
 
 	@Transactional(readOnly = true)
@@ -410,4 +412,3 @@ public class GameService {
 		save(game);
 	}
 }
-

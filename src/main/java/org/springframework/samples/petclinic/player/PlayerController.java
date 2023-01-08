@@ -128,18 +128,18 @@ public class PlayerController {
         return "redirect:/player/me";
     }
 
-    @GetMapping("/createSearch")
+    @GetMapping("/search")
 	public String findPlayer(ModelMap model) {
         Player player = new Player();
 		model.put("player", player);
 		return VIEW_FIND_PLAYER;
 	}
 
-    @PostMapping(value = "/createSearch")
-	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
+    @PostMapping(value = "/search")
+	public String processFindPlayerForm(Player player, BindingResult result, ModelMap model) {
         Player playerAuth = authenticationService.getPlayer();
-		if (player.getUser().getUsername() == null) {
-            User user=player.getUser();
+		if (player.getUser() == null || player.getUser().getUsername() == null) {
+            User user= new User();
             user.setUsername("");
 			player.setUser(user);
 		}

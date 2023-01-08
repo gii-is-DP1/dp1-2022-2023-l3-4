@@ -56,7 +56,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${statistics.numPlayedGames}"/> (<c:out value="${statistics.numWonGames} W - ${statistics.numPlayedGames - statistics.numWonGames} L"/>)
+                    <c:out value="${numGamesPlayed}"/> (<c:out value="${numGamesWon} W - ${numGamesPlayed - numGamesWon} L"/>)
                   </td>
                 </tr>
                 <tr>
@@ -66,7 +66,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${(statistics.numWonGames / statistics.numPlayedGames)*100} %"/>
+                    <c:out value="${(numGamesWon / numGamesPlayed)*100} %"/>
                   </td>
                 </tr>
               </table>
@@ -92,7 +92,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${(statistics.numWonGames / statistics.numPlayedGames)*100} %"/>
+                    <c:out value="${(numWonGames / numPlayedGames)*100} %"/>
                   </td>
                 </tr>
               </table>

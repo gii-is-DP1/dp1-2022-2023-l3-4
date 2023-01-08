@@ -14,8 +14,6 @@ import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.statistics.Statistics;
-import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -45,9 +43,6 @@ public class PlayerControllerTest {
     private PlayerService playerService;
 
     @MockBean
-    private StatisticsService statisticsService;
-
-    @MockBean
     private GameService gameService;
 
     @MockBean
@@ -65,7 +60,6 @@ public class PlayerControllerTest {
         when(authenticationService.getGamePlayer()).thenReturn(mockGamePlayer);
         when(gameService.findGamesByGameplayerPaged(eq(mockGamePlayer), any())).thenReturn(mockGames);
         when(gameService.humanReadableDuration(any())).thenReturn("string");
-        when(statisticsService.findPlayerStatistics(mockPlayer)).thenReturn(new Statistics());
     }
     
     @WithMockUser
@@ -77,7 +71,6 @@ public class PlayerControllerTest {
             .andExpect(model().attributeExists("player"))
             .andExpect(model().attributeExists("gameplayer"))
             .andExpect(model().attributeExists("games"))
-            .andExpect(model().attributeExists("statistics"))
             .andExpect(model().attributeExists("currentPage"))
             .andExpect(model().attributeExists("totalPages"))
             .andExpect(model().attributeExists("statistics"))

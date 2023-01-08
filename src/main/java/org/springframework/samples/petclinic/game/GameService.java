@@ -23,8 +23,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
-import org.springframework.samples.petclinic.statistics.Statistics;
-import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.statistics.PlayerCount;
 import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,15 +37,13 @@ public class GameService {
 	private CardService cardService;
 	private GamePlayerService gamePlayerService;
 	private GenericCardService genericCardService;
-	private StatisticsService statisticsService;
 
 	@Autowired
-	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService, StatisticsService statisticsService) {
+	public GameService(GameRepository gameRepository, CardService cardService, GamePlayerService gamePlayerService, GenericCardService genericCardService) {
 		this.gameRepository = gameRepository;
 		this.cardService=cardService;
 		this.gamePlayerService=gamePlayerService;
 		this.genericCardService=genericCardService;
-		this.statisticsService=statisticsService;
 	}
 
 	@Transactional(readOnly = true)
@@ -62,7 +59,27 @@ public class GameService {
 	@Transactional(readOnly = true)
 	public Page<Game> findGamesByGameplayerPaged(GamePlayer gamePlayer, Pageable page) {
 		return gameRepository.findGamesByGameplayerPaged(gamePlayer, page);
-	}	
+	}
+	
+	@Transactional(readOnly = true)
+	public Integer getNumGamesPlayed(GamePlayer p) {
+		return gameRepository.numGamesPlayed(p);
+	}
+
+	@Transactional(readOnly = true)
+	public Integer getNumGamesWon(GamePlayer p) {
+		return gameRepository.numGamesWon(p);
+	}
+
+	@Transactional(readOnly = true)
+	public List<PlayerCount> getRanking() {
+		return gameRepository.playerRanking();
+	}
+
+	@Transactional(readOnly = true)
+	public Integer getTotalGamesPlayed() {
+		return gameRepository.totalGamesPlayed();
+	}
 
 	@Transactional(readOnly = true)
 	public Collection<Game> listRunningGames(){
@@ -387,14 +404,6 @@ public class GameService {
 			c.setGamePlayer(null);
 			cardService.save(c);
 		} );
-
-    Statistics wonPlayer = statisticsService.findPlayerStatistics(classification.entrySet().stream().findFirst().get().getValue().get(0).getPlayer());
-		wonPlayer.setNumWonGames(wonPlayer.getNumWonGames() + 1);
-		try {
-			statisticsService.save(wonPlayer);
-		} catch (Exception e) {
-			throw new WonPlayedGamesException();
-		}
     
 		save(game);
 	}

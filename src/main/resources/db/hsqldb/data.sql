@@ -86,9 +86,9 @@ INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner
 INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (7,6000000000,'2022-02-02 15:15:15',FALSE,4,1,1);
 INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (8,6000000000,'2022-02-02 16:15:15',FALSE,3,1,2);
 INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (9,6000000000,'2022-02-02 17:15:15',FALSE,5,1,3);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (10,6000000000,'2022-02-02 18:15:15',FALSE,4,1,1);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (11,6000000000,'2022-02-02 19:15:15',FALSE,4,1,2);
-INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (12,6000000000,'2022-02-02 20:15:15',FALSE,4,1,2);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (10,6000000000,'2022-02-02 18:15:15',FALSE,4,1,4);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (11,6000000000,'2022-02-02 19:15:15',FALSE,4,1,5);
+INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (12,6000000000,'2022-02-02 20:15:15',FALSE,4,1,4);
 
 
 -- GamePlayerGames
@@ -111,12 +111,6 @@ INSERT INTO games_game_player VALUES (12,1), (12,2), (12,3);
 INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
 
 -- Statitics
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (1, 1, 10, 5, 30);
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (2, 2, 10, 4, 30);
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (3, 3, 10, 3, 30);
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (4, 4, 10, 2, 30);
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (5, 5, 10, 1, 30);
-INSERT INTO players_statistics(id, player_id, num_played_games, num_won_games, points) VALUES (6, 6, 10, 0, 30);
 
 --Friends
 

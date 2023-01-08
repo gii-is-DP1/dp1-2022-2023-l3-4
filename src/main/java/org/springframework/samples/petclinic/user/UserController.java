@@ -28,9 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.statistics.StatisticsService;
-import org.springframework.samples.petclinic.util.AuthenticationService;
-import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
@@ -61,16 +58,14 @@ public class UserController {
 	private UserService userService;
 	private PlayerService playerService;
 	private GamePlayerService gamePlayerService;
-	private StatisticsService statisticsService;
 	private AuthoritiesService authoritiesService;
 	private AuthenticationService authenticationService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, StatisticsService statisticsService, AuthoritiesService authoritiesService, AuthenticationService authenticationService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, AuthoritiesService authoritiesService) {
 		this.userService = userService;
 		this.playerService = playerService;
 		this.gamePlayerService = gamePlayerService;
-		this.statisticsService = statisticsService;
 		this.authoritiesService = authoritiesService;
 		this.authenticationService = authenticationService;
 	}
@@ -97,9 +92,7 @@ public class UserController {
 			this.playerService.savePlayer(player);
 			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 			this.userService.saveUser(player.getUser());
-			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
-			statisticsService.saveStatisticsForNewPlayer(player);
-			return "redirect:/";
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			return "redirect:/";
 		}
 	}
 

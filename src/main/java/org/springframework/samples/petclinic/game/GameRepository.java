@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.statistics.PlayerCount;
 // import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Repository;
 
@@ -50,4 +51,17 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 
     @Query("SELECT g FROM Game g WHERE g.room.id = :roomId")
     Collection<Game> findGameByRoomId(@Param(value = "roomId") Integer roomId);
+    
+    @Query("SELECT COUNT(g) FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer AND g.isRunning = false")
+    Integer numGamesPlayed(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT COUNT(g) FROM Game g WHERE :gamePlayer = g.winner")
+    Integer numGamesWon(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT g.winner.player AS player, COUNT(g) AS numWonGames FROM Game g GROUP BY g.winner.player ORDER BY COUNT(g) DESC")
+    List<PlayerCount> playerRanking();
+
+    @Query("SELECT COUNT(g) FROM Game g WHERE g.isRunning = false")
+    Integer totalGamesPlayed();
+
 }

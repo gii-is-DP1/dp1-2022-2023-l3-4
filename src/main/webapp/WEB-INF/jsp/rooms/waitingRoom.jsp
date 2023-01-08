@@ -8,11 +8,10 @@
 
 <virus:layout pageName="room">
 
-//Función actualizar
 <script type="text/javascript">
 function actualizar(){location.reload(true);}
-//Función para actualizar cada 5 segundos(5000 milisegundos)
-setInterval("actualizar()",5000);
+//Función para actualizar cada 10 segundos(10000 milisegundos)
+setInterval("actualizar()",10000);
 </script>
 
     <div class="row">

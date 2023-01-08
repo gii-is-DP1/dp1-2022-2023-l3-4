@@ -8,6 +8,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
@@ -42,6 +44,9 @@ public class RoomController {
 
 	@Autowired
     private PlayerService playerService;
+
+	@Autowired
+    private GameService gameService;
 
     @Autowired
 	public RoomController(RoomService roomService) {
@@ -202,6 +207,12 @@ public class RoomController {
 			players.forEach(p->{
 				p.setRoom(null);
 				playerService.savePlayer(p);
+			});
+
+			Collection<Game> gamesByRoom=gameService.findGameByRoomId(room.getId());
+			gamesByRoom.forEach(g->{
+				g.setRoom(null);
+				gameService.save(g);
 			});
 			roomService.deleteRoom(room.getId());
 

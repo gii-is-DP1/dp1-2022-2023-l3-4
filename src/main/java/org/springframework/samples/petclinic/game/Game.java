@@ -44,7 +44,7 @@ public class Game extends BaseEntity {
 	private Integer turn;
 	private Duration duration;
 	
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = true)
 	private Room room;
 	
 	@Transient

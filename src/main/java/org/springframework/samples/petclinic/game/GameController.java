@@ -472,14 +472,22 @@ public class GameController {
 	@GetMapping(value= "/games/{gameId}/classification")
 	public String classification(@PathVariable("gameId") int gameId, ModelMap model) throws WonPlayedGamesException {
 		Game game = this.gameService.findGame(gameId);
-		if(game.getIsRunning())
+		if(game.hasAnyWinners()){
+
 			try {
 				gameService.finishGame(game);
+				model.put("classification", game.getClassification());
+				return "games/classification";
 			} catch (WonPlayedGamesException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				model.put("message", e.getMessage());
+				model.put("messageType", "info");
+				return muestraVista(gameId, model);
 			}
-		model.put("classification", game.getClassification());
-		return "games/classification";
+		} else{
+			model.put("message", "The Game has not finished yet.");
+			model.put("messageType", "info");
+			return muestraVista(gameId, model);
+		}
+		
 	}
 }

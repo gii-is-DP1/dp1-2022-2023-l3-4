@@ -39,7 +39,7 @@
                 </td>
                 <td>
                     <c:if test="${friend.status==true}">Online</c:if>
-                        <c:if test="${friend.status==false}">disconnected</c:if>
+                        <c:if test="${friend.status==false}">Offline</c:if>
                 </td>
             </tr>
         </c:forEach>

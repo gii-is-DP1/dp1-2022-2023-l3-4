@@ -234,4 +234,13 @@ public class RoomController {
       	  
   }
 
+  //permita salir de una room
+  @GetMapping("/exit/{roomId}")
+  	public String exitRoom(@PathVariable("roomId") int roomId){
+		Player player = authService.getPlayer();
+		player.setRoom(null);
+		playerService.savePlayer(player);
+		return "redirect:/";
+	}
+
 }

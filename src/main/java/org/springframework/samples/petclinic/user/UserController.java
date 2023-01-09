@@ -19,9 +19,14 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
@@ -32,7 +37,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Juergen Hoeller
@@ -44,7 +51,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
-	private static final String USERS = "users/listPageableUsers";
+	private static final String USERS = "users/usersListing";
+	private static final String EDIT_USER = "users/updateUserForm";
+	
 
 	private UserService userService;
 	private PlayerService playerService;
@@ -81,16 +90,71 @@ public class UserController {
 			this.playerService.savePlayer(player);
 			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 			this.userService.saveUser(player.getUser());
-			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			return "redirect:/";
+			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+			return "redirect:/";
 		}
 	}
 
 	@GetMapping("/users")
-	public String findAll(ModelMap model) {
-		Page<User> pg = userService.findAll(PageRequest.of(0, 5));
-		model.put("pages", pg);
+	public String findAll(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
+		Pageable pageable = null;
+		if(page == null || page == 0) {
+			pageable = PageRequest.of(0, 10, Sort.by(Order.asc("username")));
+		} else {
+			pageable = PageRequest.of(page, 10, Sort.by(Order.asc("username")));
+		}
+		
+		Page<User> users = userService.findAll(pageable);
+		model.put("users", users.getContent());
+		model.put("totalPages", users.getTotalPages());
+		model.put("currentPage", users.getNumber());
 		return USERS;
-	} 
+	}
+
+	@GetMapping("/users/{username}/edit")
+	public String editUser(ModelMap model, @PathVariable("username") String username) {
+		User user = userService.findUser(username).get();
+    if (user != null) {
+      model.put("user", user);
+      return EDIT_USER;
+    } else {
+      model.put("message", "The user " + username + " doesn't exist");
+      model.put("messageType", "info");
+      return "redirect:/user";
+    }
+	}
+
+	@PostMapping("/users/{username}/edit")
+	public String saveUser(@PathVariable("username") String username, @Valid User user, BindingResult br, ModelMap model) {
+		if (br.hasErrors()) {
+			model.put("message", "The username cannot be empty");
+			model.put("messageType", "info");
+		} else {
+			User userToUpdate = userService.findUser(username).get();
+			if (userToUpdate != null) {
+				BeanUtils.copyProperties(user, userToUpdate, "username");
+				userService.saveUser(userToUpdate);
+				model.put("message", "Your user information has been updated successfully");
+				return findAll(model, null);
+			}
+		}
+		return "redirect:/user";
+	}
+
+	@GetMapping("/users/{username}/delete")
+	public String deleteUser(@PathVariable("username") String username, ModelMap model) {
+
+		String message;
+    try {
+      userService.deleteUser(username);
+      message = "User " + username + " succesfully deleted";
+    } catch (EmptyResultDataAccessException e) {
+      message = "User " + username + " doesn't exist";
+    }
+    model.put("message", message);
+    model.put("messageType", "info");
+    return "redirect:/users";
+	}
 
 
 }

@@ -469,7 +469,7 @@ public class GameController {
 
 	//Clasificación tras la finalización de la partida
 	@GetMapping(value= "/games/{gameId}/classification")
-	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
+	public String classification(@PathVariable("gameId") int gameId, ModelMap model) throws WonPlayedGamesException {
 		Game game = this.gameService.findGame(gameId);
 		if(game.hasAnyWinners()){
 

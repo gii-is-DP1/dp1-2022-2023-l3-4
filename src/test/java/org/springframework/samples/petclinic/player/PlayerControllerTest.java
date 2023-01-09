@@ -55,7 +55,6 @@ public class PlayerControllerTest {
     @BeforeEach
     public void setUp() {
         Player mockPlayer = new Player();
-
         GamePlayer mockGamePlayer = new GamePlayer();
         Page<Game> mockGames = new PageImpl<>(new ArrayList<>());
         when(authenticationService.getPlayer()).thenReturn(mockPlayer);

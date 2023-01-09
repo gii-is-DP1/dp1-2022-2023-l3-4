@@ -119,7 +119,7 @@ public class PlayerController {
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
-                BeanUtils.copyProperties(player, playerToUpdate, "id", "user");
+                BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room");
                 playerService.savePlayer(playerToUpdate);
                 model.put("message", "Your player information has been updated successfully");
                 return listPlayerStatistics(model, null);

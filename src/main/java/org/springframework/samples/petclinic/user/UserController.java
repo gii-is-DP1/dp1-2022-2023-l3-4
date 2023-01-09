@@ -105,9 +105,14 @@ public class UserController {
 		}
 		
 		Page<User> users = userService.findAll(pageable);
-		model.put("users", users.getContent());
-		model.put("totalPages", users.getTotalPages());
-		model.put("currentPage", users.getNumber());
+		if (users.getContent().size() > 1) {
+			model.put("users", users.getContent());
+			model.put("totalPages", users.getTotalPages());
+			model.put("currentPage", users.getNumber());
+		} else {
+			model.put("message", "There are no users registered in the system");
+			model.put("messageType", "info");
+		}
 		return USERS;
 	}
 

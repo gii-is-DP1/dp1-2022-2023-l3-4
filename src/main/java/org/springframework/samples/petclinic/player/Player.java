@@ -29,6 +29,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.springframework.samples.petclinic.achievements.Achievement;
 import org.springframework.samples.petclinic.friendRequest.Friend;
@@ -49,6 +50,7 @@ import lombok.Setter;
 public class Player extends Person {
 
 	@Column(name = "description")
+	@Size(max = 100)
 	private String description;
 
 	@Column(name = "status")

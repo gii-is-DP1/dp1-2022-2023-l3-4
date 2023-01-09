@@ -22,7 +22,7 @@ public class StatisticsController {
   private GamePlayerService gamePlayerService;
   public static final String STATISTICS_LISTING = "player/playerProfile";
   public static final String EDIT_STATISTICS = "player/updatePlayerStatistics";
-  public static final String RANKING = "statistics/ranking";
+  public static final String RANKING = "statistics/globalStatistics";
 
   @Autowired
   public StatisticsController(AuthenticationService as, GameService gs, GamePlayerService gps) {
@@ -45,8 +45,10 @@ public class StatisticsController {
     }
   }
 
-  @GetMapping("/ranking/global")
-  public String getPlayersRanking(ModelMap model) {
+  @GetMapping("/statistics/global")
+  public String getGameStatistics(ModelMap model) {
+
+    // Ranking
     List<PlayerCount> stats = gameService.getRanking();
     List<PlayerCount> top3 = stats.subList(0, 3);
     List<PlayerCount> restOfPlayers = stats.subList(3, stats.size());

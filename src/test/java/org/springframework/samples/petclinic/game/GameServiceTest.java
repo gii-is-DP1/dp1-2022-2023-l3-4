@@ -3,7 +3,9 @@ package org.springframework.samples.petclinic.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.assertj.core.util.Arrays;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCard.Colour;
@@ -65,11 +68,23 @@ public class GameServiceTest {
     Card vax_heart = new Card(5, false, gp2, generic_HVaccine);
     Card vax_heart2 = new Card(6, false, gp2, generic_HVaccine2);
 
+    Game g = new Game();
+    
+
     List<Card> cards = new ArrayList<>();
     ModelMap m = new ModelMap();
 
     @BeforeEach
     void setup(){
+        g.setCards(new ArrayList<>());
+        g.setClassification(new HashMap<>());
+        g.setIsRunning(true);
+        g.setId(0);
+        List<GamePlayer> gplayers = new ArrayList<>();
+        gplayers.add(gp1);
+        gplayers.add(gp2);
+        g.setGamePlayer(gplayers);
+        g.setInitialHour(LocalDateTime.now());
         cards.add(organ_heart1);
     }
 
@@ -180,15 +195,18 @@ public class GameServiceTest {
     public void testTransplantNegative1() {
         //Setup
         organ_heart1.setBody(true);
+        organ_brain.setBody(true);
+        cards.add(organ_brain);
         gp1.setCards(cards);
         organ_heart1.setGamePlayer(gp1);
+        organ_brain.setGamePlayer(gp1);
         organ_heart2.setBody(true);
         organ_heart2.setGamePlayer(gp2);
         List<Card> cards2 = new ArrayList<>();
         cards2.add(organ_heart2);
         gp2.setCards(cards2);
         //test 
-        assertThrows(IllegalArgumentException.class , ()-> gs.changeCards(gp1,gp2,organ_heart1,organ_heart2));
+        assertThrows(IllegalArgumentException.class , ()-> gs.changeCards(gp1,gp2,organ_brain,organ_heart2));
     }
 
     @Test
@@ -411,6 +429,40 @@ public class GameServiceTest {
         gp2.setCards(cards2);
         //test
         assertThrows(IllegalArgumentException.class , ()-> gs.infection(gp1, gp2));
+    }
+
+    @Test
+    //Jugar una carta de guante de látex.
+    public void testGlovePositive() {
+        //SetUp
+        List<Card> hand1 = new ArrayList<>();
+        hand1.add(organ_heart1);
+        hand1.add(organ_heart2);
+        hand1.add(vax_brain);
+        gp1.setCards(hand1);
+        cards.add(organ_brain);
+        cards.add(vax_heart);
+        gp2.setCards(cards);
+        //test
+        gs.glove(gp1, g);
+        assertEquals(true, gp2.getHand().size()==0);
+    }
+
+    @Test
+    //Jugar una carta de guante de látex.
+    public void testErrorPositive() {
+        //SetUp
+        List<Card> body = new ArrayList<>();
+        body.add(organ_heart2);
+        body.add(organ_brain);
+        organ_brain.setBody(true);
+        organ_heart2.setBody(true);
+        organ_heart1.setBody(true);
+        gp1.setCards(body);
+        gp2.setCards(cards);
+        //test
+        gs.medicalError(gp1, gp2);
+        assertEquals(true, gp1.getBody().size()==1 && gp2.getBody().size()==2);
     }
 
 }

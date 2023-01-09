@@ -73,14 +73,14 @@ public class UserController {
 		dataBinder.setDisallowedFields("id", "status");
 	}
 
-	@GetMapping(value = "/users/new")
+	@GetMapping(value = "/user/new")
 	public String initCreationForm(Map<String, Object> model) {
 		Player player = new Player();
 		model.put("player", player);
 		return VIEWS_PLAYER_CREATE_FORM;
 	}
 
-	@PostMapping(value = "/users/new")
+	@PostMapping(value = "/user/new")
 	public String processCreationForm(@Valid Player player, BindingResult result) throws PlayerNotFoundException {
 		if (result.hasErrors()) {
 			return VIEWS_PLAYER_CREATE_FORM;

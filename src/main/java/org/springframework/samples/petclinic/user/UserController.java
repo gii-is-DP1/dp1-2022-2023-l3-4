@@ -20,12 +20,15 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.statistics.Statistics;
 import org.springframework.samples.petclinic.statistics.StatisticsService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,16 +45,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
+	private static final String USERS = "users/listPageableUsers";
 
 	private UserService userService;
 	private PlayerService playerService;
+	private GamePlayerService gamePlayerService;
 	private StatisticsService statisticsService;
 	private AuthoritiesService authoritiesService;
 
 	@Autowired
-	public UserController(UserService userService, PlayerService playerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
+	public UserController(UserService userService, PlayerService playerService, GamePlayerService gamePlayerService, StatisticsService statisticsService, AuthoritiesService authoritiesService) {
 		this.userService = userService;
 		this.playerService = playerService;
+		this.gamePlayerService = gamePlayerService;
 		this.statisticsService = statisticsService;
 		this.authoritiesService = authoritiesService;
 	}
@@ -74,13 +80,22 @@ public class UserController {
 			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
-			//creating player, user, and authority
+			//creating player, gamePlayer, user, and authority
 			this.playerService.savePlayer(player);
+			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 			this.userService.saveUser(player.getUser());
 			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
 			statisticsService.saveStatisticsForNewPlayer(player);
 			return "redirect:/";
 		}
 	}
+
+	@GetMapping("/users")
+	public String findAll(ModelMap model) {
+		Page<User> pg = userService.findAll(PageRequest.of(0, 5));
+		model.put("pages", pg);
+		return USERS;
+	} 
+
 
 }

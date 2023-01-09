@@ -17,13 +17,15 @@ package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
@@ -38,6 +40,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Juergen Hoeller
@@ -73,20 +76,26 @@ public class PlayerController {
 
 
     @GetMapping("/me")
-        public String listPlayerStatistics(ModelMap model) {
+        public String listPlayerStatistics(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
         Player player = authenticationService.getPlayer();
         Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
-        GamePlayer gp = gameService.findGamePlayerByPlayer(player);
-        List<Game> games = gameService.listGames().stream().filter(x -> x.getGamePlayer().contains(gp)).collect(Collectors.toList());
-        List<Duration> durations = games.stream().map(x -> x.getDuration()).collect(Collectors.toList());
-        Duration totalTimePlayed = Duration.ZERO;
-        for (Duration d: durations) {
-            totalTimePlayed = totalTimePlayed.plus(d);
+        Pageable pageable = null;
+        if(page == null || page == 0) {
+            pageable = PageRequest.of(0, 10, Sort.by(Order.desc("initialHour")));
+        } else {
+            pageable = PageRequest.of(page, 10, Sort.by(Order.desc("initialHour")));
         }
+
+        GamePlayer gp = authenticationService.getGamePlayer();
+        Page<Game> games = gameService.findGamesByGameplayerPaged(gp, pageable);
+        Duration totalTimePlayed = games.stream().map(x -> x.getDuration()).reduce((x,y) -> x.plus(y)).orElse(Duration.ZERO);
+       
         model.put("statistics", playerStatistics);
         model.put("player", player);
         model.put("gameplayer", gp);
-        model.put("games", games);
+        model.put("games", games.getContent());
+        model.put("totalPages", games.getTotalPages());
+        model.put("currentPage", games.getNumber());
         model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
         return USER_PROFILE;
   }
@@ -103,16 +112,19 @@ public class PlayerController {
     @PostMapping(value="/me/edit")
     public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
-        if (bindingResult.hasErrors()) {
-            model.put("message", "The name cannot be empty");
-            model.put("messageType", "info");
+        if (bindingResult.hasFieldErrors("firstName")) {
+            bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
+        } else if (bindingResult.hasFieldErrors("lastName")) {
+            bindingResult.rejectValue("lastName", "Last name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user");
                 playerService.savePlayer(playerToUpdate);
                 model.put("message", "Your player information has been updated successfully");
-                return listPlayerStatistics(model);
+                return listPlayerStatistics(model, null);
             }
         }
         return "redirect:/player/me";

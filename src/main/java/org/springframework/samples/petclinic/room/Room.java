@@ -3,6 +3,7 @@ package org.springframework.samples.petclinic.room;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -42,6 +43,7 @@ public class Room extends BaseEntity{
     private Collection<Player> players;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player host;
 
     private String password;

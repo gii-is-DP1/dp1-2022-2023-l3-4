@@ -76,8 +76,10 @@ public class PlayerControllerTest {
             .andExpect(model().attributeExists("games"))
             .andExpect(model().attributeExists("currentPage"))
             .andExpect(model().attributeExists("totalPages"))
-            .andExpect(model().attributeExists("statistics"))
-            .andExpect(model().attributeExists("totalTimePlayed"));
+            .andExpect(model().attributeExists("numGamesPlayed"))
+            .andExpect(model().attributeExists("totalTimePlayed"))
+            .andExpect(model().attributeExists("numGamesWon"));
+
     }
 
     @WithMockUser

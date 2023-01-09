@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.game.GameService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
@@ -18,14 +19,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class StatisticsController {
   private AuthenticationService authenticationService;
   private GameService gameService;
+  private GamePlayerService gamePlayerService;
   public static final String STATISTICS_LISTING = "player/playerProfile";
   public static final String EDIT_STATISTICS = "player/updatePlayerStatistics";
   public static final String RANKING = "statistics/ranking";
 
   @Autowired
-  public StatisticsController(AuthenticationService as, GameService gs) {
+  public StatisticsController(AuthenticationService as, GameService gs, GamePlayerService gps) {
     this.authenticationService = as;
     this.gameService = gs;
+    this.gamePlayerService = gps;
   }
 
   @GetMapping("/statistics/player/edit")
@@ -77,8 +80,8 @@ public class StatisticsController {
     model.put("games", totalGamesPlayed);
 
     // Average games played
-    //Double avgGamesPlayed = statisticsService.findAll().stream().mapToInt(x -> x.getNumPlayedGames()).average().getAsDouble();
-    //model.put("avgGames", avgGamesPlayed.toString().replace(".0", ""));
+    Double avgGamesPlayed = gamePlayerService.findAll().stream().mapToInt(x -> x.getGames().size()).average().getAsDouble();
+    model.put("avgGames", avgGamesPlayed.toString().replace(".0", ""));
 
     // Maximum games played
     List<LocalDateTime> gamesDay = gameService.listGames().stream().map(x -> x.getInitialHour()).collect(Collectors.toList());

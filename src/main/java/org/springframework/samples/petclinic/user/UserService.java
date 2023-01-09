@@ -16,8 +16,6 @@
 package org.springframework.samples.petclinic.user;
 
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -52,8 +50,8 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true	)
-	public Optional<User> findUser(String username) {
-		return userRepository.findById(username);
+	public User findUser(String username) {
+		return userRepository.findById(username).get();
 	}
 
 	@Transactional(readOnly = true)
@@ -63,7 +61,7 @@ public class UserService {
 
 	@Transactional
 	public void deleteUser(String username) {
-		User user = findUser(username).get();
+		User user = findUser(username);
 		Player player = playerService.getPlayerByUsername(username);
 		if (player != null) {
 			player.setUser(null);

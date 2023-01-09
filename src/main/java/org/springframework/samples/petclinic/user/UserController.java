@@ -113,7 +113,7 @@ public class UserController {
 
 	@GetMapping("/users/{username}/edit")
 	public String editUser(ModelMap model, @PathVariable("username") String username) {
-		User user = userService.findUser(username).get();
+		User user = userService.findUser(username);
     if (user != null) {
       model.put("user", user);
       return EDIT_USER;
@@ -129,8 +129,9 @@ public class UserController {
 		if (br.hasErrors()) {
 			model.put("message", "The username cannot be empty");
 			model.put("messageType", "info");
+			return findAll(model, null);
 		} else {
-			User userToUpdate = userService.findUser(username).get();
+			User userToUpdate = userService.findUser(username);
 			if (userToUpdate != null) {
 				BeanUtils.copyProperties(user, userToUpdate, "username");
 				userService.saveUser(userToUpdate);
@@ -138,7 +139,7 @@ public class UserController {
 				return findAll(model, null);
 			}
 		}
-		return "redirect:/user";
+		return "redirect:/users";
 	}
 
 	@GetMapping("/users/{username}/delete")
@@ -153,7 +154,7 @@ public class UserController {
     }
     model.put("message", message);
     model.put("messageType", "info");
-    return "redirect:/users";
+    return findAll(model, null);
 	}
 
 

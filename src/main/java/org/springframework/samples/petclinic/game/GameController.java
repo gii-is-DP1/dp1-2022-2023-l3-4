@@ -395,11 +395,12 @@ public class GameController {
 			Card card = cardService.findCard(c_id).orElseThrow(() -> new Exception("Card not found."));
 			GamePlayer gamePlayer = authenticationService.getGamePlayer();
 			Game game = gameService.findGame(gameId);
-			gameService.glove(card, gamePlayer, game);
+			gameService.glove(gamePlayer, game);
+			gamePlayer.getHand().remove(card);
 			for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 				gamePlayerService.save(otherGamePlayer);
 			}
-			return "redirect:/games/" + gameId;
+			return turn(gameId);
 		} catch (Exception e) {
 			ModelMap model = new ModelMap();
 			model.put("message", e.getMessage());
@@ -411,9 +412,11 @@ public class GameController {
 	public String playMedicalError(int gameId, Integer g_id, Integer c_id, ModelMap model) {
 		try {
 			GamePlayer gamePlayer1 = authenticationService.getGamePlayer();
-			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Player not found."));
-			Card medicalError = cardService.findCard(c_id).orElseThrow(() -> new Exception("Card not found."));
-			gameService.medicalError(medicalError, gamePlayer1, gamePlayer2);
+			GamePlayer gamePlayer2 = gamePlayerService.findById(g_id).orElseThrow(() -> new Exception("Jugador no encontrado"));
+			Card medicalError = cardService.findCard(c_id).orElseThrow(() -> new Exception("Carta no encontrada"));
+			gameService.medicalError(gamePlayer1, gamePlayer2);
+			medicalError.discard();
+			cardService.save(medicalError);
 			// Finalizamos el turno
 			// Actualizamos los cambios en la base de datos
 			gamePlayerService.save(gamePlayer1);

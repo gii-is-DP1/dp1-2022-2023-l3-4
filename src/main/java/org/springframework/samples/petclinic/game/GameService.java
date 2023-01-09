@@ -198,13 +198,14 @@ public class GameService {
 			List<Card> body = gamePlayer2.getBody();
 			for (Card c : body) {
 				for (Card infectedCard : infectedCards) {
-					if (c.getVaccines().size()==0) {
-						if (c.getType().getColour() == infectedCard.getType().getColour() 
-							&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0) {
+					if (c.getVaccines().size()==0 && c.getVirus().size()==0) {
+						if (c.getType().getColour() == infectedCard.getType().getColour()) {
 						gamePlayer1.getCards().remove(infectedCard);
 						infectedCard.setGamePlayer(gamePlayer2);
 						gamePlayer2.getCards().add(infectedCard);
-						c.getVirus().add(infectedCard);
+						List<Card> virus = c.getVirus();
+						virus.add(infectedCard);
+						c.setVirus(virus);
 						} else {
 							throw new IllegalArgumentException("No se puede infectar un órgano no libre.");
 						}
@@ -215,10 +216,7 @@ public class GameService {
 		}
 	}
 
-	public void glove(Card card, GamePlayer gamePlayer, Game game) {
-		gamePlayer.getCards().remove(card);
-		card.discard();
-		cardService.save(card);
+	public void glove(GamePlayer gamePlayer, Game game) {
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
 				for(Card c: otherGamePlayer.getHand()) {
@@ -228,31 +226,22 @@ public class GameService {
 				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
 			}
 		}
-		for (Integer i=0; i<game.getGamePlayer().size(); i++) {
-			changeTurn(game);
-		}
-		
 	}
 
-	public void medicalError(Card medicalError, GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
-		// Intercambiamos los cuerpos de los dos jugadores
-		medicalError.discard();
+	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
 		List<Card> player1Cards = gamePlayer1.getBody();
 		List<Card> player2Cards = gamePlayer2.getBody();
 		for(Card c: player1Cards) {
 			c.setGamePlayer(gamePlayer2);
-			cardService.save(c);
+			gamePlayer1.getCards().remove(c);
 		}
 		
 		for(Card c: player2Cards) {
 			c.setGamePlayer(gamePlayer1);
-			cardService.save(c);
+			gamePlayer2.getCards().remove(c);
 		}
-		gamePlayer1.getBody().removeAll(player1Cards);
-		gamePlayer1.getBody().addAll(player2Cards);
-		gamePlayer2.getBody().removeAll(player2Cards);
-		gamePlayer2.getBody().addAll(player1Cards);
-		cardService.save(medicalError);
+		gamePlayer1.getCards().addAll(player2Cards);
+		gamePlayer2.getCards().addAll(player1Cards);
 	}
 		
 	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){

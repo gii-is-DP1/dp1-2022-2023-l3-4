@@ -17,19 +17,19 @@ package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.statistics.Statistics;
-import org.springframework.samples.petclinic.statistics.StatisticsService;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
@@ -38,6 +38,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Juergen Hoeller
@@ -51,7 +52,6 @@ public class PlayerController {
 
 
     private PlayerService playerService;
-    private StatisticsService statisticsService;
     private GameService gameService;
     private AuthenticationService authenticationService;
     private FriendService friendService;
@@ -63,9 +63,8 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, StatisticsService ss, AuthenticationService as, FriendService fs, GameService gs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs) {
         this.playerService = ps;
-        this.statisticsService = ss;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
@@ -73,20 +72,28 @@ public class PlayerController {
 
 
     @GetMapping("/me")
-        public String listPlayerStatistics(ModelMap model) {
+        public String listPlayerStatistics(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
         Player player = authenticationService.getPlayer();
-        Statistics playerStatistics = statisticsService.findPlayerStatistics(player);
-        GamePlayer gp = gameService.findGamePlayerByPlayer(player);
-        List<Game> games = gameService.listGames().stream().filter(x -> x.getGamePlayer().contains(gp)).collect(Collectors.toList());
-        List<Duration> durations = games.stream().map(x -> x.getDuration()).collect(Collectors.toList());
-        Duration totalTimePlayed = Duration.ZERO;
-        for (Duration d: durations) {
-            totalTimePlayed = totalTimePlayed.plus(d);
+        Pageable pageable = null;
+        if(page == null || page == 0) {
+            pageable = PageRequest.of(0, 10, Sort.by(Order.desc("initialHour")));
+        } else {
+            pageable = PageRequest.of(page, 10, Sort.by(Order.desc("initialHour")));
         }
-        model.put("statistics", playerStatistics);
+
+        GamePlayer gp = authenticationService.getGamePlayer();
+        Integer numGamesPlayed = gameService.getNumGamesPlayed(gp);
+        Integer numGamesWon = gameService.getNumGamesWon(gp);
+        Page<Game> games = gameService.findGamesByGameplayerPaged(gp, pageable);
+        Duration totalTimePlayed = games.stream().map(x -> x.getDuration()).reduce((x,y) -> x.plus(y)).orElse(Duration.ZERO);
+       
+        model.put("numGamesPlayed",numGamesPlayed);
+        model.put("numGamesWon",numGamesWon);
         model.put("player", player);
         model.put("gameplayer", gp);
-        model.put("games", games);
+        model.put("games", games.getContent());
+        model.put("totalPages", games.getTotalPages());
+        model.put("currentPage", games.getNumber());
         model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
         return USER_PROFILE;
   }
@@ -103,33 +110,36 @@ public class PlayerController {
     @PostMapping(value="/me/edit")
     public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
-        if (bindingResult.hasErrors()) {
-            model.put("message", "The name cannot be empty");
-            model.put("messageType", "info");
+        if (bindingResult.hasFieldErrors("firstName")) {
+            bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
+        } else if (bindingResult.hasFieldErrors("lastName")) {
+            bindingResult.rejectValue("lastName", "Last name cannot be empty.", "first name cannot be empty.");
+            return EDIT_PROFILE;
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user");
                 playerService.savePlayer(playerToUpdate);
                 model.put("message", "Your player information has been updated successfully");
-                return listPlayerStatistics(model);
+                return listPlayerStatistics(model, null);
             }
         }
         return "redirect:/player/me";
     }
 
-    @GetMapping("/createSearch")
+    @GetMapping("/search")
 	public String findPlayer(ModelMap model) {
         Player player = new Player();
 		model.put("player", player);
 		return VIEW_FIND_PLAYER;
 	}
 
-    @PostMapping(value = "/createSearch")
-	public String processFindRoomForm(Player player, BindingResult result, ModelMap model) {
+    @PostMapping(value = "/search")
+	public String processFindPlayerForm(Player player, BindingResult result, ModelMap model) {
         Player playerAuth = authenticationService.getPlayer();
-		if (player.getUser().getUsername() == null) {
-            User user=player.getUser();
+		if (player.getUser() == null || player.getUser().getUsername() == null) {
+            User user= new User();
             user.setUsername("");
 			player.setUser(user);
 		}

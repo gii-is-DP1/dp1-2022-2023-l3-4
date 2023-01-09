@@ -7,6 +7,13 @@
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
 <virus:layout pageName="room">
+
+<script type="text/javascript">
+function actualizar(){location.reload(true);}
+//Función para actualizar cada 10 segundos(10000 milisegundos)
+setInterval("actualizar()",10000);
+</script>
+
     <div class="row">
       <tr >
         <h2>Room Name:  <b><c:out value="${room.roomName}"/></b></h2>
@@ -56,7 +63,11 @@
                     </a>
                   </c:when>
                     <c:otherwise>
-                        
+                      <a href='<spring:url value="/room/exit/${room.id}" htmlEscape="true"/>'>
+                        <button>
+                            Exit
+                        </button>
+            </a>
                     </c:otherwise>
                 </c:choose>
                 

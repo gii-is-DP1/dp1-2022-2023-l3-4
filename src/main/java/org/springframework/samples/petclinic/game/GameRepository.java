@@ -15,13 +15,18 @@
  */
 package org.springframework.samples.petclinic.game;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.PlayerCount;
 // import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Repository;
 
@@ -32,5 +37,36 @@ public interface GameRepository extends CrudRepository<Game, Integer> {
 	Optional<Game> findById(int id);
     @Query("SELECT gp FROM GamePlayer gp WHERE gp.player.id = :playerId")
     GamePlayer findGamePlayerByPlayer(@Param(value = "playerId") Integer playerId);
+
+    @Query("SELECT g FROM Game g WHERE g.isRunning = true")
+    public Collection<Game> findRunningGames();
     
+    @Query("SELECT g FROM Game g WHERE g.isRunning = false")
+    public Collection<Game> findTerminategGames();
+
+
+    @Query("SELECT g FROM Game g WHERE g.room.id = :roomId")
+    Collection<Game> findGameByRoomId(@Param(value = "roomId") Integer roomId);
+
+    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer")
+    List<Game> findGamesByGameplayer(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT g FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer AND g.isRunning = false")
+    Page<Game> findGamesByGameplayerPaged(@Param(value = "gamePlayer") GamePlayer gamePlayer, Pageable page);
+    
+    @Query("SELECT COUNT(g) FROM Game g WHERE :gamePlayer MEMBER OF g.gamePlayer AND g.isRunning = false")
+    Integer numGamesPlayed(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT COUNT(g) FROM Game g WHERE :gamePlayer = g.winner")
+    Integer numGamesWon(@Param(value = "gamePlayer") GamePlayer gamePlayer);
+
+    @Query("SELECT g.winner.player AS player, COUNT(g) AS numWonGames FROM Game g GROUP BY g.winner.player ORDER BY COUNT(g) DESC")
+    List<PlayerCount> playerRanking();
+
+    @Query("SELECT COUNT(g) FROM Game g WHERE g.isRunning = false")
+    Integer totalGamesPlayed();
+
+    @Query("SELECT g FROM Game g WHERE g.room = :room AND g.isRunning = true")
+    Game findAnyRunningGame(@Param(value = "room") Room room);
+
 }

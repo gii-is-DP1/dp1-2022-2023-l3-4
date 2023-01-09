@@ -32,9 +32,11 @@ import javax.persistence.Table;
 
 import org.springframework.samples.petclinic.achievements.Achievement;
 import org.springframework.samples.petclinic.friendRequest.Friend;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.Person;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.user.User;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -55,19 +57,23 @@ public class Player extends Person {
 	@Column(name = "profile_image")
 	private String profileImage;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "username", referencedColumnName = "username")
+	@OneToOne
+  @JoinColumn(name = "username")
 	private User user;
+
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "gameplayer_id", referencedColumnName = "id")
+	private GamePlayer gamePlayer;
 
 	@ManyToMany
 	@JoinTable(name = "player_achievements", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "achievement_id"))
 	private Set<Achievement> achievements;
 
-    @OneToMany(mappedBy="playerSend")
-    private Collection<Friend> friendSend;
+	@OneToMany(mappedBy="playerSend", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Collection<Friend> friendSend;
 
-	@OneToMany(mappedBy="playerRec")
-    private Collection<Friend> friendRec;
+	@OneToMany(mappedBy="playerRec", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Collection<Friend> friendRec;
 
 
 	@ManyToOne(cascade = CascadeType.ALL)

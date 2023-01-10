@@ -16,12 +16,14 @@
 package org.springframework.samples.petclinic.player;
 
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -31,6 +33,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.samples.petclinic.achievements.Achievement;
 import org.springframework.samples.petclinic.friendRequest.Friend;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
@@ -47,6 +54,7 @@ import lombok.Setter;
 @Table(name = "players")
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 public class Player extends Person {
 
 	@Column(name = "description")
@@ -85,4 +93,19 @@ public class Player extends Person {
 	public void addRoom(Room room) {
 		this.room=room;
     }
+
+	// Auditing
+
+	@CreatedBy
+	private String creator; 
+
+	@CreatedDate 
+	private LocalDateTime createdDate; 
+
+	@LastModifiedBy 
+	private String modifier;
+	
+	@LastModifiedDate
+	private LocalDateTime lastModifiedDate;
+
 }

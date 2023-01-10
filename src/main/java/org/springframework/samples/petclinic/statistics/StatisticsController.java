@@ -27,20 +27,6 @@ public class StatisticsController {
     this.gamePlayerService = gps;
   }
 
-  @GetMapping("/statistics/player/edit")
-  public String editPlayerStatistics(ModelMap model) {
-
-    Player player = authenticationService.getPlayer();
-    if (player != null) {
-      model.put("player", player);
-      return EDIT_STATISTICS;
-    } else {
-      model.put("message", "Cannot find player statistics, because the player does not exist");
-      model.put("messageType", "info");
-      return "redirect:/";
-    }
-  }
-
   @GetMapping("/statistics/global")
   public String getGameStatistics(ModelMap model) {
 

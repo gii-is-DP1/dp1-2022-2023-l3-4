@@ -13,12 +13,10 @@ import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
-import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,8 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +101,7 @@ public class StatisticsControllerTest {
   @WithMockUser(value = "frabenrui1", password = "z3bas")
   @Test
   public void testPlayersRanking() throws Exception {
-      mockMvc.perform(get("/ranking/global"))
+      mockMvc.perform(get("/statistics/global"))
       .andExpect(status().isOk())
       .andExpect(model().attributeExists("rops"))
       .andExpect(model().attributeExists("top3"))
@@ -117,6 +113,6 @@ public class StatisticsControllerTest {
       .andExpect(model().attributeExists("maxGames"))
       .andExpect(model().attributeExists("minGames"))
       .andExpect(model().attributeExists("avgGames"))
-      .andExpect(view().name("statistics/ranking"));
+      .andExpect(view().name("statistics/globalStatistics"));
   }
 }

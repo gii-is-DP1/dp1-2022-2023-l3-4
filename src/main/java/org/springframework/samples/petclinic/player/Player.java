@@ -18,15 +18,11 @@ package org.springframework.samples.petclinic.player;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -68,16 +64,12 @@ public class Player extends Person {
 	private String profileImage;
 	
 	@OneToOne
-  @JoinColumn(name = "username")
+  	@JoinColumn(name = "username")
 	private User user;
 
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "player")
 	@JoinColumn(name = "gameplayer_id", referencedColumnName = "id")
 	private GamePlayer gamePlayer;
-
-	@ManyToMany
-	@JoinTable(name = "player_achievements", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "achievement_id"))
-	private Set<Achievement> achievements;
 
 	@OneToMany(mappedBy="playerSend", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<Friend> friendSend;

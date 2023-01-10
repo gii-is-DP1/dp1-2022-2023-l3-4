@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.samples.petclinic.achievements.AchievementService;
 import org.springframework.samples.petclinic.configuration.SecurityConfiguration;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
@@ -52,6 +53,9 @@ public class PlayerControllerTest {
     @MockBean
     private FriendService friendService;
 
+    @MockBean
+    private AchievementService achievementService;
+
     @BeforeEach
     public void setUp() {
         Player mockPlayer = new Player();
@@ -63,6 +67,7 @@ public class PlayerControllerTest {
         when(gameService.humanReadableDuration(any())).thenReturn("string");
         when(gameService.getNumGamesPlayed(mockGamePlayer)).thenReturn(10);
         when(gameService.getNumGamesWon(mockGamePlayer)).thenReturn(5);
+        when(achievementService.getPlayerAchievements(mockPlayer)).thenReturn(new ArrayList<>());
     }
     
     @WithMockUser
@@ -78,7 +83,8 @@ public class PlayerControllerTest {
             .andExpect(model().attributeExists("totalPages"))
             .andExpect(model().attributeExists("numGamesPlayed"))
             .andExpect(model().attributeExists("totalTimePlayed"))
-            .andExpect(model().attributeExists("numGamesWon"));
+            .andExpect(model().attributeExists("numGamesWon"))
+            .andExpect(model().attributeExists("achievements"));
 
     }
 

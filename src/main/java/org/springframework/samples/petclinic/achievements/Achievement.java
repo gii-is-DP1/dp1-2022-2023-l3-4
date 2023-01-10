@@ -31,7 +31,7 @@ public class Achievement extends BaseEntity {
   private String badgeImage;
 
   @Column(name = "threshold")
-  private double threshold;
+  private Integer threshold;
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "type", referencedColumnName = "id")

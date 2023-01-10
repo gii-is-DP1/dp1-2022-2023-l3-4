@@ -28,8 +28,8 @@ INSERT INTO achievement_types(id,name) VALUES (1,'Explorador'), (2,'Aprendiz'), 
 -- Achievements
 
 INSERT INTO achievements(id,name,threshold,description,badge_image,type) VALUES 
-(1, 'Viciado', 10.0, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
-(2, 'Triunfador', 20.0, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
+(1, 'Viciado', 1, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
+(2, 'Triunfador', 2, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
 
 -- Player
 
@@ -86,8 +86,6 @@ INSERT INTO games_game_player VALUES (11,1), (11,2), (11,3), (11,4);
 INSERT INTO games_game_player VALUES (12,1), (12,2), (12,3);
 
 -- PlayerAchievements
-
-INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
 
 -- Statitics
 

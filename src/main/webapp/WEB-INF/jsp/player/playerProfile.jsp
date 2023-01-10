@@ -107,8 +107,8 @@
                   </td>
                 </tr>
                 <c:choose>
-                  <c:when test="${player.achievements.size()>0}">
-                    <c:forEach items="${player.achievements}" var="achievement">
+                  <c:when test="${achievements.size()>0}">
+                    <c:forEach items="${achievements}" var="achievement">
                       <tr>
                         <td>
                           <c:out value="${achievement.name}"/>

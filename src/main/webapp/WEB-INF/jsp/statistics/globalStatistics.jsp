@@ -4,11 +4,12 @@
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<virus:layout pageName="ranking">
+<virus:layout pageName="globalStatistics">
   <table width="100%">
     <tr>
       <td>
-        <table width="50%" class="table table-striped">
+        <table width="50%" class="table table-striped" title="Ranking">
+          <h1>Ranking</h1>
           <thead>
             <th>Top</th>
             <th></th>

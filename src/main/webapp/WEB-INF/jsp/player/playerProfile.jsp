@@ -103,16 +103,28 @@
               <table>
                 <tr>
                   <td>
-                    <h2>Achievements</h2>
+                    <h2>Achievements<a style="padding-left: 20px;" href="/statistics/achievements">View All</a></h2> 
                   </td>
                 </tr>
-                <c:forEach items="${player.achievements}" var="achievement">
-                  <tr>
-                    <td>
-                      <c:out value="${achievement.name}"/>
-                    </td>
-                  </tr>
-                </c:forEach>
+                <c:choose>
+                  <c:when test="${player.achievements.size()>0}">
+                    <c:forEach items="${player.achievements}" var="achievement">
+                      <tr>
+                        <td>
+                          <c:out value="${achievement.name}"/>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </c:when>
+                  <c:otherwise>
+                    <tr>
+                      <td>
+                        You got no achievements
+                      </td>
+                    </tr>
+
+                  </c:otherwise>
+                </c:choose>
               </table>
             </td>
           </tr>

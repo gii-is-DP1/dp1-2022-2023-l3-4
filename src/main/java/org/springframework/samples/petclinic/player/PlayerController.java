@@ -17,6 +17,8 @@ package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -26,6 +28,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.samples.petclinic.achievements.Achievement;
+import org.springframework.samples.petclinic.achievements.AchievementService;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
@@ -55,6 +59,7 @@ public class PlayerController {
     private GameService gameService;
     private AuthenticationService authenticationService;
     private FriendService friendService;
+    private AchievementService achievementService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -63,16 +68,17 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs) {
         this.playerService = ps;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
+        this.achievementService = acs;
     }
 
 
     @GetMapping("/me")
-        public String listPlayerStatistics(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
+        public String playerProfile(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
         Player player = authenticationService.getPlayer();
         Pageable pageable = null;
         if(page == null || page == 0) {
@@ -86,6 +92,7 @@ public class PlayerController {
         Integer numGamesWon = gameService.getNumGamesWon(gp);
         Page<Game> games = gameService.findGamesByGameplayerPaged(gp, pageable);
         Duration totalTimePlayed = games.stream().map(x -> x.getDuration()).reduce((x,y) -> x.plus(y)).orElse(Duration.ZERO);
+        List<Achievement> achievements = achievementService.getPlayerAchievements(player);
        
         model.put("numGamesPlayed",numGamesPlayed);
         model.put("numGamesWon",numGamesWon);
@@ -95,6 +102,7 @@ public class PlayerController {
         model.put("totalPages", games.getTotalPages());
         model.put("currentPage", games.getNumber());
         model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
+        model.put("achievements", achievements);
         return USER_PROFILE;
   }
 
@@ -122,7 +130,7 @@ public class PlayerController {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room");
                 playerService.savePlayer(playerToUpdate);
                 model.put("message", "Your player information has been updated successfully");
-                return listPlayerStatistics(model, null);
+                return playerProfile(model, null);
             }
         }
         return "redirect:/player/me";

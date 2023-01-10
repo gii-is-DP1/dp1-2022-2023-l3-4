@@ -40,14 +40,20 @@
                 <td>
                     <c:out value="${ach.threshold}"/>
                 </td>
-                <td>
-                    <a href="/statistics/achievements/${ach.id}/edit"><span class="glyphicon glyphicon-pencil"></span></a>
-                    <a href="/statistics/achievements/${ach.id}/delete"><span class="glyphicon glyphicon-trash"></span></a>
-                </td>
+                <c:if test="${isAdmin}">
+                    <td>
+                        <a href="/statistics/achievements/${ach.id}/edit"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href="/statistics/achievements/${ach.id}/delete"><span class="glyphicon glyphicon-trash"></span></a>
+                    </td>
+                </c:if>
+                
             </tr>
         </c:forEach>
         </tbody>
     </table>
-    <a class="btn btn-default" href="/statistics/achievements/new">Create new achievement</a>
+    <c:if test="${isAdmin}">
+        <a class="btn btn-default" href="/statistics/achievements/new">Create new achievement</a>
+    </c:if>
+    
 
 </petclinic:layout>

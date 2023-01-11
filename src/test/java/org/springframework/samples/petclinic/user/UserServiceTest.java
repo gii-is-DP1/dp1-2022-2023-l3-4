@@ -3,8 +3,10 @@ package org.springframework.samples.petclinic.user;
 
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -50,7 +52,7 @@ public class UserServiceTest {
     @Test
     public void shoulDeletedUser(){
         userService.deleteUser("p");
-        assertTrue(!userService.findUser("p").equals(null), "The user was not deteleted.");
+        assertThrows(NoSuchElementException.class, () -> userService.findUser("p"));
         
     }
     

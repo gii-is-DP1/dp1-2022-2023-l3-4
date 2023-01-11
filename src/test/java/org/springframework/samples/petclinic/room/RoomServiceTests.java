@@ -35,11 +35,7 @@ class RoomServiceTests {
 
 
     @Test
-    @Transactional
-    public void shouldInsertRoom() throws DuplicatedNameRoomException, PlayerHostsExistingRoomException {
-        Collection<Room> rooms = this.roomService.findRoomsByRoomName("room");
-        int found = rooms.size();
-
+    void testConstraints(){
         Room room = new Room();
         room.setId(3);
         assertThrows(ConstraintViolationException.class,() -> roomRepository.save(room),

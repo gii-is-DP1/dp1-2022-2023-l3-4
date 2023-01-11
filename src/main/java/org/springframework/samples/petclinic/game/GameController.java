@@ -285,6 +285,8 @@ public class GameController {
 				cardService.infect(c_organ, c_virus);
 				cardService.save(c_virus);
 				cardService.save(c_organ);
+				gamePlayerService.save(c_virus.getGamePlayer());
+				gamePlayerService.save(c_organ.getGamePlayer());
 				if(old_card!=null)cardService.save(old_card);
 				return turn(gameId);
 			}catch(IllegalArgumentException e){

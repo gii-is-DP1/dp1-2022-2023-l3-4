@@ -38,9 +38,6 @@ public class GameControllerTest {
     private GamePlayerService gamePlayerServ;
 
     @MockBean
-    private AuthenticationService authenticationService;
-
-    @MockBean
     private CardService cardService;
 
     @MockBean
@@ -55,15 +52,22 @@ public class GameControllerTest {
     @MockBean
     private AuthenticationService authService;
 
-    @InjectMocks
-    private GameController gc;
+    @WithMockUser
+    @Test
+    public void testListRunningGames() throws Exception {
+        mockMvc.perform(get("/runningGames"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("games/runningGameListing"))
+            .andExpect(model().attributeExists("games"));
+
+    }
 
     @WithMockUser
     @Test
-    public void testGameListing() throws Exception {
-        mockMvc.perform(get("/games"))
+    public void testListTerminateGames() throws Exception {
+        mockMvc.perform(get("/terminateGames"))
             .andExpect(status().isOk())
-            .andExpect(view().name("games/listing"))
+            .andExpect(view().name("games/terminateGameListing"))
             .andExpect(model().attributeExists("games"));
 
     }

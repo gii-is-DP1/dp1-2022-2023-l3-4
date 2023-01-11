@@ -58,8 +58,8 @@ public class FriendService {
     }
 
     @Transactional
-    public Friend findFriendById(Integer playerId) throws DataAccessException {
-        Friend friend=friendRepository.findById(playerId).get();
+    public Friend findFriendById(Integer friendId) throws DataAccessException {
+        Friend friend=friendRepository.findById(friendId).get();
         return friend;
     }
 

@@ -16,6 +16,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
@@ -127,7 +128,7 @@ public class GameService {
 				if(c_organ1.getType().getType().toString()=="ORGAN"
 				&& c_organ2.getType().getType().toString()=="ORGAN"){
 				if(c_organ1.getVaccines().size()<2 && c_organ2.getVaccines().size()<2){
-				if(g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)){
+				if((g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)) || c_organ1.getType().getColour()==c_organ2.getType().getColour()){
 					cardService.changeGamePlayer(c_organ1, g1, g2);
 					cardService.changeGamePlayer(c_organ2, g2, g1);
 					if(c_organ1.getVaccines().size()==1){
@@ -173,29 +174,40 @@ public class GameService {
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
+		private void achus(Card virus, Card organ, GamePlayer gamePlayer1, GamePlayer gamePlayer2, List<Card> virusInTheBody, List<Card> cleanOrgans){
+			gamePlayer1.getCards().remove(virus);
+			virus.setGamePlayer(gamePlayer2);
+			virus.setCardVirus(organ);
+			organ.getVirus().add(virus);
+			virusInTheBody.remove(virus);
+			cleanOrgans.remove(organ);
+		}
+
 	
 
 	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
-		List<Card> infectedCards = new ArrayList<>();
-		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS && c.getType().getType() != Type.ORGAN) {
-				infectedCards.add(c);
-			}
-		}
+		List<Card> virusInTheBody = gamePlayer1.getVirusInTheBody();
+		List<Card> cleanOrgans = gamePlayer2.getCleanOrgans();
 		gamePlayer1.getCards().remove(card);
-		for (Card infectedCard : infectedCards) {
+		for (Card virus : virusInTheBody) {
 		//Comprobar si se pueden infectar sus organos
-			List<Card> body = gamePlayer2.getBody();
-			for (Card c : body) {
-				if (c.getType().getColour() == infectedCard.getType().getColour() 
-				&& c.getType().getType() == Type.ORGAN && c.getVirus().size()==0 && c.getVaccines().size()==0) {
-					gamePlayer1.getCards().remove(infectedCard);
-					infectedCard.setGamePlayer(gamePlayer2);
-					c.getVirus().add(infectedCard);
+			for (Card organ : cleanOrgans) {
+				if (organ.getType().getColour() == virus.getType().getColour()) {
+					achus(virus,organ,gamePlayer1,gamePlayer2,virusInTheBody,cleanOrgans);
 				}
 			}
+		}while(virusInTheBody.size()>0 && cleanOrgans.size()>0 &&(cardService.getColours(virusInTheBody).contains("RAINBOW")
+		|| cardService.getColours(cleanOrgans).contains("RAINBOW"))) {
+				if(cardService.getColours(virusInTheBody).contains("RAINBOW")){
+					Card virus = cardService.getARainBow(virusInTheBody);
+					achus(virus,cleanOrgans.get(0),gamePlayer1,gamePlayer2, virusInTheBody,cleanOrgans);
+				}else if(cardService.getColours(cleanOrgans).contains("RAINBOW")){
+					Card organ = cardService.getARainBow(cleanOrgans);
+					achus(virusInTheBody.get(0),organ,gamePlayer1,gamePlayer2, virusInTheBody,cleanOrgans);
+				}
+			} 
 		}
-	}
+	
 
 	public void glove(Card card, GamePlayer gamePlayer, Game game) {
 		gamePlayer.getCards().remove(card);

@@ -31,11 +31,13 @@ public class GameServiceTest {
     //Elementos comunes a addOrgan
     GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
     GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
+    GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
     GamePlayer gp1 = new GamePlayer(0);
     GamePlayer gp2 = new GamePlayer(1);
     Card organ_heart1 = new Card(0, false, gp1, generic_heart);
     Card organ_heart2 = new Card(1, false, gp2, generic_heart);
-    Card organ_stomach = new Card(1, true, gp2, generic_stomach);
+    Card organ_rainbow = new Card(3, false, gp2, generic_rainbow);
+    Card organ_stomach = new Card(2, true, gp2, generic_stomach);
     List<Card> cards = new ArrayList<>();
     ModelMap m = new ModelMap();
 
@@ -68,8 +70,21 @@ public class GameServiceTest {
     }
 
     @Test
-    //Jugar un corazón con un estómago ya en el cuerpo de otra persona que también tiene un corazón en la mano
+    //Jugar un organo arcoíris con un estómago ya en el cuerpo
     public void testAddOrganPositive3() {
+        //setup
+        cards.add(organ_stomach);
+        cards.add(organ_rainbow);
+        gp1.setCards(cards);
+        //test
+        gs.addOrgan(organ_rainbow, gp1, gp1, m);
+        assertEquals(2, gp1.getBody().size());
+        assertEquals(1, gp1.getHand().size());
+    }
+
+    @Test
+    //Jugar un corazón con un estómago ya en el cuerpo de otra persona que también tiene un corazón en la mano
+    public void testAddOrganPositive4() {
         //Setup
         gp1.setCards(cards);
         cards.clear();

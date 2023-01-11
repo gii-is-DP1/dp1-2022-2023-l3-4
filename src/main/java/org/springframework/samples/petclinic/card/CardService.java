@@ -89,10 +89,9 @@ public class CardService {
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
-		cardRepository.save(card);
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
-		virus_vaccine.setGamePlayer(organ.getGamePlayer());
+		changeGamePlayer(virus_vaccine,virus_vaccine.getGamePlayer(),organ.getGamePlayer());
 		if(virus_vaccine.getType().getType().toString()=="VIRUS"){
 			organ.getVirus().add(virus_vaccine);
 			virus_vaccine.setCardVirus(organ);
@@ -150,6 +149,13 @@ public class CardService {
  }
  public List<Card> findAllCardsByIds(List<Integer> cardIds) {
 	return cardRepository.findCardsByIds(cardIds);
+}
+
+public List<String> getColours(List<Card> cards){
+	return cards.stream().map(c->c.getType().getColour().toString()).collect(Collectors.toList());
+}
+public Card getARainBow(List<Card> cards){
+	return cards.stream().filter(v->v.getType().getColour().toString()=="RAINBOW").findAny().get();
 }
 
 }

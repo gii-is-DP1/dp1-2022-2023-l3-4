@@ -1,7 +1,6 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
-import java.util.Optional;
 
 
 import javax.validation.Valid;
@@ -18,12 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -165,6 +162,12 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room roomPlayer=player.getRoom();
 		Room room=this.roomService.findRoomById(roomId);
+		//Para cuando se borra una room que te redirect a room Search
+		if(room==null){
+			model.put("message", "the room you were in was deleted");
+			model.put("messageType", "warning");
+			return "redirect:/room/createSearch";
+		}
 		//Si no eres host de una room o ya perteneces a esa sala
 		if(roomService.findRoomByHost(player)==null||room.getId()==player.getRoom().getId()){
 			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&(player.getRoom()==null||!(room.getId()==roomPlayer.getId()))) {
@@ -236,5 +239,14 @@ public class RoomController {
 			}
       	  
   }
+
+  //permita salir de una room
+  @GetMapping("/exit/{roomId}")
+  	public String exitRoom(@PathVariable("roomId") int roomId){
+		Player player = authService.getPlayer();
+		player.setRoom(null);
+		playerService.savePlayer(player);
+		return "redirect:/";
+	}
 
 }

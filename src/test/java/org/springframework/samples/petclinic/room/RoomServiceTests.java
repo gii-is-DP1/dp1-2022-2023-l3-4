@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 class RoomServiceTests {
     
-    @Autowired(required = false)
+    @Autowired
     RoomRepository roomRepository;
 
     @Autowired
@@ -34,29 +34,6 @@ class RoomServiceTests {
     protected PlayerService playerService;
 
 
-    // @Test
-    // void testConstraints(){
-    //     Room room = new Room();
-    //     room.setId(3);
-    //     assertThrows(ConstraintViolationException.class,() -> roomRepository.save(room),
-    //     "You are not constraining "+
-    //     "the roomName property, it should be mandatory");
-
-    //     Room room2 = new Room();
-    //     room2.setId(3);
-    //     room2.setRoomName("sala7");
-    //     room2.setNumMaxPlayers(1);
-    //     assertThrows(Exception.class,() -> roomRepository.save(room2),
-    //     "The numMaxPLayers property must be between 2 and 6");
-
-    //     Room room3 = new Room();
-    //     room3.setId(3);
-    //     room3.setRoomName("salaaaaaaaaaaaaaaaaaaaa7");
-    //     room3.setNumMaxPlayers(4);
-    //     assertThrows(Exception.class,() -> roomRepository.save(room3),
-    //     "The roomName property must be between 1 and 20 characters");
-    // }
-
     @Test
     @Transactional
     public void shouldInsertRoom() throws DuplicatedNameRoomException, PlayerHostsExistingRoomException {
@@ -64,40 +41,61 @@ class RoomServiceTests {
         int found = rooms.size();
 
         Room room = new Room();
-        room.setRoomName("sala3");
-        room.setIsPrivate(true);
+        room.setId(3);
+        assertThrows(ConstraintViolationException.class,() -> roomRepository.save(room),
+        "You are not constraining "+
+        "the roomName property, it should be mandatory");
+
+        Room room2 = new Room();
+        room2.setId(4);
+        room2.setRoomName("sala7");
+        room2.setNumMaxPlayers(1);
+        assertThrows(Exception.class,() -> roomRepository.save(room2),
+        "The numMaxPLayers property must be between 2 and 6");
+
+        Room room3 = new Room();
+        room3.setId(5);
+        room3.setRoomName("salaaaaaaaaaaaaaaaaaaaa7");
+        room3.setNumMaxPlayers(4);
+        assertThrows(Exception.class,() -> roomRepository.save(room3),
+        "The roomName property must be between 1 and 20 characters");
+    }
+
+    @Test
+    @Transactional
+    public void shouldInsertRoom() throws DuplicatedNameRoomException, PlayerHostsExistingRoomException {
+        Collection<Room> rooms = this.roomService.findRoomsByRoomName("");
+        int found = rooms.size();
+
+        Room room = new Room();
+        room.setRoomName("room");
+        room.setIsPrivate(false);
         room.setNumMaxPlayers(5);
-            Player player = new Player();
-            player.setFirstName("Jefferson");
-            player.setLastName("Nunez");
-            room.setHost(player);
-            player.setRoom(room);
+        Player player = new Player();
+        player.setFirstName("Jefferson");
+        player.setLastName("Nunez");
+        this.playerService.savePlayer(player);
+        room.setHost(player);
 
-            Player player2 = new Player();
-            player2.setFirstName("Avery");
-            player2.setLastName("Pruitt");
-            player2.setRoom(room);
+        Player player2 = new Player();
+        player2.setFirstName("Avery");
+        player2.setLastName("Pruitt");
 
-            Player player3 = new Player();
-            player3.setFirstName("Kimberly");
-            player3.setLastName("McMahan");
-            player3.setRoom(room);
+        Player player3 = new Player();
+        player3.setFirstName("Kimberly");
+        player3.setLastName("McMahan");
 
-            Collection<Player> Players = new ArrayList<Player>();
-            Players.add(player);
-            Players.add(player2);
-            Players.add(player3);
-
-            this.playerService.savePlayer(player);
-            this.playerService.savePlayer(player2);
-            this.playerService.savePlayer(player3);
-            room.setPlayers(Players);
-
-            this.roomService.saveRoom(room);
+        this.roomService.saveRoom(room);
+        player.setRoom(room);
+        player2.setRoom(room);
+        player3.setRoom(room);
+        this.playerService.savePlayer(player);
+        this.playerService.savePlayer(player2);
+        this.playerService.savePlayer(player3);
         assertThat(room.getId().longValue()).isNotEqualTo(0);
 
-        rooms = this.roomService.findRoomsByRoomName("sala3");
-        assertThat(rooms.size()).isEqualTo(found + 1);
+        Collection<Room> rooms1 = this.roomService.findRoomsByRoomName("");
+        assertThat(rooms1.size()).isEqualTo(found + 1);
     }
 
     @Test
@@ -108,7 +106,7 @@ class RoomServiceTests {
         String newRoomName = oldRoomName + "X";
     
         room.setRoomName(newRoomName);
-        this.roomService.saveRoom(room);
+        this.roomService.updateRoom(room);
     
         room = this.roomService.findRoomById(1);
         assertThat(room.getRoomName()).isEqualTo(newRoomName);

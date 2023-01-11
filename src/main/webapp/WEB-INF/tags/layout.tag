@@ -10,6 +10,7 @@
 <virus:htmlHeader/>
 
 <body>
+<body background="\resources\images\virus-background.png"></body>
 <virus:bodyHeader menuName="${pageName}"/>
 
 <div class="container-fluid">

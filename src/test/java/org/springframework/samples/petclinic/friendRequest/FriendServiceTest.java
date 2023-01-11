@@ -36,13 +36,13 @@ public class FriendServiceTest {
         Collection<Player> friends = friendService.findFriendsById(1);
         assertTrue(friends.size() == 2, "The friend with id 1 should have 2 friends");
     }
-    
+
     @Test
     @Transactional
     public void testFindMyRecRequestById() {
         Collection<Friend> requests = friendService.findMyRecRequestById(1);
         assertTrue(requests.size() == 1, "The frind with id 1 should have 1 friend request");
-        
+
     }
 
     @Test
@@ -58,16 +58,16 @@ public class FriendServiceTest {
         Friend friend = friendService.findByPlayersId(3, 1);
         assertNotNull(friend, "El reposisotorio ha devuelto una lista nula");
         assertEquals(3, friend.getId(), "Los juagodores indicados no son amigos");
-        
+
     }
     @Test
     @Transactional
     public void testSavePlayer() { 
-       
+
 
         Player player1 = playerService.findPlayerById(3);
         Player player2 = playerService.findPlayerById(4);
-      
+
         friend20.setStatus(null);
         friend20.setPlayerRec(player1);
         friend20.setPlayerSend(player2);
@@ -78,10 +78,9 @@ public class FriendServiceTest {
    @Test
    @Transactional
    public void testDeleteFriendById() {
-   
+
         friendService.deleteFriendById(4);
         assertFalse(friendRepository.findById(4).isPresent(), "friend20 should have been deleted");
    }
-    
-}
 
+}

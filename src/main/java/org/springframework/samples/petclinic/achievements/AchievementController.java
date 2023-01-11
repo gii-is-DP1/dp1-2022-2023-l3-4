@@ -9,8 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -18,22 +17,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/statistics/achievements")
 public class AchievementController {
 
   private AchievementService achievementService;
-  public static final String ACHIEVEMENT_LISTING = "achievements/AchievementsListing";
+  private AuthenticationService authenticationService;
+  public static final String ACHIEVEMENT_LISTING = "achievements/achievementsListing";
   public static final String GET_ACHIEVEMENT = "achievements/Achievement";
   public static final String EDIT_ACHIEVEMENT = "achievements/createOrUpdateAchievementForm";
   public static final String INVALID_ACH = "achievements/invalidAchievement";
   
 
   @Autowired
-  public AchievementController(AchievementService achievementService) {
+  public AchievementController(AchievementService achievementService, AuthenticationService authenticationService) {
     this.achievementService = achievementService;
+    this.authenticationService = authenticationService;
   }
 
   @ModelAttribute("types")
@@ -41,22 +40,24 @@ public class AchievementController {
 		return this.achievementService.findAchievementTypes();
 	}
 
-  @GetMapping("/")
+  @GetMapping("/statistics/achievements")
   public String listAllAchievements(ModelMap model) {
     List<Achievement> allAchievements = achievementService.getAllAchievements();
+    Boolean isAdmin = authenticationService.getUser().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"));
     model.put("achievements", allAchievements);
+    model.put("isAdmin", isAdmin);
     return ACHIEVEMENT_LISTING;
   }
 
-  @GetMapping("/me")
+  @GetMapping("/player/me/achievements")
   public String getMyAchiements(ModelMap model, Principal principal) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    List<Achievement> myAchievements = achievementService.getMyAchievements(auth.getPrincipal().toString());
+    List<Achievement> myAchievements = achievementService.getPlayerAchievements(authenticationService.getPlayer());
     model.put("achievements", myAchievements);
+    model.put("isAdmin", false);
     return ACHIEVEMENT_LISTING;
   }
 
-  @GetMapping("/{id}/edit")
+  @GetMapping("/statistics/achievements/{id}/edit")
   public String getAchievement(@PathVariable("id") Integer id, ModelMap model) {
     Achievement achievement = achievementService.getAchievement(id);
     if (achievement != null) {
@@ -69,7 +70,7 @@ public class AchievementController {
     }
   }
   
-  @PostMapping("/{id}/edit")
+  @PostMapping("/statistics/achievements/{id}/edit")
   public String saveAchievement(@PathVariable("id") Integer id, @Valid Achievement achievement, BindingResult bindingResult, ModelMap model) {
     if (bindingResult.hasErrors()) {
       model.put("message", "Description cannot be empty");
@@ -90,7 +91,7 @@ public class AchievementController {
     }
   }
   
-  @GetMapping("/{id}/delete")
+  @GetMapping("/statistics/achievements/{id}/delete")
   public String removeAchievement(@PathVariable("id") Integer id, ModelMap model) {
     String message;
 
@@ -105,13 +106,13 @@ public class AchievementController {
     return listAllAchievements(model);
   }
 
-  @GetMapping("/new")
+  @GetMapping("/statistics/achievements/new")
   public String addAchievement(ModelMap model) {
     model.put("achievement", new Achievement());
     model.put("types", populateAchievementTypes());
     return EDIT_ACHIEVEMENT;
   }
-  @PostMapping("/new")
+  @PostMapping("/statistics/achievements/new")
   public String saveAchievement(@Valid Achievement achievement, BindingResult bindingResult, ModelMap model) {
     if (bindingResult.hasErrors()) {
       model.put("message", "The achievement already exists in the database");

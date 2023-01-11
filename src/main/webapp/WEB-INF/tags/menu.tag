@@ -55,10 +55,10 @@
 				</sec:authorize>
 				
 				<sec:authorize access="hasAnyAuthority('player')">
-				<petclinic:menuItem active="${name eq 'ranking'}" url="/ranking/global"
-					title="Top players">
-					<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-					<span>Ranking</span>
+				<petclinic:menuItem active="${name eq 'globalStatistics'}" url="/statistics/global"
+					title="Main game statistics">
+					<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+					<span>Statistics</span>
 				</petclinic:menuItem>
 				</sec:authorize>
 
@@ -103,6 +103,13 @@
 						</ul></li>
 				</sec:authorize>
 
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<petclinic:menuItem active="${name eq 'user'}" url="/users"
+					title="Users">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					<span>Users</span>
+				</petclinic:menuItem>
+				</sec:authorize>
 			</ul>
 
 
@@ -111,7 +118,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				<sec:authorize access="!isAuthenticated()">
 					<li><a href="<c:url value="/login" />">Login</a></li>
-					<li><a href="<c:url value="/users/new" />">Register</a></li>
+					<li><a href="<c:url value="/user/new" />">Register</a></li>
 				</sec:authorize>
 
 				<sec:authorize access="isAuthenticated()">

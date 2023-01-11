@@ -63,7 +63,11 @@ setInterval("actualizar()",10000);
                     </a>
                   </c:when>
                     <c:otherwise>
-                        
+                      <a href='<spring:url value="/room/exit/${room.id}" htmlEscape="true"/>'>
+                        <button>
+                            Exit
+                        </button>
+            </a>
                     </c:otherwise>
                 </c:choose>
                 

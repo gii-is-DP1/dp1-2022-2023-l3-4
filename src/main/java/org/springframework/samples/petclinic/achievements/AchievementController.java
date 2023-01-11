@@ -1,6 +1,5 @@
 package org.springframework.samples.petclinic.achievements;
 
-import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,14 +45,6 @@ public class AchievementController {
     Boolean isAdmin = authenticationService.getUser().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"));
     model.put("achievements", allAchievements);
     model.put("isAdmin", isAdmin);
-    return ACHIEVEMENT_LISTING;
-  }
-
-  @GetMapping("/player/me/achievements")
-  public String getMyAchiements(ModelMap model, Principal principal) {
-    List<Achievement> myAchievements = achievementService.getPlayerAchievements(authenticationService.getPlayer());
-    model.put("achievements", myAchievements);
-    model.put("isAdmin", false);
     return ACHIEVEMENT_LISTING;
   }
 
@@ -128,7 +119,7 @@ public class AchievementController {
       } catch (DuplicatedAchievementNameException e) {
         return INVALID_ACH;
       }
-      return listAllAchievements(model); // con esto evitamos que vuelvan a cargar el formulario en servidor
+      return listAllAchievements(model);
     }
   }
 

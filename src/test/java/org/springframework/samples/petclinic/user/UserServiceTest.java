@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.player;
+package org.springframework.samples.petclinic.user;
 
 
 
@@ -14,7 +14,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class UserServiceTest {
@@ -23,7 +22,7 @@ public class UserServiceTest {
 
     @Test
     public void shoulFindUser(){
-        User userPrueba= userService.findUser("frabenrui1").get();
+        User userPrueba= userService.findUser("frabenrui1");
         assertTrue(userPrueba.getUsername().equals("frabenrui1") , "There should be a user with name = p.");
         
     }
@@ -33,17 +32,17 @@ public class UserServiceTest {
         User userPrueba= new User();
         userPrueba.setUsername("prueba");
         userService.saveUser(userPrueba);
-        User comprobation= userService.findUser("prueba").get();
+        User comprobation= userService.findUser("prueba");
         assertTrue(comprobation.getUsername() == "prueba", "The user was not saved.");
         
     }
 
     @Test
     public void shoulUpdateUser(){
-        User userPrueba= userService.findUser("p").get();
+        User userPrueba= userService.findUser("p");
         userPrueba.setPassword("pswd");
         userService.saveUser(userPrueba);
-        User comprobation= userService.findUser("p").get();
+        User comprobation= userService.findUser("p");
         assertTrue(comprobation.getPassword() == "pswd", "The user was not updated.");
         
     }
@@ -51,7 +50,7 @@ public class UserServiceTest {
     @Test
     public void shoulDeletedUser(){
         userService.deleteUser("p");
-        assertTrue(!userService.findUser("p").isPresent(), "The user was not deteleted.");
+        assertTrue(!userService.findUser("p").equals(null), "The user was not deteleted.");
         
     }
     

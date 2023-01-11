@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,18 +53,18 @@ public class UserControllerTest{
 
     @BeforeEach
     void setUp() {
-        Page<User> mockUsers = new PageImpl<>(new ArrayList<>());
-        when(userService.findAll(any())).thenReturn(mockUsers);
         User mockUser = new User();
         mockUser.setUsername(TEST_USERNAME);
-        userService.saveUser(mockUser);
+        List<User> l = List.of(mockUser);
+        Page<User> mockUsers = new PageImpl<>(l);
+        when(userService.findAll(any())).thenReturn(mockUsers);
         when(userService.findUser(TEST_USERNAME)).thenReturn(mockUser);
     }
 
     @WithMockUser(value = "spring")
     @Test
     public void testInitCreationForm() throws Exception{
-        mockMvc.perform(get("/users/new")).andExpect(status().isOk()).andExpect(model().attributeExists("player"))
+        mockMvc.perform(get("/user/new")).andExpect(status().isOk()).andExpect(model().attributeExists("player"))
         .andExpect(view().name("users/createPlayerForm"));
     }
     

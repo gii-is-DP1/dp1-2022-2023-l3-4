@@ -9,32 +9,12 @@
 <body>
 	<h2>Profile</h2>
 	<mvc:form modelAttribute="player">
-    <table>
-			<tr>
-				<td><mvc:label path="firstName">First Name:</mvc:label></td>
-				<td style="padding-left: 20px"><mvc:input path="firstName"/></td>
-			</tr>
-			<tr>
-				<td><mvc:label path="lastName">Last Name:</mvc:label></td>
-				<td style="padding-left: 20px"><mvc:input path="lastName"/></td>
-			</tr>
-			<tr>
-				<td><mvc:label path="description">Description:</mvc:label></td>
-				<td style="padding-left: 20px"><mvc:input path="description"/></td>
-			</tr>
-			<tr>
-				<td><mvc:label path="status">Select status:</mvc:label>
-        <td style="padding-left: 20px"><mvc:checkbox path="status"/> Online</td>
-			</tr>
-			<tr>
-				<tr>
-					<td><mvc:label path="profileImage">Select profile image:</mvc:label>
-					<td style="padding-left: 20px"><mvc:input path="profileImage"/></td>
-				</tr>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="Save" /></td>
-			</tr>
-		</table>
+		<virus:inputField label="First Name" name="firstName"/>
+		<virus:inputField label="Last Name" name="lastName"/>
+		<virus:inputField label="Description" name="description"/>
+		<mvc:label path="status">Select status:</mvc:label>
+		<mvc:checkbox path="status"/> Online
+		<virus:inputField label="Select profile Image" name="profileImage"/>
+		<input type="submit" value="Save" />
   </mvc:form>
 </virus:layout>

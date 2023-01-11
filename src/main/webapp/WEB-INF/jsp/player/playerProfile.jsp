@@ -56,7 +56,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${statistics.numPlayedGames}"/> (<c:out value="${statistics.numWonGames} W - ${statistics.numPlayedGames - statistics.numWonGames} L"/>)
+                    <c:out value="${numGamesPlayed}"/> (<c:out value="${numGamesWon} W - ${numGamesPlayed - numGamesWon} L"/>)
                   </td>
                 </tr>
                 <tr>
@@ -66,7 +66,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${(statistics.numWonGames / statistics.numPlayedGames)*100} %"/>
+                    <c:out value="${(numGamesWon / numGamesPlayed)*100} %"/>
                   </td>
                 </tr>
               </table>
@@ -92,7 +92,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <c:out value="${(statistics.numWonGames / statistics.numPlayedGames)*100} %"/>
+                    <c:out value="${(numWonGames / numPlayedGames)*100} %"/>
                   </td>
                 </tr>
               </table>
@@ -103,16 +103,28 @@
               <table>
                 <tr>
                   <td>
-                    <h2>Achievements</h2>
+                    <h2>Achievements<a style="padding-left: 20px;" href="/statistics/achievements">View All</a></h2> 
                   </td>
                 </tr>
-                <c:forEach items="${player.achievements}" var="achievement">
-                  <tr>
-                    <td>
-                      <c:out value="${achievement.name}"/>
-                    </td>
-                  </tr>
-                </c:forEach>
+                <c:choose>
+                  <c:when test="${achievements.size()>0}">
+                    <c:forEach items="${achievements}" var="achievement">
+                      <tr>
+                        <td>
+                          <c:out value="${achievement.name}"/>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </c:when>
+                  <c:otherwise>
+                    <tr>
+                      <td>
+                        You got no achievements
+                      </td>
+                    </tr>
+
+                  </c:otherwise>
+                </c:choose>
               </table>
             </td>
           </tr>
@@ -126,7 +138,7 @@
           <c:choose>
             <c:when test="${games.size() > 0}">
                 <thead>
-                  <th>Game</th><th>Initial Hour</th><th>Duration</th><th></th>
+                  <th>Game</th><th>Date</th><th>Duration</th><th>Players</th><th>Rounds</th><th>Cards</th><th></th>
                 </thead>
                 <tbody>
                   <c:forEach items="${games}" var="game">
@@ -141,8 +153,19 @@
                         <c:out value="${game.humanReadableDuration()}"/>
                       </td>
                       <td>
+                        <c:out value="${game.gamePlayer.size()}"/>
+                      </td>
+                      <td>
+                        <c:out value="${game.round}"/>
+                      </td>
+                      <td>
+                        Organs: <c:out value="${game.numOrgansPlayed()}"/>
+                        Vaccines: <c:out value="${game.numVaccinesPlayed()}"/>
+                        Virus: <c:out value="${game.numVirusPlayed()}"/>
+                      </td>
+                      <td>
                         <c:choose>
-                          <c:when test="${game.gamePlayer.get(game.gamePlayer.indexOf(gameplayer)).isWinner()}">
+                          <c:when test="${game.winner.equals(gameplayer)}">
                             WIN
                           </c:when>
                           <c:otherwise>
@@ -152,6 +175,26 @@
                       </td>
                     </tr>
                   </c:forEach>
+                  <tr>
+                    <td>
+                      <c:if test="${currentPage < totalPages - 1 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage + 1}" htmlEscape="true"/>'>
+                          <button>
+                            Next page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                    <td>
+                      <c:if test="${currentPage > 0 }">
+                        <a href='<spring:url value="/player/me?page=${currentPage - 1}" htmlEscape="true"/>'>
+                          <button>
+                            Previous page
+                          </button>
+                        </a>
+                      </c:if>
+                    </td>
+                  </tr>
                 </tbody>
             </c:when>
             <c:otherwise>

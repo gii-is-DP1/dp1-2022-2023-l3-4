@@ -1,7 +1,6 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,7 +17,8 @@ public interface RoomRepository extends CrudRepository<Room,Integer>{
 	public Room findByRoomName(@Param("roomName") String roomName);
 
     @Query("SELECT room FROM Room room WHERE room.host =:player")
-    public Optional<Room> findRoomByHost(@Param("player") Player player);
+    public Room findRoomByHost(@Param("player") Player player);
     
+
 
 }

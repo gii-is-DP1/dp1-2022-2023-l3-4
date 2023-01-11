@@ -16,9 +16,15 @@
 package org.springframework.samples.petclinic.player;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.friendRequest.Friend;
+import org.springframework.samples.petclinic.friendRequest.FriendService;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +38,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayerService {
 
     private PlayerRepository playerRepository;
+    private GamePlayerService gamePlayerService;
+    private FriendService friendService;
     
 
     @Autowired
-    public PlayerService(PlayerRepository playerRepository){
+    public PlayerService(PlayerRepository playerRepository, GamePlayerService gamePlayerService, FriendService friendService){
         this.playerRepository = playerRepository;
+        this.gamePlayerService = gamePlayerService;
+        this.friendService = friendService;
     }
 
     @Transactional
@@ -64,7 +74,36 @@ public class PlayerService {
 
     @Transactional
     public Player findPlayerById(Integer id) {
-        return playerRepository.findById(id).get();
+        try {
+            return playerRepository.findById(id).get();
+        } catch (Exception e) {
+            return null;
+        }
+        
+    }
+
+    @Transactional(readOnly = false)
+    public void deletePlayer(Player player) {
+        GamePlayer gp = gamePlayerService.getGamePlayerByPlayer(player);
+        if (gp != null) {
+            gp.setPlayer(null);
+            gamePlayerService.save(gp);
+        }
+        List<Friend> friendsReq = friendService.findAllMyRequestById(player.getId()).stream().collect(Collectors.toList());
+        List<Friend> friendsRecReq = friendService.findMyRecRequestById(player.getId()).stream().collect(Collectors.toList());
+
+        for (Friend f: friendsReq) {
+            f.setPlayerRec(null);
+            f.setPlayerSend(null);
+            friendService.deleteFriend(f);
+        }
+        
+        for (Friend f: friendsRecReq) {
+            f.setPlayerRec(null);
+            f.setPlayerSend(null);
+            friendService.deleteFriend(f);
+        }
+        playerRepository.delete(player);
     }
 
 

@@ -34,7 +34,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				.antMatchers("/resources/**","/webjars/**","/h2-console/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/","/oups").permitAll()
-				.antMatchers("/users/new").permitAll()
 				.antMatchers("/session/**").permitAll()
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
 				.antMatchers("/genericCards/**").hasAnyAuthority("admin")
@@ -46,9 +45,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/room/**").authenticated()
 				.antMatchers("/friend/**").authenticated()
 				.antMatchers("/game/**").authenticated()
+				.antMatchers("/runningGames/**").hasAnyAuthority("admin")	
+				.antMatchers("/terminateGames/**").hasAnyAuthority("admin")	
 				.antMatchers("/games/**").authenticated()
-				.antMatchers("/statistics/**").hasAnyAuthority("admin")
-				.antMatchers("/ranking/global").authenticated()
+				.antMatchers("/statistics/achievements").authenticated()
+				.antMatchers("/statistics/achievements/**").hasAnyAuthority("admin")
+				.antMatchers("/statistics/global").authenticated()
+				.antMatchers("/users/**").hasAnyAuthority("admin")
+				.antMatchers("/user/new").permitAll()
 				.anyRequest().denyAll()
 				.and()
 				 	.formLogin()
@@ -58,6 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and()
 					.logout()
 						.logoutSuccessUrl("/"); 
+						
                 // Configuración para que funcione la consola de administración 
                 // de la BD H2 (deshabilitar las cabeceras de protección contra
                 // ataques de tipo csrf y habilitar los framesets si su contenido

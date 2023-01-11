@@ -27,19 +27,24 @@
 					<span>Home</span>
 				</petclinic:menuItem>
 
+
+
+				<sec:authorize access="hasAnyAuthority('player')">
+
 				<petclinic:menuItem active="${name eq 'room'}" url="/room/myRoom"
 					title="this is my room">
 					<span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
 					<span>My room</span>
 				</petclinic:menuItem>
 
-				<sec:authorize access="isAuthenticated()">
 				<petclinic:menuItem active="${name eq 'friend'}" url="/friend/myFriends"
 					title="this is my friends">
 					<span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span>
 					<span>Friends</span>
 				</petclinic:menuItem>
+
 				</sec:authorize>
+
 
 				<sec:authorize access="hasAnyAuthority('admin')">
 				<petclinic:menuItem active="${name eq 'achievement'}" url="/statistics/achievements/"
@@ -49,12 +54,62 @@
 				</petclinic:menuItem>
 				</sec:authorize>
 				
-				<petclinic:menuItem active="${name eq 'ranking'}" url="/ranking/global"
-					title="Top players">
-					<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-					<span>Ranking</span>
+				<sec:authorize access="hasAnyAuthority('player')">
+				<petclinic:menuItem active="${name eq 'globalStatistics'}" url="/statistics/global"
+					title="Main game statistics">
+					<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+					<span>Statistics</span>
 				</petclinic:menuItem>
+				</sec:authorize>
 
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<li class="dropdown"><a  class="dropdown-toggle"
+						data-toggle="dropdown"> 
+						<span class="glyphicon glyphicon-asterisk"></span>
+							Game <span
+							class="glyphicon glyphicon-chevron-down"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li>
+								<div class="navbar-login">
+									<div class="row">
+										
+											<p class="text-center">
+												<a href="<c:url value="/runningGames" />">
+												<span class="glyphicon glyphicon-play icon-size">Running Game</span>
+												</a>
+											</p>
+										
+	
+									</div>
+								</div>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<div class="navbar-login">
+									<div class="row">
+										
+											<p class="text-center">
+												<a href="<c:url value="/terminateGames" />">
+												<span class="glyphicon glyphicon-pause icon-size">Terminate Game</span>
+												</a>
+											</p>
+										
+	
+									</div>
+								</div>
+							</li>
+
+						</ul></li>
+				</sec:authorize>
+
+				<sec:authorize access="hasAnyAuthority('admin')">
+				<petclinic:menuItem active="${name eq 'user'}" url="/users"
+					title="Users">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					<span>Users</span>
+				</petclinic:menuItem>
+				</sec:authorize>
 			</ul>
 
 
@@ -63,8 +118,9 @@
 			<ul class="nav navbar-nav navbar-right">
 				<sec:authorize access="!isAuthenticated()">
 					<li><a href="<c:url value="/login" />">Login</a></li>
-					<li><a href="<c:url value="/users/new" />">Register</a></li>
+					<li><a href="<c:url value="/user/new" />">Register</a></li>
 				</sec:authorize>
+
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a  class="dropdown-toggle"
 						data-toggle="dropdown"> 

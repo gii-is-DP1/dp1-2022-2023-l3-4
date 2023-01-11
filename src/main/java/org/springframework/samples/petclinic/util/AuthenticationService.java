@@ -5,7 +5,6 @@ import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
-import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -16,8 +15,6 @@ public class AuthenticationService {
 
 	@Autowired
 	private PlayerService playerService;
-	@Autowired
-	private UserService userService;
 	@Autowired
 	private GameService gameService;
 	

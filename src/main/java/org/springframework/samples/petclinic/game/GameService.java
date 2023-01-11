@@ -2,16 +2,11 @@
 package org.springframework.samples.petclinic.game;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
@@ -22,12 +17,12 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.PlayerCount;
+import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import net.bytebuddy.asm.Advice.OffsetMapping.Target.ForArray.ReadOnly;
 
 @Service
 public class GameService {
@@ -49,9 +44,69 @@ public class GameService {
 	public List<Game> listGames(){
 		return gameRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public List<Game> findGamesByGameplayer(GamePlayer gamePlayer) {
+		return gameRepository.findGamesByGameplayer(gamePlayer);
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Game> findGamesByGameplayerPaged(GamePlayer gamePlayer, Pageable page) {
+		return gameRepository.findGamesByGameplayerPaged(gamePlayer, page);
+	}
+	
+	@Transactional(readOnly = true)
+	public Integer getNumGamesPlayed(GamePlayer p) {
+		return gameRepository.numGamesPlayed(p);
+	}
+
+	@Transactional(readOnly = true)
+	public Integer getNumGamesWon(GamePlayer p) {
+		return gameRepository.numGamesWon(p);
+	}
+
+	@Transactional(readOnly = true)
+	public List<PlayerCount> getRanking() {
+		return gameRepository.playerRanking();
+	}
+
+	@Transactional(readOnly = true)
+	public Integer getTotalGamesPlayed() {
+		return gameRepository.totalGamesPlayed();
+	}
+
+	@Transactional(readOnly = true)
+	public Collection<Game> listRunningGames(){
+		return gameRepository.findRunningGames();
+	}
+
+	
+	@Transactional(readOnly = true)
+	public Collection<Game> listTerminateGames(){
+		return gameRepository.findTerminategGames();
+	}
+
+	@Transactional(readOnly = true)
+	public Collection<Game> findGameByRoomId(Integer roomId){
+		return gameRepository.findGameByRoomId(roomId);
+	}
+
+	@Transactional(readOnly = true)
+	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
+		Game game = findGame(gameId);
+		GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
+		Boolean isYourTurn = currentTurnGamePlayer.equals(g);
+		return isYourTurn;
+	}
+
 	@Transactional(readOnly = true)
 	public Game findGame(Integer i){
 		return gameRepository.findById(i).get();
+	}
+
+	@Transactional(readOnly = true)
+	public Game getRunningGame(Room room) {
+		return gameRepository.findAnyRunningGame(room);
 	}
 
 	@Transactional
@@ -117,9 +172,7 @@ public class GameService {
 					
 					
 				}else{
-					model.put("message", "No puede poner dos órganos del mismo color en un cuerpo");
-					model.put("messageType", "info");
-					throw new IllegalArgumentException();		
+					throw new IllegalArgumentException("You can't add two " + organ.getType().getColour() + " organs to a body");		
 				}			
 		}
 
@@ -146,20 +199,18 @@ public class GameService {
 					else if(c_organ2.getVirus().size()==1){
 						Card virus2 = c_organ2.getVirus().get(0);
 						cardService.changeGamePlayer(virus2, g2, g1);
-					}
-					gamePlayerService.save(g1);
-					gamePlayerService.save(g2);				
+					}			
 				
 			}else{
-				throw new IllegalArgumentException("No pueden quedar cuerpos con órganos repetidos");
+				throw new IllegalArgumentException("A body can't have repeated organs.");
 			}
 
 			}else{
-				throw new IllegalArgumentException("No se pueden intercambiar órganos imnunizados");
+				throw new IllegalArgumentException("You can't exchange immunized organs.");
 				
 			}
 	} else{
-		throw new IllegalArgumentException("Solo se pueden intercambiar órganos");
+		throw new IllegalArgumentException("You can only exchange organs.");
 	}
 			}
 
@@ -183,7 +234,20 @@ public class GameService {
 			cleanOrgans.remove(organ);
 		}
 
-	
+
+        public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
+			// Verificamos que la víctima tenga la carta que se quiere robar
+			if (victimPlayer.getCards().contains(stolenCard)) {
+				// Realizamos el robo de la carta
+				stolenCard.setGamePlayer(thiefPlayer);
+				thiefCard.discard();
+				victimPlayer.getCards().remove(stolenCard);
+				thiefPlayer.getCards().add(stolenCard);
+				thiefPlayer.getCards().remove(thiefCard);
+				cardService.save(stolenCard);
+				cardService.save(thiefCard);
+			}
+	}
 
 	public void infection(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
 		List<Card> virusInTheBody = gamePlayer1.getVirusInTheBody();
@@ -209,24 +273,32 @@ public class GameService {
 		}
 	
 
-	public void glove(Card card, GamePlayer gamePlayer, Game game) {
-		gamePlayer.getCards().remove(card);
+	public void glove(GamePlayer gamePlayer, Game game) {
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
 			if (otherGamePlayer != gamePlayer) {  // Excluimos al jugador que ejecuta la acción
+				for(Card c: otherGamePlayer.getHand()) {
+					c.discard();
+					cardService.save(c);
+				}
 				otherGamePlayer.setCards(new ArrayList<>());  // Descartamos todas las cartas del mazo del jugador
 			}
 		}
 	}
 
 	public void medicalError(GamePlayer gamePlayer1, GamePlayer gamePlayer2) {
-		// Intercambiamos los cuerpos de los dos jugadores
 		List<Card> player1Cards = gamePlayer1.getBody();
 		List<Card> player2Cards = gamePlayer2.getBody();
-		gamePlayer1.getBody().removeAll(player1Cards);
-		gamePlayer1.getBody().addAll(player2Cards);
-		gamePlayer2.getBody().removeAll(player2Cards);
-		gamePlayer2.getBody().addAll(player1Cards);
-
+		for(Card c: player1Cards) {
+			c.setGamePlayer(gamePlayer2);
+			gamePlayer1.getCards().remove(c);
+		}
+		
+		for(Card c: player2Cards) {
+			c.setGamePlayer(gamePlayer1);
+			gamePlayer2.getCards().remove(c);
+		}
+		gamePlayer1.getCards().addAll(player2Cards);
+		gamePlayer2.getCards().addAll(player1Cards);
 	}
 		
 	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
@@ -264,32 +336,12 @@ public class GameService {
 				}
 				return classification;
 		}
-
-	public Map<GamePlayer, Integer> getRanking() {
-		List<GamePlayer> gpWinners = new ArrayList<>();
-		for (Game g: listGames()) {
-			GamePlayer gp = g.getGamePlayer().stream().filter(x -> x.getWinner().equals(true)).findFirst().get();
-			gpWinners.add(gp);
-		}
-
-		Map<GamePlayer, Integer> gpWins = new HashMap<>();
-		for (GamePlayer gp: gpWinners) {
-			if (gpWins.containsKey(gp)) {
-				gpWins.put(gp, gpWins.get(gp) + 1);
-			} else {
-				gpWins.put(gp, 1);
-			}
-		}
-
-		gpWins.entrySet().stream().sorted(Map.Entry.comparingByValue());
-		return gpWins;
-		// return new ArrayList<>(gpWins.keySet());
-
-	}
 	
 	@Transactional(readOnly = false)
 	public Game startGame(Room room) {
 		Game game = new Game();
+		game.setRoom(room);
+		game.setIsRunning(true);
 		game.setRound(0);
 		game.setTurn(0);
 		game.setInitialHour(LocalDateTime.now());
@@ -300,8 +352,7 @@ public class GameService {
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
-			GamePlayer gp = new GamePlayer();
-			gp.setPlayer(p);
+			GamePlayer gp = findGamePlayerByPlayer(p);
 			gp.setCards(new ArrayList<>());
 			gamePlayers.add(gp);
 			gamePlayerService.save(gp);
@@ -341,12 +392,16 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) {
+	public void finishGame(Game game) throws WonPlayedGamesException {
 		game.endGame();
 		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
 		game.setClassification(classification);
+		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
+    	game.getCards().stream().forEach(c -> {
+			c.setGamePlayer(null);
+			cardService.save(c);
+		} );
+    
 		save(game);
 	}
-
 }
-

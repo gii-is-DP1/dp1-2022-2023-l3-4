@@ -1,13 +1,14 @@
 package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
-import java.util.Optional;
 
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.room.exceptions.DuplicatedNameRoomException;
@@ -16,12 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -42,6 +41,9 @@ public class RoomController {
 
 	@Autowired
     private PlayerService playerService;
+
+	@Autowired
+    private GameService gameService;
 
     @Autowired
 	public RoomController(RoomService roomService) {
@@ -90,7 +92,7 @@ public class RoomController {
 	@GetMapping(value = "/edit")
 	public String initEditForm( ModelMap model) {
 		Player player = authService.getPlayer();
-		Room room =roomService.findRoomByHost(player).get();
+		Room room =roomService.findRoomByHost(player);
 		model.put("room", room);
 		model.put("player", player);
 		return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
@@ -99,7 +101,7 @@ public class RoomController {
 	@PostMapping(value = "/edit")
 	public String processEditForm(@Valid Room room, BindingResult result, ModelMap model) throws PlayerHostsExistingRoomException {	
 		Player player = authService.getPlayer();
-		Room roomOld = roomService.findRoomByHost(player).get();
+		Room roomOld = roomService.findRoomByHost(player);
 		if (result.hasErrors()) {
 			model.put("room", room);
 			return VIEWS_ROOM_CREATE_OR_UPDATE_FORM;
@@ -160,8 +162,14 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room roomPlayer=player.getRoom();
 		Room room=this.roomService.findRoomById(roomId);
+		//Para cuando se borra una room que te redirect a room Search
+		if(room==null){
+			model.put("message", "the room you were in was deleted");
+			model.put("messageType", "warning");
+			return "redirect:/room/createSearch";
+		}
 		//Si no eres host de una room o ya perteneces a esa sala
-		if(roomService.findRoomByHost(player).isEmpty()||room.getId()==player.getRoom().getId()){
+		if(roomService.findRoomByHost(player)==null||room.getId()==player.getRoom().getId()){
 			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&(player.getRoom()==null||!(room.getId()==roomPlayer.getId()))) {
 				model.put("player", player);
 				model.put("room", new Room());
@@ -191,6 +199,8 @@ public class RoomController {
 
 	}
 	
+
+	
 	@GetMapping("/delete/{roomId}")
 	public String deleteRoom(@PathVariable("roomId") int roomId, ModelMap model){
 		Player player = authService.getPlayer();
@@ -201,7 +211,14 @@ public class RoomController {
 				p.setRoom(null);
 				playerService.savePlayer(p);
 			});
-			roomService.deleteRoom(roomId);
+
+			Collection<Game> gamesByRoom=gameService.findGameByRoomId(room.getId());
+			gamesByRoom.forEach(g->{
+				g.setRoom(null);
+				gameService.save(g);
+			});
+			roomService.deleteRoom(room.getId());
+
 			return "redirect:/";
 		} else {
 			return "redirect:/";
@@ -214,13 +231,22 @@ public class RoomController {
 	@GetMapping("/myRoom")
         public String showMyRoom() {
 			Player player = authService.getPlayer();
-			Optional<Room> room=roomService.findRoomByHost(player);
-			if(room.isEmpty()){
+			Room room=roomService.findRoomByHost(player);
+			if(room==null){
 				return "redirect:/room/new";
 			}else{
-				return "redirect:/room/"+room.get().getId();
+				return "redirect:/room/"+room.getId();
 			}
       	  
   }
+
+  //permita salir de una room
+  @GetMapping("/exit/{roomId}")
+  	public String exitRoom(@PathVariable("roomId") int roomId){
+		Player player = authService.getPlayer();
+		player.setRoom(null);
+		playerService.savePlayer(player);
+		return "redirect:/";
+	}
 
 }

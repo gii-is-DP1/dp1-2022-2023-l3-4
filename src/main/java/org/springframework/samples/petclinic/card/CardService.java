@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
-import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 
 import java.util.Optional;
 
@@ -41,12 +41,10 @@ import java.util.Optional;
 public class CardService {
 
 	private CardRepository cardRepository;
-	private GamePlayerService gamePlayerService;
 
 	@Autowired
-	public CardService(CardRepository cardRepository, GamePlayerService gamePlayerService) {
+	public CardService(CardRepository cardRepository) {
 		this.cardRepository = cardRepository;
-		this.gamePlayerService = gamePlayerService;
 	}
 
 	@Transactional(readOnly = true)	
@@ -86,9 +84,13 @@ public class CardService {
 
 	@Transactional
 	public void changeGamePlayer(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		if((gamePlayer2.isThisOrganNotPresent(card) && card.getVaccines().size()<2) || card.getType().getType()==Type.VACCINE){
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
+		} else {
+			throw new IllegalArgumentException("No puedes robar un órgano que ya tienes o que esté inmunizado.");
+		}
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
 		changeGamePlayer(virus_vaccine,virus_vaccine.getGamePlayer(),organ.getGamePlayer());
@@ -108,7 +110,7 @@ public class CardService {
 				if(organ.getVaccines().size()<2){
 					infectOrVaccinate(organ, vaccine);
 				}else{
-					throw new IllegalArgumentException("Este órgano ya está inmunizado");
+					throw new IllegalArgumentException("This organ is already immunized");
 				}
 		
 			}else{
@@ -118,7 +120,7 @@ public class CardService {
 				vaccine.discard();
 			}
 			}else{
-				throw new IllegalArgumentException("No puedes vacunar un órgano que no sea ni arcoirís ni de tu color");
+				throw new IllegalArgumentException("You can only vaccinate a " + vaccine.getType().getColour() + " or RAINBOW organ with a " +vaccine.getType().getColour() + " vaccine.");
 			}
 	}
 
@@ -141,10 +143,10 @@ public class CardService {
 				virus.discard();
 				organ.setVaccines(new ArrayList<>());
 	  }else{
-		  throw new IllegalArgumentException("No puedes infectar un órgano inmunizado");
+		  throw new IllegalArgumentException("You can't infect an immunized organ.");
 	  }
   }else{
-	  throw new IllegalArgumentException("No puedes infectar un ógano que no sea ni arcoirís ni de tu color si tu virus no es arcoíris");
+	  throw new IllegalArgumentException("You can only infect a " + virus.getType().getColour() + " or RAINBOW organ with a " +virus.getType().getColour() + " virus.");
   }
  }
  public List<Card> findAllCardsByIds(List<Integer> cardIds) {

@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
@@ -31,19 +33,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "gamePlayers")
+@Table(name = "game_players")
 public class GamePlayer extends BaseEntity {
 	private Boolean winner;
 	private Boolean host;
 
     @OneToOne
+    @JoinColumn(name = "player_id", referencedColumnName = "id")
     private Player player;
     
 
-    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer")
+    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
     @JsonIgnore
     private List<Card> cards;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
+    private Set<Game> games;
 
     public GamePlayer(){
         
@@ -54,8 +59,8 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        this.host=false;
-        this.winner=false;
+        // this.host=false;
+        // this.winner=false;
     }
 
     public List<Card> getBody(){

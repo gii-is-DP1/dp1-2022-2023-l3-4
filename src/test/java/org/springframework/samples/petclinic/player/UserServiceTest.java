@@ -3,8 +3,10 @@ package org.springframework.samples.petclinic.player;
 
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,7 @@ public class UserServiceTest {
 
     @Test
     public void shoulFindUser(){
-        User userPrueba= userService.findUser("frabenrui1").get();
+        User userPrueba= userService.findUser("frabenrui1");
         assertTrue(userPrueba.getUsername().equals("frabenrui1") , "There should be a user with name = p.");
         
     }
@@ -33,17 +35,17 @@ public class UserServiceTest {
         User userPrueba= new User();
         userPrueba.setUsername("prueba");
         userService.saveUser(userPrueba);
-        User comprobation= userService.findUser("prueba").get();
+        User comprobation= userService.findUser("prueba");
         assertTrue(comprobation.getUsername() == "prueba", "The user was not saved.");
         
     }
 
     @Test
     public void shoulUpdateUser(){
-        User userPrueba= userService.findUser("p").get();
+        User userPrueba= userService.findUser("p");
         userPrueba.setPassword("pswd");
         userService.saveUser(userPrueba);
-        User comprobation= userService.findUser("p").get();
+        User comprobation= userService.findUser("p");
         assertTrue(comprobation.getPassword() == "pswd", "The user was not updated.");
         
     }
@@ -51,7 +53,7 @@ public class UserServiceTest {
     @Test
     public void shoulDeletedUser(){
         userService.deleteUser("p");
-        assertTrue(!userService.findUser("p").isPresent(), "The user was not deteleted.");
+        assertThrows(NoSuchElementException.class, () -> userService.findUser("p"));
         
     }
     

@@ -66,7 +66,7 @@ public class Player extends Person {
   	@JoinColumn(name = "username")
 	private User user;
 
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "player")
+	@OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = false, mappedBy = "player")
 	@JoinColumn(name = "gameplayer_id", referencedColumnName = "id")
 	private GamePlayer gamePlayer;
 

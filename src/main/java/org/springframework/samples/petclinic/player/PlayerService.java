@@ -74,10 +74,15 @@ public class PlayerService {
 
     @Transactional
     public Player findPlayerById(Integer id) {
-        return playerRepository.findById(id).get();
+        try {
+            return playerRepository.findById(id).get();
+        } catch (Exception e) {
+            return null;
+        }
+        
     }
 
-    @Transactional
+    @Transactional(readOnly = false)
     public void deletePlayer(Player player) {
         GamePlayer gp = gamePlayerService.getGamePlayerByPlayer(player);
         if (gp != null) {

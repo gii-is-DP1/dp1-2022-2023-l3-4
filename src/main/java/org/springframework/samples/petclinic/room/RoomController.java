@@ -162,6 +162,12 @@ public class RoomController {
 		Player player = authService.getPlayer();
 		Room roomPlayer=player.getRoom();
 		Room room=this.roomService.findRoomById(roomId);
+		//Para cuando se borra una room que te redirect a room Search
+		if(room==null){
+			model.put("message", "the room you were in was deleted");
+			model.put("messageType", "warning");
+			return "redirect:/room/createSearch";
+		}
 		//Si no eres host de una room o ya perteneces a esa sala
 		if(roomService.findRoomByHost(player)==null||room.getId()==player.getRoom().getId()){
 			if (room.getPlayers().size()>= room.getNumMaxPlayers()&&(player.getRoom()==null||!(room.getId()==roomPlayer.getId()))) {

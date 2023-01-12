@@ -92,7 +92,7 @@ public class GameControllerTest {
         
         mockMvc.perform(get("/games/{gameId}/delete", TEST_GAME_ID))
             .andExpect(status().isOk())
-            .andExpect(view().name("/terminateGames"))
+            .andExpect(view().name("games/terminateGameListing"))
             .andExpect(model().attributeExists("message"));
     }
 

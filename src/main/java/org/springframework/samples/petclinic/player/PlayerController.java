@@ -35,6 +35,7 @@ import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -60,6 +61,7 @@ public class PlayerController {
     private AuthenticationService authenticationService;
     private FriendService friendService;
     private AchievementService achievementService;
+    private UserService userService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -68,12 +70,13 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs, UserService userService) {
         this.playerService = ps;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
         this.achievementService = acs;
+        this.userService = userService;
     }
 
 
@@ -128,9 +131,18 @@ public class PlayerController {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
-                playerService.savePlayer(playerToUpdate);
-                model.put("message", "Your player information has been updated successfully");
-                return playerProfile(model, null);
+                if(player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
+                    bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+                    return EDIT_PROFILE;
+                } else {
+                    User userToUpdate = playerToUpdate.getUser();
+                    userToUpdate.setPassword(player.getUser().getPassword());
+                    userService.saveUser(userToUpdate);
+                    playerService.savePlayer(playerToUpdate);
+                    model.put("message", "Your player information has been updated successfully");
+                    return playerProfile(model, null);
+                }
+                
             }
         }
         return "redirect:/player/me";

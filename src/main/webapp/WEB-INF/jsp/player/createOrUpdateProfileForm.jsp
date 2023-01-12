@@ -12,6 +12,7 @@
 		<virus:inputField label="First Name" name="firstName"/>
 		<virus:inputField label="Last Name" name="lastName"/>
 		<virus:inputField label="Description" name="description"/>
+		<virus:passwordField label="Password" name="user.password"/>
 		<mvc:label path="status">Select status:</mvc:label>
 		<mvc:checkbox path="status"/> Online
 		<virus:inputField label="Select profile Image" name="profileImage"/>

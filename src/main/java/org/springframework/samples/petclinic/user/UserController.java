@@ -105,7 +105,7 @@ public class UserController {
 		}
 		
 		Page<Player> players = playerService.findAll(pageable);
-		if (players.getContent().size() > 1) {
+		if (players.getContent().size() >= 1) {
 			model.put("players", players.getContent());
 			model.put("totalPages", players.getTotalPages());
 			model.put("currentPage", players.getNumber());

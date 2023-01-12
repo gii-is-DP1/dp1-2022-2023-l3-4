@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class PlayerServiceTest {
+public class PlayerServiceTests {
     @Autowired
     protected PlayerService playerService;
 

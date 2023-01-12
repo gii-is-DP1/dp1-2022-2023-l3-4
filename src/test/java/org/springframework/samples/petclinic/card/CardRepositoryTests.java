@@ -2,7 +2,6 @@ package org.springframework.samples.petclinic.card;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 
 @DataJpaTest
-public class CardRepositoryTest {
+public class CardRepositoryTests {
 
     @Autowired
     CardRepository cr;

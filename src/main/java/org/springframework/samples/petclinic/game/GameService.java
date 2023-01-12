@@ -109,6 +109,11 @@ public class GameService {
 	}
 
 	@Transactional
+	public void deleteGame(Integer gameId) {
+		gameRepository.deleteById(gameId);
+	}
+
+	@Transactional
 	public void save(Game game){
 		gameRepository.save(game);
 

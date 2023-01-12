@@ -17,6 +17,7 @@ package org.springframework.samples.petclinic.game;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -101,6 +102,20 @@ public class GameController {
 		Collection<Game> terminateGames=  gameService.listTerminateGames();
 		model.put("games", terminateGames);
 		return TERMINATE_GAMES_LISTING;
+	}
+
+	@GetMapping(value="/games/{gameId}/delete")
+	public String deleteGame(@PathVariable("gameId") int gameId, ModelMap model) {
+		String message;
+		try {
+			gameService.deleteGame(gameId);
+			message = "Game " + gameId + " succesfully deleted";
+    } catch (EmptyResultDataAccessException e) {
+      message = "Game " + gameId + " doesn't exist";
+    }
+    model.put("message", message);
+    model.put("messageType", "info");
+    return terminateRunningGames(model);
 	}
 	
 	//Muestra vista Individual de cada jugador

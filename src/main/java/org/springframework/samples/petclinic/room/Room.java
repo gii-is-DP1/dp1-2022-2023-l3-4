@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic.room;
 
 import java.util.Collection;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -47,6 +48,6 @@ public class Room extends BaseEntity{
 
     private String password;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", orphanRemoval = true)
     private Collection<Game> games;
 }

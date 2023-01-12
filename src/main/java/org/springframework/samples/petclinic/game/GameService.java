@@ -303,30 +303,40 @@ public class GameService {
 			Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
 			if(healthyOrgans==4){
 				gamePlayer.setWinner(true);
+				List<GamePlayer> l = new ArrayList<>();
+				l.add(gamePlayer);
 				classification.put(1, List.of(gamePlayer));
 			} else if(healthyOrgans==3){
 				if(classification.containsKey(2)){
 					classification.get(2).add(gamePlayer);
 				}else{
-					classification.put(2, List.of(gamePlayer));
+					List<GamePlayer> l = new ArrayList<>();
+					l.add(gamePlayer);
+					classification.put(2, l);
 						}
 					} else if(healthyOrgans==2){
 						if(classification.containsKey(3)){
 							classification.get(3).add(gamePlayer);
 						}else{
-							classification.put(3, List.of(gamePlayer));
+							List<GamePlayer> l = new ArrayList<>();
+							l.add(gamePlayer);
+							classification.put(3, l);
 						}
 					} else if(healthyOrgans==1){
 						if(classification.containsKey(4)){
 							classification.get(4).add(gamePlayer);
 						}else{
-							classification.put(4, List.of(gamePlayer));
+							List<GamePlayer> l = new ArrayList<>();
+							l.add(gamePlayer);
+							classification.put(4, l);
 						}
 					} else {
 						if(classification.containsKey(5)){
 							classification.get(5).add(gamePlayer);
 						}else{
-							classification.put(5, List.of(gamePlayer));
+							List<GamePlayer> l = new ArrayList<>();
+							l.add(gamePlayer);
+							classification.put(5, l);
 						}
 					} 
 				}

@@ -17,6 +17,4 @@ public interface AchievementRepository extends CrudRepository<Achievement, Integ
   @Query("SELECT a FROM Achievement a WHERE a.threshold <= :numWonGames ORDER BY a.threshold DESC")
   public List<Achievement> findAchievementsBelowThreshold(@Param(value = "numWonGames") Integer numWonGames);
 
-  // @Query("SELECT u.achievements FROM User u WHERE u.username = :username")
-  // public List<Achievement> findByUsername(String username);
 }

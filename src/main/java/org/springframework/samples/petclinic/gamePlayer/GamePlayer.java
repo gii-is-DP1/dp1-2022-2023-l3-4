@@ -43,7 +43,7 @@ public class GamePlayer extends BaseEntity {
     private Player player;
     
 
-    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
+    @OneToMany(mappedBy = "gamePlayer")
     @JsonIgnore
     private List<Card> cards;
 

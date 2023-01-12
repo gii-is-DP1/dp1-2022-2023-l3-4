@@ -116,7 +116,7 @@ public class PlayerController {
     }
 
     @PostMapping(value="/me/edit")
-    public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
+    public String savePlayer(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
         if (bindingResult.hasFieldErrors("firstName")) {
             bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");

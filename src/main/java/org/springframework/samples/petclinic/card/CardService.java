@@ -84,16 +84,22 @@ public class CardService {
 
 	@Transactional
 	public void changeGamePlayer(Card card, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
-		if((gamePlayer2.isThisOrganNotPresent(card) && card.getVaccines().size()<2) || card.getType().getType()==Type.VACCINE){
 		gamePlayer1.getCards().remove(card);
 		gamePlayer2.getCards().add(card);
 		card.setGamePlayer(gamePlayer2);
-		} else {
-			throw new IllegalArgumentException("No puedes robar un órgano que ya tienes o que esté inmunizado.");
+		if(card.getType().getType()==Type.ORGAN){
+			if(card.getVaccines().size()==1){
+				Card vaccine1 = card.getVaccines().get(0);
+				changeGamePlayer(vaccine1, gamePlayer1, gamePlayer2);
+			}
+			else if(card.getVirus().size()==1){
+				Card virus1 = card.getVirus().get(0);
+				changeGamePlayer(virus1, gamePlayer1, gamePlayer2);
+			}
 		}
 	}
 	private void infectOrVaccinate(Card organ, Card virus_vaccine){		
-		virus_vaccine.setGamePlayer(organ.getGamePlayer());
+		changeGamePlayer(virus_vaccine,virus_vaccine.getGamePlayer(),organ.getGamePlayer());
 		if(virus_vaccine.getType().getType().toString()=="VIRUS"){
 			organ.getVirus().add(virus_vaccine);
 			virus_vaccine.setCardVirus(organ);
@@ -151,6 +157,13 @@ public class CardService {
  }
  public List<Card> findAllCardsByIds(List<Integer> cardIds) {
 	return cardRepository.findCardsByIds(cardIds);
+}
+
+public List<String> getColours(List<Card> cards){
+	return cards.stream().map(c->c.getType().getColour().toString()).collect(Collectors.toList());
+}
+public Card getARainBow(List<Card> cards){
+	return cards.stream().filter(v->v.getType().getColour().toString()=="RAINBOW").findAny().get();
 }
 
 }

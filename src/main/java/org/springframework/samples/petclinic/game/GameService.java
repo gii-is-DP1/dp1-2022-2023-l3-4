@@ -11,6 +11,7 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCardService;
+import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
@@ -180,38 +181,22 @@ public class GameService {
 				if(c_organ1.getType().getType().toString()=="ORGAN"
 				&& c_organ2.getType().getType().toString()=="ORGAN"){
 				if(c_organ1.getVaccines().size()<2 && c_organ2.getVaccines().size()<2){
-				if(g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)){
+				if((g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)) || c_organ1.getType().getColour()==c_organ2.getType().getColour()){
 					cardService.changeGamePlayer(c_organ1, g1, g2);
 					cardService.changeGamePlayer(c_organ2, g2, g1);
-					if(c_organ1.getVaccines().size()==1){
-						Card vaccine1 = c_organ1.getVaccines().get(0);
-						cardService.changeGamePlayer(vaccine1, g1, g2);
-					}
-					else if(c_organ1.getVirus().size()==1){
-						Card virus1 = c_organ1.getVirus().get(0);
-						cardService.changeGamePlayer(virus1, g1, g2);
-					}
-					else if(c_organ2.getVaccines().size()==1){
-						Card vaccine2 = c_organ2.getVaccines().get(0);
-						cardService.changeGamePlayer(vaccine2, g2, g1);
-					}
-					else if(c_organ2.getVirus().size()==1){
-						Card virus2 = c_organ2.getVirus().get(0);
-						cardService.changeGamePlayer(virus2, g2, g1);
-					}			
-				
+												
 			}else{
 				throw new IllegalArgumentException("A body can't have repeated organs.");
 			}
-
 			}else{
 				throw new IllegalArgumentException("You can't exchange immunized organs.");
 				
 			}
-	} else{
+		}else{
 		throw new IllegalArgumentException("You can only exchange organs.");
 	}
 			}
+		
 
 
 		public void changeTurn(Game game)	{
@@ -224,50 +209,61 @@ public class GameService {
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
+		private void achus(Card virus, Card organ, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+			cardService.changeGamePlayer(virus, gamePlayer1, gamePlayer2);
+			virus.setCardVirus(organ);
+			organ.getVirus().add(virus);
+		}
+
 
         public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
-			// Verificamos que la víctima tenga la carta que se quiere robar
-			if (victimPlayer.getCards().contains(stolenCard)) {
 				// Realizamos el robo de la carta
-				stolenCard.setGamePlayer(thiefPlayer);
-				thiefCard.discard();
-				victimPlayer.getCards().remove(stolenCard);
-				thiefPlayer.getCards().add(stolenCard);
-				thiefPlayer.getCards().remove(thiefCard);
-				cardService.save(stolenCard);
-				cardService.save(thiefCard);
-			}
-	}
-
-	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
-		List<Card> infectedCards = new ArrayList<>();
-		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS) {
-				infectedCards.add(c);
-			}
+				if(thiefPlayer.isThisOrganNotPresent(stolenCard)){
+					if(stolenCard.getVaccines().size()<2){
+						thiefPlayer.getCards().remove(thiefCard);
+						thiefCard.discard();
+						cardService.changeGamePlayer(stolenCard, victimPlayer, thiefPlayer);
+				}else{
+					throw new IllegalArgumentException("You can't stole an immune organ");
+				}
+				} else{
+					throw new IllegalArgumentException("You can't have repeated organs");
+				}
 		}
+	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		Card special_used = gamePlayer1.getHand().stream().filter(c->c.getType().getType()==Type.INFECTION).findFirst().get();
+		gamePlayer1.getCards().remove(special_used);
+		special_used.discard();
+		List<Card> virusInTheBody = gamePlayer1.getVirusInTheBody();
+		List<Card> cleanOrgans = gamePlayer2.getCleanOrgans();
 		
+		for (Card virus : virusInTheBody) {
 		//Comprobar si se pueden infectar sus organos
-			List<Card> body = gamePlayer2.getBody();
-			for (Card c : body) {
-				for (Card infectedCard : infectedCards) {
-					if (c.getVaccines().size()==0 && c.getVirus().size()==0) {
-						if (c.getType().getColour() == infectedCard.getType().getColour()) {
-						gamePlayer1.getCards().remove(infectedCard);
-						infectedCard.setGamePlayer(gamePlayer2);
-						gamePlayer2.getCards().add(infectedCard);
-						List<Card> virus = c.getVirus();
-						virus.add(infectedCard);
-						c.setVirus(virus);
-						} else {
-							throw new IllegalArgumentException("You can't infect an already infected organ.");
-						}
-					} else {
-						throw new IllegalArgumentException("You can't infect an immunized organ.");
+			for (Card organ : cleanOrgans) {
+				if (organ.getType().getColour() == virus.getType().getColour()) {
+					achus(virus,organ,gamePlayer1,gamePlayer2);
 				}
 			}
 		}
-	}
+		virusInTheBody = gamePlayer1.getVirusInTheBody();
+		cleanOrgans = gamePlayer2.getCleanOrgans();
+		
+		while(virusInTheBody.size()>0 && cleanOrgans.size()>0 &&(cardService.getColours(virusInTheBody).contains("RAINBOW")
+		|| cardService.getColours(cleanOrgans).contains("RAINBOW"))) {
+				if(cardService.getColours(virusInTheBody).contains("RAINBOW")){
+					Card virus = cardService.getARainBow(virusInTheBody);
+					achus(virus,cleanOrgans.get(0),gamePlayer1,gamePlayer2);
+					virusInTheBody.remove(virus);
+					cleanOrgans.remove(cleanOrgans.get(0));
+				}else if(cardService.getColours(cleanOrgans).contains("RAINBOW")){
+					Card organ = cardService.getARainBow(cleanOrgans);
+					achus(virusInTheBody.get(0),organ,gamePlayer1,gamePlayer2);
+					virusInTheBody.remove(virusInTheBody.get(0));
+					cleanOrgans.remove(organ);
+				}
+			} 
+		}
+	
 
 	public void glove(GamePlayer gamePlayer, Game game) {
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {

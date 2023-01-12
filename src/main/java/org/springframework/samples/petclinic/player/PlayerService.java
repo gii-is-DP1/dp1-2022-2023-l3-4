@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.friendRequest.Friend;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
@@ -48,6 +50,11 @@ public class PlayerService {
         this.gamePlayerService = gamePlayerService;
         this.friendService = friendService;
     }
+
+    @Transactional(readOnly = true)
+	public Page<Player> findAll(Pageable pageable) {
+		return playerRepository.findAll(pageable);
+	}
 
     @Transactional
     public void savePlayer(Player player) throws DataAccessException {

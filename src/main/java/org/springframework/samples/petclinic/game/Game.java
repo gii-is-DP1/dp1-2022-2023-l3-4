@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -44,20 +45,20 @@ public class Game extends BaseEntity {
 	private Integer turn;
 	private Duration duration;
 	
-	@ManyToOne(optional = true)
+	@ManyToOne(cascade = CascadeType.PERSIST, optional = true)
 	private Room room;
 	
 	@Transient
 	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Card> cards;
 
 	@Size(min=2, max=6)
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.PERSIST)
 	private List<GamePlayer> gamePlayer;
 
-	@ManyToOne(optional = true)
+	@ManyToOne(cascade = CascadeType.PERSIST, optional = true)
 	private GamePlayer winner;
 
 	public List<Card> baraja(){

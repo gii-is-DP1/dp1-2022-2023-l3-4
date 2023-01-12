@@ -6,14 +6,17 @@
 
 <petclinic:layout pageName="friends">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h2>Friends</h2>
+        </div>
+        <div class="col-md-2">
+            <a href="/friend/myInvitationRequests">My Invitation Requests</a>
         </div>
         <div class="col-md-2">
             <a href="/friend/myFriendsRequest">My Friends Request</a>
         </div>
         <div class="col-md-2">
-            <a href="/player/createSearch">Search Player</a>
+            <a href="/player/search">Search Player</a>
         </div>
     </div>
 

@@ -48,6 +48,11 @@ public class InvitationService {
     }
 
     @Transactional
+    public void saveInvitation(Invitation invitation) throws DataAccessException {
+        invitationRepository.save(invitation);
+    }
+
+    @Transactional
     public void deleteInvitationById(Integer requestId) throws DataAccessException {
         invitationRepository.deleteById(requestId);
     }

@@ -21,6 +21,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.player.PlayerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Spring Data JPA OwnerRepository interface
@@ -36,5 +38,6 @@ public interface PlayerRepository extends CrudRepository<Player, Integer> {
   @Query("SELECT p FROM Player p WHERE p.user.username = :username")
   public Player findPlayerByUsername(@Param("username") String username);
 
+  Page<Player> findAll(Pageable pageable);
 
 }

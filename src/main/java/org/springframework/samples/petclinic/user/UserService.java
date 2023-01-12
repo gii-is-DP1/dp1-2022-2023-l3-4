@@ -18,8 +18,6 @@ package org.springframework.samples.petclinic.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.stereotype.Service;
@@ -52,11 +50,6 @@ public class UserService {
 	@Transactional(readOnly = true	)
 	public User findUser(String username) {
 		return userRepository.findById(username).get();
-	}
-
-	@Transactional(readOnly = true)
-	public Page<User> findAll(Pageable pageable) {
-		return userRepository.findAll(pageable);
 	}
 
 	@Transactional

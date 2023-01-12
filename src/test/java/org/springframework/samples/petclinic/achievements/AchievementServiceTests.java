@@ -40,6 +40,7 @@ public class AchievementServiceTests {
     Achievement achievement = new Achievement();
     achievement.setName("Rompiendo el sistema");
     achievement.setDescription("Nada que objetar");
+    achievement.setThreshold(100);
     achievement.setType(achievementService.findAchievementTypes().get(0));
     Achievement newAchievement;
     newAchievement = achievementService.saveAchievement(achievement);

@@ -138,7 +138,7 @@ public class UserController {
 		} else {
 			User userToUpdate = userService.findUser(username);
 			if (userToUpdate != null) {
-				BeanUtils.copyProperties(user, userToUpdate, "username");
+				BeanUtils.copyProperties(user, userToUpdate, "username", "authorities", "player");
 				userService.saveUser(userToUpdate);
 				model.put("message", "Your user information has been updated successfully");
 				return findAll(model, null);

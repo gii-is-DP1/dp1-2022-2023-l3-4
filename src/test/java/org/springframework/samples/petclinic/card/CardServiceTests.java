@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class CardServiceTest {
+public class CardServiceTests {
     @Autowired
     CardService cs;
 

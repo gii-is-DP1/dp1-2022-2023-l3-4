@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.samples.petclinic.player.Player;
 
 @DataJpaTest
-public class FriendRepositoryTest {
+public class FriendRepositoryTests {
     @Autowired
     FriendRepository friendRepository;
 

@@ -41,7 +41,7 @@ public class FriendServiceTests {
     @Transactional
     public void testFindMyRecRequestById() {
         Collection<Friend> requests = friendService.findMyRecRequestById(1);
-        assertTrue(requests.size() == 1, "The frind with id 1 should have 1 friend request");
+        assertTrue(requests.size() == 1, "The friend with id 1 should have 1 friend request");
 
     }
 

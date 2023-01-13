@@ -113,7 +113,7 @@ public class PlayerController {
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
-                BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
+                BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "friendInvitationSend", "friendInvitationRec", "achievements", "room", "gamePlayer");
                 if(player.getUser() == null || player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
                     bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
                     return EDIT_PROFILE;

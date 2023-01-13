@@ -72,19 +72,21 @@ public class UserController {
 		} else if (bindingResult.hasFieldErrors("lastName")) {
 			bindingResult.rejectValue("lastName", "Last name cannot be empty.", "Last name cannot be empty.");
 			return CREATE_OR_UPDATE_PLAYER;
-		} else if (bindingResult.hasFieldErrors("user.username")) {
-			bindingResult.rejectValue("user.username", "User name cannot be empty.", "User name cannot be empty.");
-			return CREATE_OR_UPDATE_PLAYER;
-		}	else if (bindingResult.hasFieldErrors("user.password")) {
-			bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
-			return CREATE_OR_UPDATE_PLAYER;
 		}	else {
 			//creating player, gamePlayer, user, and authority
 			try {
-				this.userService.saveUser(player.getUser());
-				this.playerService.savePlayer(player);
-				this.gamePlayerService.saveGamePlayerForNewPlayer(player);
-				this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+				if (player.getUser().getPassword() == null) {
+					bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+					return CREATE_OR_UPDATE_PLAYER;
+				} else if (player.getUser().getUsername() == null) {
+					bindingResult.rejectValue("user.username", "User name cannot be empty.", "User name cannot be empty.");
+					return CREATE_OR_UPDATE_PLAYER;
+				} else {
+					this.userService.saveUser(player.getUser());
+					this.playerService.savePlayer(player);
+					this.gamePlayerService.saveGamePlayerForNewPlayer(player);
+					this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+				}
 			} catch (DuplicatedUserException e) {
 				return INVALID_USER;
 			}

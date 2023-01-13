@@ -65,11 +65,21 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/user/new")
-	public String processCreationForm(@Valid Player player, BindingResult result) throws PlayerNotFoundException {
-		if (result.hasErrors()) {
+	public String processCreationForm(@Valid Player player, BindingResult bindingResult) throws PlayerNotFoundException {
+		
+		if (bindingResult.hasFieldErrors("firstName")) {
+			bindingResult.rejectValue("firstName", "First name cannot be empty.", "First name cannot be empty.");
 			return VIEWS_PLAYER_CREATE_FORM;
-		}
-		else {
+		} else if (bindingResult.hasFieldErrors("lastName")) {
+			bindingResult.rejectValue("lastName", "Last name cannot be empty.", "Last name cannot be empty.");
+			return VIEWS_PLAYER_CREATE_FORM;
+		} else if (bindingResult.hasFieldErrors("user.username")) {
+			bindingResult.rejectValue("user.username", "User name cannot be empty.", "User name cannot be empty.");
+			return VIEWS_PLAYER_CREATE_FORM;
+		}	else if (bindingResult.hasFieldErrors("user.password")) {
+			bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+			return VIEWS_PLAYER_CREATE_FORM;
+		}	else {
 			//creating player, gamePlayer, user, and authority
 			try {
 				this.userService.saveUser(player.getUser());
@@ -118,17 +128,19 @@ public class UserController {
 	}
 
 	@PostMapping("/users/{username}/edit")
-	public String saveUser(@PathVariable("username") String username, @Valid Player player, BindingResult br, ModelMap model) {
-		if (br.hasErrors()) {
-			model.put("message", "The username cannot be empty");
-			model.put("messageType", "info");
-			return findAll(model, null);
+	public String saveUser(@PathVariable("username") String username, @Valid Player player, BindingResult bindingResult, ModelMap model) {
+		if (bindingResult.hasFieldErrors("firstName")) {
+			bindingResult.rejectValue("firstName", "First name cannot be empty.", "First name cannot be empty.");
+			return EDIT_USER;
+		} else if (bindingResult.hasFieldErrors("lastName")) {
+			bindingResult.rejectValue("lastName", "Last name cannot be empty.", "Last name cannot be empty.");
+			return EDIT_USER;
 		} else {
 			Player playerToUpdate = playerService.getPlayerByUsername(username);
 			if (playerToUpdate != null) {
-				BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
+				BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "friendInvitationSend", "friendInvitationRec", "achievements", "room", "gamePlayer");
 				if(player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
-						br.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+						bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
 						return EDIT_USER;
 				} else {
 						User userToUpdate = playerToUpdate.getUser();

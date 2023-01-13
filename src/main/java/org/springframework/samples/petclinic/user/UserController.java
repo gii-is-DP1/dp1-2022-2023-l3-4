@@ -53,6 +53,7 @@ public class UserController {
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 	private static final String USERS = "users/usersListing";
 	private static final String EDIT_USER = "player/createOrUpdateProfileForm";
+	private static final String INVALID_USER = "users/invalidUser";
 	
 
 	private UserService userService;
@@ -87,10 +88,14 @@ public class UserController {
 		}
 		else {
 			//creating player, gamePlayer, user, and authority
-			this.userService.saveUser(player.getUser());
-			this.playerService.savePlayer(player);
-			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
-			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+			try {
+				this.userService.saveUser(player.getUser());
+				this.playerService.savePlayer(player);
+				this.gamePlayerService.saveGamePlayerForNewPlayer(player);
+				this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+			} catch (DuplicatedUserException e) {
+				return INVALID_USER;
+			}
 			return "redirect:/";
 		}
 	}
@@ -145,7 +150,7 @@ public class UserController {
 				} else {
 						User userToUpdate = playerToUpdate.getUser();
 						userToUpdate.setPassword(player.getUser().getPassword());
-						userService.saveUser(userToUpdate);
+						userService.updateUser(userToUpdate);
 						playerService.savePlayer(playerToUpdate);
 						model.put("message", "Your player information has been updated successfully");
 						return findAll(model, null);

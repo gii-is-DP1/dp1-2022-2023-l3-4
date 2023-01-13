@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic.user;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -63,14 +64,44 @@ public class UserControllerTests{
         Page<Player> mockPlayers = new PageImpl<>(l);
         when(playerService.findAll(any())).thenReturn(mockPlayers);
         when(userService.findUser(TEST_USERNAME)).thenReturn(user);
+        when(userService.findAll()).thenReturn(List.of(user));
         when(playerService.getPlayerByUsername(TEST_USERNAME)).thenReturn(mockPlayer);
     }
-
+    
     @WithMockUser(value = "spring")
     @Test
     public void testInitCreationForm() throws Exception{
-        mockMvc.perform(get("/user/new")).andExpect(status().isOk()).andExpect(model().attributeExists("player"))
+        mockMvc.perform(get("/user/new"))
+        .andExpect(status().isOk())
+        .andExpect(model().attributeExists("player"))
         .andExpect(view().name("users/createPlayerForm"));
+    }
+    
+    @WithMockUser(value = "spring")
+    @Test
+    public void testPostCreationForm() throws Exception{
+        mockMvc.perform(post("/user/new")
+            .with(csrf())
+            .param("firstName" ,"Pablo")
+            .param("lastName", "Cerezo")
+            .param("user.username", "pabpabmar")
+            .param("password", "pwd"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/"));
+    }
+        
+    @WithMockUser(value = "spring")
+    @Test
+    public void testPostCreationFormBadUsername() throws Exception{
+        doThrow(DuplicatedUserException.class).when(userService).saveUser(any());
+        mockMvc.perform(post("/user/new")
+            .with(csrf())
+            .param("firstName" ,"Pablo")
+            .param("lastName", "Cerezo")
+            .param("user.username", "frabenrui1")
+            .param("password", "pwd"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("users/invalidUser"));
     }
     
     @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")

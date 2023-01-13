@@ -137,7 +137,7 @@ public class PlayerController {
                 } else {
                     User userToUpdate = playerToUpdate.getUser();
                     userToUpdate.setPassword(player.getUser().getPassword());
-                    userService.saveUser(userToUpdate);
+                    userService.updateUser(userToUpdate);
                     playerService.savePlayer(playerToUpdate);
                     model.put("message", "Your player information has been updated successfully");
                     return playerProfile(model, null);

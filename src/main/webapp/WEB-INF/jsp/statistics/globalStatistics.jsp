@@ -47,7 +47,7 @@
             <c:forEach items="${rops}" var="rop">
               <tr>
                 <td>
-                  <c:out value="${rops.indexOf(rop) + 1}"/>
+                  <c:out value="${rops.indexOf(rop) + 4}"/>
                 </td>
                 <td>
                   <c:if test="${rop.player.profileImage == ''}"></c:if>

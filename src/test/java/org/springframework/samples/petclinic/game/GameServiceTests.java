@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +26,7 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
+import org.springframework.samples.petclinic.statistics.PlayerCount;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
@@ -529,14 +530,8 @@ public class GameServiceTests {
         gamePlayers.add(gp5);
         gamePlayers.add(gp6);
         gamePlayers.add(gp7);
-
-        Map<Integer, List<GamePlayer>> classification = new HashMap<>();
-        classification.put(1, List.of(gp1));
-        classification.put(2, List.of(gp2,gp3));
-        classification.put(3, List.of(gp4,gp5));
-        classification.put(4, List.of(gp6,gp7));
         //test
-        assertEquals(classification,gs.clasificate(gamePlayers));
+        assertEquals(List.of(gp1,gp2,gp3,gp4,gp5,gp6,gp7),gs.classificate(gamePlayers));
     }
 
     @Test
@@ -635,24 +630,54 @@ public class GameServiceTests {
         assertEquals(0, gp1.getHand().size());
     }
 
-    // @Test 
-    // public void testFinishGame(){
-    //     //setup
-    //     gp1.getCards().clear();
-    //     classificateCommonMethod(organ_brain,gp1);
-    //     organ_heart1.getVirus().clear();
-    //     classificateCommonMethod(organ_heart1,gp1);
-    //     classificateCommonMethod(organ_rainbow,gp1);
-    //     classificateCommonMethod(organ_stomach,gp1);
-    //     gamePlayers.add(gp1);
-    //     g.setGamePlayer(gamePlayers);
-    //     when(cr.save(any())).thenReturn(vax_heart);
-    //     when(gr.save(g)).thenReturn(g);
-    //     //test
-    //     gs.finishGame(g);
-    //     assertEquals(false, g.getIsRunning());
+    @Test 
+    public void testFinishGame(){
+        //setup
+        gp1.getCards().clear();
+        classificateCommonMethod(organ_brain,gp1);
+        organ_heart1.getVirus().clear();
+        classificateCommonMethod(organ_heart1,gp1);
+        classificateCommonMethod(organ_rainbow,gp1);
+        classificateCommonMethod(organ_stomach,gp1);
+        gamePlayers.add(gp1);
+        g.setGamePlayer(gamePlayers);
+        when(cr.save(any())).thenReturn(vax_heart);
+        when(gr.save(g)).thenReturn(g);
+        //test
+        gs.finishGame(g);
+        assertEquals(false, g.getIsRunning());
+    }
+    
+    @Test 
+    public void testIsYourTurn(){
+        //setup
+        gamePlayers.add(gp1);
+        g.setGamePlayer(gamePlayers);
+        g.setTurn(0);
+        g.setId(0);
+        Optional<Game> g_o = Optional.of(g);
+        when(gr.findById(any())).thenReturn(g_o);
+        //test
+        assertEquals(true, gs.isYourTurn(gp1, 0));
+    }
 
-    // }
+    @Test 
+    public void testFindAll(){
+        List<Game> games = List.of(g); 
+        when(gr.findAll()).thenReturn(games);
+        assertEquals(games, gs.listGames());
+    }
 
+    @Test
+    public void testGetNumGamesPlayed(){
+        when(gr.numGamesPlayed(gp1)).thenReturn(3);
+        assertEquals(3, gs.getNumGamesPlayed(gp1));
+    }
+
+    @Test
+    public void testGetNumGamesWon(){
+        when(gr.numGamesWon(gp1)).thenReturn(3);
+        assertEquals(3, gs.getNumGamesWon(gp1));
+    }
 
 }

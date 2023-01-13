@@ -166,7 +166,12 @@ public class RoomController {
 		if(room==null){
 			model.put("message", "the room you were in was deleted");
 			model.put("messageType", "warning");
-			return "redirect:/room/createSearch";
+			return createSearch(model);
+		}
+
+		Game game = gameService.getRunningGame(room);
+		if(game!=null){
+			return "redirect:/games/"+game.getId();
 		}
 		//Si no eres host de una room o ya perteneces a esa sala
 		if(roomService.findRoomByHost(player)==null||room.getId()==player.getRoom().getId()){

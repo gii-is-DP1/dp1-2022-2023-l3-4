@@ -97,9 +97,9 @@ public class UserController {
 	public String findAll(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
 		Pageable pageable = null;
 		if(page == null || page == 0) {
-			pageable = PageRequest.of(0, 10, Sort.by(Order.asc("user.username")));
+			pageable = PageRequest.of(0, 5, Sort.by(Order.asc("user.username")));
 		} else {
-			pageable = PageRequest.of(page, 10, Sort.by(Order.asc("user.username")));
+			pageable = PageRequest.of(page, 5, Sort.by(Order.asc("user.username")));
 		}
 		
 		Page<Player> players = playerService.findAll(pageable);

@@ -48,6 +48,6 @@ public class Room extends BaseEntity{
 
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "room")
     private Collection<Game> games;
 }

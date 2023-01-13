@@ -3,8 +3,6 @@ package org.springframework.samples.petclinic.friendRequest;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.petclinic.invitation.Invitation;
-import org.springframework.samples.petclinic.invitation.InvitationService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.samples.petclinic.room.Room;
@@ -30,10 +28,6 @@ public class FriendController {
 
 	@Autowired
     private PlayerService playerService;
-
-    @Autowired
-
-    private InvitationService invitationService;
 
     @Autowired
 	public FriendController(FriendService friendService,AuthenticationService authService,PlayerService playerService) {
@@ -62,14 +56,6 @@ public class FriendController {
 		return VIEWS_MY_REQUEST;
 	}
 
-    @GetMapping("/myInvitationRequests")
-	public String friendsInvitationListing(ModelMap model) {
-        Player playerAuth= authService.getPlayer();
-        Collection<Invitation> myInvitation=invitationService.findMyRecInvitationById(playerAuth.getId());
-        model.put("myInvitation",myInvitation);
-		return VIEWS_MY_INVITATIONS;
-	}
-
     @GetMapping("/myFriendsRequest/{requestId}/accept")
 	public String friendRequestAccept(@PathVariable("requestId") int requestId) {
         Friend friend=friendService.findFriendById(requestId);
@@ -85,19 +71,6 @@ public class FriendController {
         this.friendService.savePlayer(friend);
         this.friendService.savePlayer(friend);
 		return "redirect:/friend/myFriendsRequest";
-	}
-
-    @GetMapping("/myInvitationRequest/{invitationId}/denied")
-	public String friendInvitationDenied(@PathVariable("invitationId") int invitationId) {
-        Invitation invitation = invitationService.findInvitationById(invitationId);
-        invitation.setIsViewer(null);
-        invitation.setPlayerInvitationRec(null);
-        invitation.setPlayerInvitationSend(null);
-        invitation.setRoom(null);
-        this.invitationService.saveInvitation(invitation);
-        this.invitationService.deleteInvitationById(invitationId);
-
-		return "redirect:/friend/myInvitationRequests";
 	}
 
     @GetMapping("/{player1Id}/delete/{player2Id}")
@@ -124,31 +97,6 @@ public class FriendController {
             
         }
 		return "redirect:/friend/myFriends";
-	}
-
-    @GetMapping("/invitation/{playerId}")
-	public String invitationRequest(@PathVariable("playerId") int playerId, ModelMap model) {
-        Player playerInvitationSend = authService.getPlayer();
-        Player playerInvitationRec = playerService.findPlayerById(playerId);
-        Room room = playerInvitationSend.getRoom();
-        Invitation repeat = invitationService.findInvitationByPlayersAndRoomId(playerInvitationRec.getId(), playerInvitationSend.getId(), room.getId());
-        if(repeat == null) {
-            if(playerInvitationSend.getRoom() != null) {
-                Invitation invitation = new Invitation();
-                invitation.setIsViewer(false);
-                invitation.setPlayerInvitationSend(playerInvitationSend);
-                invitation.setPlayerInvitationRec(playerInvitationRec);
-                invitation.setRoom(playerInvitationSend.getRoom());
-                this.invitationService.saveInvitation(invitation);
-           } else {
-            model.put("message", "You should be in a room");
-            model.put("messageType", "warning");
-           }
-        } else {
-            model.put("message", "You already sent a invitation to this friend");
-            model.put("messageType", "warning");
-        }
-		return "redirect:/room/myRoom";
 	}
 
 }

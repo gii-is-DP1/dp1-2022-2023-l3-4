@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 public class GameControllerTests {
 
-	private static final Integer TEST_GAME_ID = 1;
+  	private static final Integer TEST_GAME_ID = 1;
 
     @Autowired
     private MockMvc mockMvc; 

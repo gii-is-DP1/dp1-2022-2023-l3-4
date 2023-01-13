@@ -349,7 +349,7 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) throws WonPlayedGamesException {
+	public void finishGame(Game game){
 		game.endGame();
 		List<GamePlayer> classification = classificate(game.getGamePlayer());
 		game.setGamePlayer(classification);

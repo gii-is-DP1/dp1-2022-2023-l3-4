@@ -1,8 +1,10 @@
 package org.springframework.samples.petclinic.game;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -39,12 +41,21 @@ import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
-
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 @WebMvcTest(controllers = GameController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
 classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 public class GameControllerTests {
 
+	private static final Integer TEST_GAME_ID = 1;
+
+    @Autowired
+    private MockMvc mockMvc; 
+	
 		@MockBean
 		private GameService gameService;
 		
@@ -102,6 +113,72 @@ public class GameControllerTests {
 			String result = gameController.init(roomId, model);
 			assertThat(result).isEqualTo("redirect:/games/"+ runningGame.getId());
 		}
+
+		@Test
+		public void testInitNoHost() {
+			//given
+			Integer roomId = 1;
+			Integer gameId = 0;
+			Room room = new Room();
+			Game runningGame = new Game();
+			Player currentPlayer = new Player();
+			GamePlayer gp_vista = new GamePlayer();
+			ModelMap model = new ModelMap();
+			runningGame.setId(0);
+			runningGame.setWinner(null);
+			Card card = new Card();
+			card.setBody(false);
+			gp_vista.setCards(List.of(card));
+			card.setGamePlayer(gp_vista);
+			runningGame.setGamePlayer(List.of(gp_vista));
+			runningGame.setTurn(0);
+			room.setHost(new Player());
+
+			//when
+			when(authenticationService.getGamePlayer()).thenReturn(gp_vista);
+			when(roomService.findRoomById(roomId)).thenReturn(room);
+			when(gameService.getRunningGame(room)).thenReturn(null);
+			when(gameService.findGame(gameId)).thenReturn(runningGame);
+			when(gameService.startGame(room)).thenReturn(runningGame);
+			when(authenticationService.getPlayer()).thenReturn(currentPlayer);
+			
+			//then
+			String result = gameController.init(roomId, model);
+			assertThat(result).isEqualTo("welcome");
+		}
+
+		@Test
+		public void testInitRunningGame() {
+			//given
+			Integer roomId = 1;
+			Integer gameId = 0;
+			Room room = new Room();
+			Game runningGame = new Game();
+			Player currentPlayer = new Player();
+			GamePlayer gp_vista = new GamePlayer();
+			ModelMap model = new ModelMap();
+			runningGame.setId(0);
+			runningGame.setWinner(null);
+			Card card = new Card();
+			card.setBody(false);
+			gp_vista.setCards(List.of(card));
+			card.setGamePlayer(gp_vista);
+			runningGame.setGamePlayer(List.of(gp_vista));
+			runningGame.setTurn(0);
+			room.setHost(new Player());
+
+			//when
+			when(authenticationService.getGamePlayer()).thenReturn(gp_vista);
+			when(roomService.findRoomById(roomId)).thenReturn(room);
+			when(gameService.getRunningGame(room)).thenReturn(runningGame);
+			when(gameService.findGame(gameId)).thenReturn(runningGame);
+			when(gameService.startGame(room)).thenReturn(runningGame);
+			when(authenticationService.getPlayer()).thenReturn(currentPlayer);
+			
+			//then
+			String result = gameController.init(roomId, model);
+			assertThat(result).isEqualTo("games/game");
+		}
 		
 		@Test
 		public void testListRunningGames() {
@@ -132,6 +209,22 @@ public class GameControllerTests {
 			assertThat(result).isEqualTo(GameController.TERMINATE_GAMES_LISTING);
 			assertThat(model.get("games")).isEqualTo(terminateGames);
 		}
+
+		@WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
+    	@Test
+    	public void testDeleteTerminatedGames() throws Exception {
+        Game mockGame = new Game();
+        mockGame.setId(TEST_GAME_ID);
+        mockGame.setRoom(new Room());
+        mockGame.setGamePlayer(new ArrayList<>());
+        mockGame.setCards(new ArrayList<>());
+        mockGame.setWinner(new GamePlayer());
+        
+        mockMvc.perform(get("/games/{gameId}/delete", TEST_GAME_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("games/terminateGameListing"))
+            .andExpect(model().attributeExists("message"));
+    }
 		
 		@Test
 		public void testMuestraVista() {
@@ -205,6 +298,40 @@ public class GameControllerTests {
 		assertThat(result).isEqualTo("redirect:/games/" + game.getId());
 	}
 
+	@Test
+	public void testTurnWinner() {
+		int gameId = 1;
+		Game game = new Game();
+		game.setId(gameId);
+		GamePlayer gamePlayer = new GamePlayer();
+		GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+    	GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
+    	GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
+		GenericCard generic_bone = new GenericCard(12,Colour.YELLOW, Type.ORGAN);
+		Card organ_heart = new Card(1, true, gamePlayer, generic_heart);
+    	Card organ_rainbow = new Card(3, true, gamePlayer, generic_rainbow);
+    	Card organ_stomach = new Card(2, true, gamePlayer, generic_stomach);
+		Card organ_bone = new Card(13,true,gamePlayer,generic_bone);
+		game.setWinner(gamePlayer);
+		gamePlayer.setWinner(true);
+		List<Card> cards = new ArrayList<>();
+		cards.add(organ_bone);
+		cards.add(organ_heart);
+		cards.add(organ_rainbow);
+		cards.add(organ_stomach);
+		gamePlayer.setCards(cards);
+		List<GamePlayer> gps = new ArrayList<>();
+		gps.add(gamePlayer);
+		game.setGamePlayer(gps);
+		
+		//when
+		when(gameService.findGame(gameId)).thenReturn(game);
+		
+		//then
+		String result = gameController.turn(gameId);
+		assertThat(result).isEqualTo("redirect:/games/"+gameId+"/classification");
+	}
+
     @Test
 	public void testPlay() {
 		//given
@@ -232,6 +359,91 @@ public class GameControllerTests {
 		//then
 		assertEquals("/games/selecciona", gameController.play(gameId, cardId, model));
 	}
+
+	@Test
+	public void testPlayGloves() {
+		//given
+		int gameId = 1;
+		Integer cardId = 1;
+		Card card = new Card();
+		GamePlayer gp = new GamePlayer();
+		Game game = new Game();
+		ModelMap model = new ModelMap();
+        GenericCard genericCard = new GenericCard();
+        genericCard.setId(1);
+        genericCard.setType(Type.GLOVES);
+        genericCard.setColour(Colour.RED);
+		card.setType(genericCard);
+		card.setBody(false);
+		gp.setCards(List.of(card));
+		card.setGamePlayer(gp);
+		game.setGamePlayer(List.of(gp));
+		
+		//when
+		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
+		when(authenticationService.getGamePlayer()).thenReturn(gp);
+		when(gameService.findGame(gameId)).thenReturn(game);
+		
+		//then
+		assertEquals("redirect:/games/1", gameController.play(gameId, cardId, model));
+	}
+
+	@Test
+	public void testPlayNoCard() {
+		//given
+		int gameId = 1;
+		Integer cardId = 1;
+		Card card = new Card();
+		GamePlayer gp = new GamePlayer();
+		Game game = new Game();
+		ModelMap model = new ModelMap();
+        GenericCard genericCard = new GenericCard();
+        genericCard.setId(1);
+        genericCard.setType(Type.GLOVES);
+        genericCard.setColour(Colour.RED);
+		card.setType(genericCard);
+		card.setBody(false);
+		game.setTurn(0);
+		gp.setCards(List.of(card));
+		card.setGamePlayer(gp);
+		game.setGamePlayer(List.of(gp));
+		Optional<Card> cardO = Optional.of(card);
+		//when
+		when(cardService.findCard(4)).thenReturn(cardO);
+		when(authenticationService.getGamePlayer()).thenReturn(gp);
+		when(gameService.findGame(gameId)).thenReturn(game);
+		
+		//then
+		assertEquals("games/game", gameController.play(gameId, cardId, model));
+	}
+
+	@Test
+	public void testPlayCardNoGameplayer() {
+		//given
+		int gameId = 1;
+		Integer cardId = 1;
+		Card card = new Card();
+		GamePlayer gp = new GamePlayer();
+		Game game = new Game();
+		ModelMap model = new ModelMap();
+        GenericCard genericCard = new GenericCard();
+        genericCard.setId(1);
+        genericCard.setType(Type.GLOVES);
+        genericCard.setColour(Colour.RED);
+		card.setType(genericCard);
+		card.setBody(false);
+		game.setTurn(0);
+		gp.setCards(new ArrayList<>());
+		card.setGamePlayer(gp);
+		game.setGamePlayer(List.of(gp));
+		//when
+		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
+		when(authenticationService.getGamePlayer()).thenReturn(gp);
+		when(gameService.findGame(gameId)).thenReturn(game);
+		
+		//then
+		assertEquals("games/game", gameController.play(gameId, cardId, model));
+	}
 	
 	@Test
 	public void testPlayOnBody() {
@@ -241,23 +453,18 @@ public class GameControllerTests {
 		Integer g_id = 1;
 		GamePlayer gp = new GamePlayer();
 		Card card = new Card();
-		Card card2 = new Card();
 		Game game = new Game();
 		game.setId(gameId);
         GenericCard genericCard = new GenericCard();
         genericCard.setId(1);
         genericCard.setType(Type.ORGAN);
         genericCard.setColour(Colour.RED);
-		GenericCard genericCard2 = new GenericCard();
-        genericCard2.setId(2);
-        genericCard2.setType(Type.ORGAN);
-        genericCard2.setColour(Colour.BLUE);
 		card.setType(genericCard);
 		card.setGamePlayer(gp);
-		card2.setType(genericCard2);
-		card2.setGamePlayer(gp);
-		card2.setBody(true);
-		gp.setCards(List.of(card, card2));
+		card.setBody(false);
+		List<Card> cards = new ArrayList<>();
+		cards.add(card);
+		gp.setCards(cards);
 		gp.setId(g_id);
 		List<GamePlayer> gps = new ArrayList<>();
 		gps.add(gp);
@@ -271,7 +478,7 @@ public class GameControllerTests {
 		when(gameService.findGame(gameId)).thenReturn(game);
 		
 		//then
-		assertEquals("playOrgan", gameController.playOnBody(gameId, cardId, gp.getId(), model));
+		assertEquals("redirect:/games/1", gameController.playOnBody(gameId, cardId, gp.getId(), model));
 	}
 	
 	@Test
@@ -282,18 +489,27 @@ public class GameControllerTests {
 		Integer cardId = 1;
 		Integer targetC = 1;
 		Card card = new Card();
+		GamePlayer gp = new GamePlayer();
         GenericCard genericCard = new GenericCard();
         genericCard.setId(1);
         genericCard.setType(Type.VACCINE);
         genericCard.setColour(Colour.RED);
 		card.setType(genericCard);
+		card.setBody(false);
+		List<Card> cards = new ArrayList<>();
+		cards.add(card);
+		gp.setCards(cards);
+		List<GamePlayer> gps = new ArrayList<>();
+		gps.add(gp);
+		game.setGamePlayer(gps);
 		ModelMap model = new ModelMap();
 		
 		//when
+		when(gameService.findGame(1)).thenReturn(game);
 		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
 		
 		//then
-		assertEquals("playVaccine", gameController.playOnCard(game.getId(), cardId, targetC, model));
+		assertEquals("redirect:/games/1", gameController.playOnCard(game.getId(), cardId, targetC, model));
 	}
 	
 	@Test
@@ -301,245 +517,108 @@ public class GameControllerTests {
 		//given
 		Integer gameId = 1;
 		Integer cardId = 1;
-		Integer targetC = 1;
-		Integer targetC2 = 2;
+		Integer targetC = 2;
+		Integer targetC2 = 3;
+		GamePlayer gp = new GamePlayer();
 		Card card = new Card();
         GenericCard genericCard = new GenericCard();
         genericCard.setId(1);
         genericCard.setType(Type.TRANSPLANT);
         genericCard.setColour(Colour.RED);
+		GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+    	GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
+		Card organ_heart = new Card(1, false, gp, generic_heart);
+    	Card organ_rainbow = new Card(3, false, null, generic_rainbow);
+		organ_heart.setId(targetC);
+		organ_rainbow.setId(targetC2);
 		card.setType(genericCard);
 		ModelMap model = new ModelMap();
+		Game game = new Game();
+		game.setId(gameId);
+		card.setType(genericCard);
+		card.setBody(false);
+		List<Card> cards = new ArrayList<>();
+		cards.add(card);
+		cards.add(organ_heart);
+		gp.setCards(cards);
+		List<GamePlayer> gps = new ArrayList<>();
+		gps.add(gp);
+		game.setGamePlayer(gps);
 		
 		//when
+		when(gameService.findGame(gameId)).thenReturn(game);
 		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
+		when(cardService.findCard(targetC)).thenReturn(Optional.of(organ_heart));
+		when(cardService.findCard(targetC2)).thenReturn(Optional.of(organ_rainbow));
 		
 		//then
-		assertEquals("playTransplant", gameController.playOnAnotherCard(gameId, cardId, targetC, targetC2, model));
+		assertEquals("redirect:/games/1", gameController.playOnAnotherCard(gameId, cardId, targetC, targetC2, model));
 	}
-
-    @Test
-		public void playOrgan_validInput_returnsTurn() {
-			// Arrange
-			int gameId = 1;
-			Integer g_id = 2;
-			Integer c_id = 3;
-			ModelMap model = new ModelMap();
-			
-			Optional<Card> c = Optional.of(new Card());
-			GamePlayer gp1 = new GamePlayer();
-			Optional<GamePlayer> gp2 = Optional.of(new GamePlayer());
-			
-			when(cardService.findCard(c_id)).thenReturn(c);
-			when(authenticationService.getGamePlayer()).thenReturn(gp1);
-			when(gamePlayerService.findById(g_id)).thenReturn(gp2);
-			
-			// Act
-			String result = gameController.playOrgan(gameId, g_id, c_id, model);
-			
-			// Assert
-			assertEquals("turn", result);
-			verify(gameService).addOrgan(c.get(), gp2.get(), gp2.get(), model);
-			verify(cardService).save(c.get());
-			verify(gamePlayerService).save(gp1);
-			verify(gamePlayerService).save(gp2.get());
-		}
-		
-		@Test
-		public void playOrgan_invalidInput_returnsMuestraVista() {
-			// Arrange
-			int gameId = 1;
-			Integer g_id = 2;
-			Integer c_id = 3;
-			ModelMap model = new ModelMap();
-			
-			Optional<Card> c = Optional.empty();
-			GamePlayer gp1 = new GamePlayer();
-			Optional<GamePlayer> gp2 = Optional.empty();
-			
-			when(cardService.findCard(c_id)).thenReturn(c);
-			when(authenticationService.getGamePlayer()).thenReturn(gp1);
-			when(gamePlayerService.findById(g_id)).thenReturn(gp2);
-			
-			// Act
-			String result = gameController.playOrgan(gameId, g_id, c_id, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			verify(model).put("message", "Movimiento inválido");
-			verify(model).put("messageType", "info");
-		}
 
         @Test
 		public void playVirus_validInput_returnsTurn() {
 			// Arrange
 			int gameId = 1;
+			Game game = new Game();
+			game.setId(gameId);
 			Integer c1_id = 2;
 			Integer c2_id = 3;
 			ModelMap model = new ModelMap();
-			
+			game.setGamePlayer(new ArrayList<>());
 			Optional<Card> c1 = Optional.of(new Card());
 			Optional<Card> c2 = Optional.of(new Card());
 			Card old_card = new Card();
-			
+			c1.get().setVaccines(new ArrayList<>());
+			c2.get().setVaccines(new ArrayList<>());
+
+			when(gameService.findGame(gameId)).thenReturn(game);
 			when(cardService.findCard(c1_id)).thenReturn(c1);
 			when(cardService.findCard(c2_id)).thenReturn(c2);
-			when(c2.get().getVirus().size()).thenReturn(1);
-			when(c2.get().getVaccines().size()).thenReturn(1);
-			when(c2.get().getVirus().get(0)).thenReturn(old_card);
-			when(c2.get().getVaccines().get(0)).thenReturn(old_card);
 			
 			// Act
 			String result = gameController.playVirus(gameId, c1_id, c2_id, model);
 			
 			// Assert
-			assertEquals("turn", result);
+			assertEquals("redirect:/games/1", result);
 			verify(cardService).infect(c2.get(), c1.get());
 			verify(cardService).save(c1.get());
 			verify(cardService).save(c2.get());
-			verify(cardService).save(old_card);
-			verify(gameController).turn(gameId);
 		}
 		
-		@Test
-		public void playVirus_invalidInput_returnsMuestraVista() {
-			// Arrange
-			int gameId = 1;
-			Integer c1_id = 2;
-			Integer c2_id = 3;
-			ModelMap model = new ModelMap();
-			
-			Optional<Card> c1 = Optional.empty();
-			Optional<Card> c2 = Optional.empty();
-			
-			when(cardService.findCard(c1_id)).thenReturn(c1);
-			when(cardService.findCard(c2_id)).thenReturn(c2);
-			
-			// Act
-			String result = gameController.playVirus(gameId, c1_id, c2_id, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			verify(model).put("message", "Movimiento inválido");
-			verify(model).put("messageType", "info");
-			verify(gameController).muestraVista(gameId, model);
-		}
-		
-		@Test
-		public void playVaccine_validInput_returnsTurn() {
-			// Arrange
-			int gameId = 1;
-			Integer c1_id = 2;
-			Integer c2_id = 3;
-			ModelMap model = new ModelMap();
-			
-			Optional<Card> c1 = Optional.of(new Card());
-			Optional<Card> c2 = Optional.of(new Card());
-			Card old_virus = new Card();
-			
-			when(cardService.findCard(c1_id)).thenReturn(c1);
-			when(cardService.findCard(c2_id)).thenReturn(c2);
-			when(c2.get().getVirus().size()).thenReturn(1);
-			when(c2.get().getVirus().get(0)).thenReturn(old_virus);
-			
-			// Act
-			String result = gameController.playVaccine(gameId, c1_id, c2_id, model);
-			
-			// Assert
-			assertEquals("turn", result);
-			verify(cardService).vaccinate(c2.get(), c1.get());
-			verify(cardService).save(c1.get());
-			verify(cardService).save(c2.get());
-			verify(cardService).save(old_virus);
-			verify(gameController).turn(gameId);
-		}
-		
-		@Test
-		public void playVaccine_invalidInput_returnsMuestraVista() {
-			// Arrange
-			int gameId = 1;
-			Integer c1_id = 2;
-			Integer c2_id = 3;
-			ModelMap model = new ModelMap();
-			
-			Optional<Card> c1 = Optional.empty();
-			Optional<Card> c2 = Optional.empty();
-			
-			when(cardService.findCard(c1_id)).thenReturn(c1);
-			when(cardService.findCard(c2_id)).thenReturn(c2);
-			
-			// Act
-			String result = gameController.playVaccine(gameId, c1_id, c2_id, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			verify(model).put("message", "Movimiento inválido");
-			verify(model).put("messageType", "info");
-			verify(gameController).muestraVista(gameId, model);
-		}
-
-        @Test
-		public void playTransplant_validInput_returnsTurn() {
-			// Arrange
-			int gameId = 1;
-			Integer c1_id = 2;
-			Integer c2_id = 3;
-			Integer transplantId = 4;
-			ModelMap model = new ModelMap();
-			
-			// Act
-			String result = gameController.playTransplant(gameId, c1_id, c2_id, transplantId, model);
-			
-			// Assert
-			assertEquals("turn", result);
-		}
-		
-		@Test
-		public void playTransplant_invalidInput_returnsMuestraVista() {
-			// Arrange
-			int gameId = 1;
-			Integer c1_id = 2;
-			Integer c2_id = 3;
-			Integer transplantId = null;
-			ModelMap model = new ModelMap();
-			
-			// Act
-			String result = gameController.playTransplant(gameId, c1_id, c2_id, transplantId, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-		}
-
         @Test
 		public void playThief_validInput_returnsTurn() {
 			// Arrange
 			int gameId = 1;
 			Integer c_id = 2;
 			Integer stolenCardId = 3;
+			Game game = new Game();
+			game.setId(gameId);
 			ModelMap model = new ModelMap();
-			
+			GamePlayer gp2 = new GamePlayer();
+			GamePlayer gp = new GamePlayer();
+			List<Card> cards = new ArrayList<>();
+			Card card = new Card();
+			Card card1 = new Card();
+			card.setGamePlayer(gp2);
+			card.setBody(true);
+			card1.setBody(false);
+			card.setId(stolenCardId);
+			cards.add(card);
+			gp2.setCards(cards);
+			List<GamePlayer> gps = new ArrayList<>();
+			gps.add(gp);
+			gps.add(gp2);
+			gp.setCards(cards);
+			game.setGamePlayer(gps);
+			when(authenticationService.getGamePlayer()).thenReturn(gp);
+			when(cardService.findCard(stolenCardId)).thenReturn(Optional.of(card));
+			when(cardService.findCard(c_id)).thenReturn(Optional.of(card1));
+			when(gameService.findGame(gameId)).thenReturn(game);
 			// Act
 			String result = gameController.playThief(gameId, c_id, stolenCardId, model);
 			
 			// Assert
-			assertEquals("turn", result);
-		}
-		
-		@Test
-		public void playThief_invalidInput_returnsMuestraVista() {
-			// Arrange
-			int gameId = 1;
-			Integer c_id = null;
-			Integer stolenCardId = 3;
-			ModelMap model = new ModelMap();
-			
-			// Act
-			String result = gameController.playThief(gameId, c_id, stolenCardId, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			assertEquals("Movimiento inválido", model.get("message"));
-			assertEquals("info", model.get("messageType"));
+			assertEquals("redirect:/games/1", result);
 		}
 		
 		@Test
@@ -602,33 +681,6 @@ public class GameControllerTests {
 			assertEquals("Card not found.", model.get("message"));
 			assertEquals("info", model.get("messageType"));
 		}
-
-        @Test
-	public void testPlayMedicalError() {
-		// Arrange
-		int gameId = 1;
-		Integer g_id = 2;
-		Integer c_id = 3;
-		ModelMap model = new ModelMap();
-		GamePlayer gamePlayer1 = mock(GamePlayer.class);
-		GamePlayer gamePlayer2 = mock(GamePlayer.class);
-		Card medicalError = mock(Card.class);
-		
-		when(authenticationService.getGamePlayer()).thenReturn(gamePlayer1);
-		when(gamePlayerService.findById(g_id)).thenReturn(Optional.of(gamePlayer2));
-		when(cardService.findCard(c_id)).thenReturn(Optional.of(medicalError));
-		
-		// Act
-		String result = gameController.playMedicalError(gameId, g_id, c_id, model);
-		
-		// Assert
-		assertEquals("turn", result);
-		verify(gameService).medicalError(gamePlayer1, gamePlayer2);
-		verify(medicalError).discard();
-		verify(cardService).save(medicalError);
-		verify(gamePlayerService).save(gamePlayer1);
-		verify(gamePlayerService).save(gamePlayer2);
-	}
 	
 	@Test
 	public void testPlayMedicalError_GamePlayerNotFound() {
@@ -680,67 +732,130 @@ public class GameControllerTests {
 		verify(gamePlayerService, never()).save(any());
 	}
 
-    //Test method for discardView
+    //Test method for discard
 	@Test
-	public void discardViewTest(){
+	public void discardTestIsYourTurnAndContainsAllCards(){
 		//Arrange
-		Integer gameId = 1;
-		ModelMap model = new ModelMap();
-		GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
-		List<Card> hand = currentGamePlayer.getHand();
-		Hand emptyForm = new Hand();
-		
-		//Act
-		String result = gameController.discardView(gameId, model);
-		
-		//Assert
-		assertEquals("games/discard", result);
-		assertEquals(hand, model.get("hand"));
-		assertEquals(emptyForm, model.get("cardsForm"));
-	}
-	
-	//Test method for discard
-	@Test
-	public void discardTest(){
-		//Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
 		Integer gameId = 1;
 		ModelMap model = new ModelMap();
         Hand cardIds = new Hand();
-		GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
-		List<Card> cards = cardService.findAllCardsByIds(cardIds.getCards());
-		
-		//Act
-		//String result = gameController.discard(cardIds, gameId, model, br);
-		
-		//Assert
-		//assertEquals("turn(gameId)", result);
-		assertTrue(currentGamePlayer.getCards().containsAll(cards));
+        when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+		when(gameService.isYourTurn(gamePlayer, gameId)).thenReturn(true);
+        when(gameService.findGame(anyInt())).thenReturn(game);
+		assertEquals("redirect:/games/1", gameController.discard(cardIds, gameId, model, null));
 	}
-	
-	@Test 
-	public void classificationTest(){
-		int gameId = 1;
-		Game game = new Game();
+
+    @Test
+	public void discardTestIsYourTurnAndNotContainsAllCards(){
+		//Arrange
+        List<Card> cards = new ArrayList<>();
+        GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+		Card organ_heart = new Card(1, true, gamePlayer, generic_heart);
+        cards.add(organ_heart);
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
+		Integer gameId = 1;
+		ModelMap model = new ModelMap();
+        Hand cardIds = new Hand();
+        cardIds.getCards().add(1);
+        when(cardService.findAllCardsByIds(cardIds.getCards())).thenReturn(cards);
+        when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+		when(gameService.isYourTurn(gamePlayer, gameId)).thenReturn(true);
+        when(gameService.findGame(anyInt())).thenReturn(game);
+		assertEquals("games/game", gameController.discard(cardIds, gameId, model, null));
+	}
+
+    @Test
+	public void discardTestIsNotYourTurn(){
+		//Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
+        GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
+        currentGamePlayer.setCards(new ArrayList<>());
+        Hand cardIds = new Hand();
+        Integer gameId = 1;
+		ModelMap model = new ModelMap();
+		when(gameService.isYourTurn(currentGamePlayer, gameId)).thenReturn(false);
+        when(gameService.findGame(anyInt())).thenReturn(game); 
+		assertEquals("games/game", gameController.discard(cardIds, gameId, model, null));
+	}
+
+    //Elementos comunes a classification
+    int gameId = 1;
+    Game game = new Game();
+    List<GamePlayer> gamePlayers = new ArrayList<>();
+    GamePlayer gamePlayer = new GamePlayer(0);
+    ModelMap model = new ModelMap();
+
+    public void classificationTestCommonMethod(){
 		game.setId(gameId);
-		GamePlayer gamePlayer = new GamePlayer();
+        game.setIsRunning(true);
+
 		GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
     	GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
     	GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
 		GenericCard generic_bone = new GenericCard(12,Colour.YELLOW, Type.ORGAN);
-		Card organ_heart = new Card(1, false, gamePlayer, generic_heart);
-    	Card organ_rainbow = new Card(3, false, gamePlayer, generic_rainbow);
+		Card organ_heart = new Card(1, true, gamePlayer, generic_heart);
+    	Card organ_rainbow = new Card(3, true, gamePlayer, generic_rainbow);
     	Card organ_stomach = new Card(2, true, gamePlayer, generic_stomach);
 		Card organ_bone = new Card(13,true,gamePlayer,generic_bone);
 		game.setWinner(gamePlayer);
 		gamePlayer.setWinner(true);
-		gamePlayer.setCards(List.of(organ_heart, organ_rainbow, organ_stomach, organ_bone));
-
-		
-		ModelMap model = new ModelMap();
-		
-		String result = gameController.classification(gameId, model);
-		
+        gamePlayer.getCards().add(organ_heart);
+        gamePlayer.getCards().add(organ_rainbow);
+        gamePlayer.getCards().add(organ_stomach);
+        gamePlayer.getCards().add(organ_bone);
+    }
+	
+	@Test 
+	public void classificationTestHasWinnerAndIsRunning(){
+        classificationTestCommonMethod();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+		when(gameService.findGame(anyInt())).thenReturn(game);
+		//test
+		String result = gameController.classification(gameId, model);		
 		assertEquals(result, "games/classification");
-		assertEquals(model.get("classification"), gamePlayer);
+		assertEquals(model.get("classification"), gamePlayers);     
 	}
+    
+    @Test
+    public void classificationTestHasWinnerAndIsNotRunning(){
+        classificationTestCommonMethod();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setIsRunning(false);
+        when(gameService.findGame(anyInt())).thenReturn(game);
+        String result2 = gameController.classification(gameId, model);
+        assertEquals("games/classification", result2 );
+    }
+
+    @Test
+    public void classificationTestHasNotWinnerAndIsRunning(){
+        classificationTestCommonMethod();
+        gamePlayer.getCards().remove(gamePlayer.getCards().get(0));
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setWinner(null);
+        game.setIsRunning(false);
+        game.setTurn(0);
+        when(gameService.findGame(anyInt())).thenReturn(game);
+        String result2 = gameController.classification(gameId, model);
+        assertEquals("games/game", result2 );
+    }
+
 }

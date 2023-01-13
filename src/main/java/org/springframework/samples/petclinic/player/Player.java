@@ -36,6 +36,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.samples.petclinic.friendRequest.Friend;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.invitation.Invitation;
 import org.springframework.samples.petclinic.model.Person;
 import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.user.User;
@@ -76,6 +77,11 @@ public class Player extends Person {
 	@OneToMany(mappedBy="playerRec", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Collection<Friend> friendRec;
 
+	@OneToMany(mappedBy = "playerInvitationSend", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Collection<Invitation> friendInvitationSend;
+
+	@OneToMany(mappedBy = "playerInvitationRec", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Collection<Invitation> friendInvitationRec;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="room_id",referencedColumnName = "id")

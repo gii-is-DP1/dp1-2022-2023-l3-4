@@ -61,13 +61,23 @@ setInterval("actualizar()",10000);
                                     Start Game
                                 </button>
                     </a>
+                    <a href='<spring:url value="/friend/myFriends" htmlEscape="true"/>'>
+                                <button>
+                                    Invite friend
+                                </button>
+                    </a>
                   </c:when>
                     <c:otherwise>
                       <a href='<spring:url value="/room/exit/${room.id}" htmlEscape="true"/>'>
                         <button>
                             Exit
                         </button>
-            </a>
+                      </a>
+                      <a href='<spring:url value="/friend/myFriends" htmlEscape="true"/>'>
+                                <button>
+                                    Invite friend
+                                </button>
+                      </a>
                     </c:otherwise>
                 </c:choose>
                 

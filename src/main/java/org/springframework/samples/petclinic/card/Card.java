@@ -27,8 +27,6 @@ import javax.validation.constraints.Size;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,16 +46,6 @@ public class Card extends BaseEntity implements Serializable {
  
 	private Boolean played;
 	private Boolean body;
-
-	// @ManyToOne
-    // @JoinColumn(name="card_id")
-    // private Card cards;
-
-	// @ElementCollection
-	// @Size(min=0, max=2)
-    // @CollectionTable(name = "vaccines", joinColumns = @JoinColumn(name = "card_id")) // 2
-    // @Column(name = "vaccine_set") // 3
-    // private Set<Card> vaccineSet;	
 	
 	@ManyToOne
 	@JoinColumn(name="cardVaccine_id")
@@ -82,53 +70,15 @@ public class Card extends BaseEntity implements Serializable {
 	@ManyToOne(optional = true)
 	private GamePlayer gamePlayer;
 
-	public Card(int id, boolean body, boolean played, List<Card> vaccines, List<Card> virus, GamePlayer game_player_id, GenericCard type) {
-		this.id = id;
-		this.body = body;
-		this.played = played;
-		this.vaccines = vaccines;
-		this.virus = virus;
-		this.gamePlayer = game_player_id;
-		this.type = type;
-	}
-
 	public Card() {}
 
 	public Card(Integer id, Boolean body, GamePlayer gp, GenericCard type){
-		// Card organ = new Card();
-		// organ.setId(id);
-		// organ.setBody(body);
-		// organ.setPlayed(false);
-		// organ.setVaccines(new ArrayList<>());
-		// organ.setVirus(new ArrayList<>());
-		// organ.setGamePlayer(gp);
-		// organ.setType(type);
 		this.id = id;
 		this.body = body;
 		this.played = false;
 		this.vaccines = new ArrayList<>();
 		this.virus = new ArrayList<>();
 		this.type = type;
-	}
-	public Card createVirus(Integer id, GamePlayer gp, GenericCard type, Card cardVirus){
-		Card virus = new Card();
-		virus.setId(id);
-		virus.setBody(false);
-		virus.setPlayed(false);
-		virus.setCardVirus(cardVirus);
-		virus.setGamePlayer(gp);
-		virus.setType(type);
-		return virus;
-	}
-	public Card createVaccine(Integer id, GamePlayer gp, GenericCard type, Card cardVaccine){
-		Card vaccine = new Card();
-		vaccine.setId(id);
-		vaccine.setBody(false);
-		vaccine.setPlayed(false);
-		vaccine.setCardVaccine(cardVirus);
-		vaccine.setGamePlayer(gp);
-		vaccine.setType(type);
-		return vaccine;
 	}
 
 	public void discard(){
@@ -147,11 +97,10 @@ public class Card extends BaseEntity implements Serializable {
 	}
 
 	public Boolean areCompatible(Card virus_or_vaccine){
-		return (getType().getType().name()=="ORGAN") && 
+		return 
 		(virus_or_vaccine.getType().getColour().name()==getType().getColour().name() || getType().getColour().name()=="RAINBOW" ||
 		virus_or_vaccine.getType().getColour().name()=="RAINBOW");
 
 	}
-
 
 }

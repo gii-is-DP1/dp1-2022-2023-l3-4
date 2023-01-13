@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.friendRequest.Friend;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
@@ -49,6 +51,11 @@ public class PlayerService {
         this.friendService = friendService;
     }
 
+    @Transactional(readOnly = true)
+	public Page<Player> findAll(Pageable pageable) {
+		return playerRepository.findAll(pageable);
+	}
+
     @Transactional
     public void savePlayer(Player player) throws DataAccessException {
         if(player.getStatus() == null) {
@@ -58,26 +65,32 @@ public class PlayerService {
         playerRepository.save(player);
     }
 
+    @Transactional(readOnly = true)
     public Player getPlayerByUsername(String username) {
         return playerRepository.findPlayerByUsername(username);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Collection<Player> getPlayersByUsername(String username) {
         return playerRepository.findPlayersByUsername(username);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Collection<Player> getAllPlayers() {
         return (Collection<Player>) playerRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Player findPlayerById(Integer id) {
-        return playerRepository.findById(id).get();
+        try {
+            return playerRepository.findById(id).get();
+        } catch (Exception e) {
+            return null;
+        }
+        
     }
 
-    @Transactional
+    @Transactional(readOnly = false)
     public void deletePlayer(Player player) {
         GamePlayer gp = gamePlayerService.getGamePlayerByPlayer(player);
         if (gp != null) {

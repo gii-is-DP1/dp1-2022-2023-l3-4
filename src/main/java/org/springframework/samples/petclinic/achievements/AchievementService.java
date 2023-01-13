@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.game.GameService;
+import org.springframework.samples.petclinic.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,21 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AchievementService {
 
   private AchievementRepository achievementRepository;
+  private GameService gameService;
 
   @Autowired
-  public AchievementService(AchievementRepository achievementRepository) {
+  public AchievementService(AchievementRepository achievementRepository, GameService gameService) {
     this.achievementRepository = achievementRepository;
+    this.gameService = gameService;
   }
 
   @Transactional(readOnly=true)
   public List<Achievement> getAllAchievements() {
     return achievementRepository.findAll();
-  }
-
-  @Transactional(readOnly = true)
-  public List<Achievement> getMyAchievements(String username) {
-    return null;
-    // return achievementRepository.findByUsername(username);
   }
 
   @Transactional(readOnly = true)
@@ -44,11 +42,6 @@ public class AchievementService {
   }
 
   @Transactional
-  public Achievement updateAchievement(Achievement achievement) {
-    return this.achievementRepository.save(achievement);
-  }
-
-  @Transactional
   public void removeAchievement(Integer id) {
     this.achievementRepository.deleteById(id);
   }
@@ -57,6 +50,12 @@ public class AchievementService {
   public Achievement getAchievement(Integer id) {
     Optional<Achievement> achievement = this.achievementRepository.findById(id);
     return achievement.isPresent() ? achievement.get() : null;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Achievement> getPlayerAchievements(Player p) {
+    Integer numWonGames = gameService.getNumGamesWon(p.getGamePlayer());
+    return achievementRepository.findAchievementsBelowThreshold(numWonGames);
   }
   
 }

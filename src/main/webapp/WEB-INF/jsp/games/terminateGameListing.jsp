@@ -5,13 +5,14 @@
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
 <virus:layout pageName="games">
-    <h2>Running Games</h2>
+    <h2>Terminated Games</h2>
 
     <table id="gamesTable" class="table table-striped">
         <thead>
         <tr>
             <th>Room name</th>
             <th>Players</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -44,6 +45,9 @@
 
                             </ul>
                         </li>
+                    </td>
+                    <td>
+                        <a href="/games/${game.id}/delete"><span class="glyphicon glyphicon-trash"></span></a>
                     </td>
                 </tr>
             </c:forEach>

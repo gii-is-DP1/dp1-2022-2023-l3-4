@@ -16,12 +16,8 @@
 package org.springframework.samples.petclinic.user;
 
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.stereotype.Service;
@@ -52,18 +48,13 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true	)
-	public Optional<User> findUser(String username) {
-		return userRepository.findById(username);
-	}
-
-	@Transactional(readOnly = true)
-	public Page<User> findAll(Pageable pageable) {
-		return userRepository.findAll(pageable);
+	public User findUser(String username) {
+		return userRepository.findById(username).get();
 	}
 
 	@Transactional
 	public void deleteUser(String username) {
-		User user = findUser(username).get();
+		User user = findUser(username);
 		Player player = playerService.getPlayerByUsername(username);
 		if (player != null) {
 			player.setUser(null);

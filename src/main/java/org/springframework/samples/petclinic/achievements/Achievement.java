@@ -6,6 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.samples.petclinic.model.BaseEntity;
@@ -31,7 +32,8 @@ public class Achievement extends BaseEntity {
   private String badgeImage;
 
   @Column(name = "threshold")
-  private double threshold;
+  @NotNull
+  private Integer threshold;
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "type", referencedColumnName = "id")

@@ -52,7 +52,7 @@ public class UserController {
 
 	private static final String VIEWS_PLAYER_CREATE_FORM = "users/createPlayerForm";
 	private static final String USERS = "users/usersListing";
-	private static final String EDIT_USER = "users/updateUserForm";
+	private static final String EDIT_USER = "player/createOrUpdateProfileForm";
 	
 
 	private UserService userService;
@@ -73,23 +73,23 @@ public class UserController {
 		dataBinder.setDisallowedFields("id", "status");
 	}
 
-	@GetMapping(value = "/users/new")
+	@GetMapping(value = "/user/new")
 	public String initCreationForm(Map<String, Object> model) {
 		Player player = new Player();
 		model.put("player", player);
 		return VIEWS_PLAYER_CREATE_FORM;
 	}
 
-	@PostMapping(value = "/users/new")
+	@PostMapping(value = "/user/new")
 	public String processCreationForm(@Valid Player player, BindingResult result) throws PlayerNotFoundException {
 		if (result.hasErrors()) {
 			return VIEWS_PLAYER_CREATE_FORM;
 		}
 		else {
 			//creating player, gamePlayer, user, and authority
+			this.userService.saveUser(player.getUser());
 			this.playerService.savePlayer(player);
 			this.gamePlayerService.saveGamePlayerForNewPlayer(player);
-			this.userService.saveUser(player.getUser());
 			this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
 			return "redirect:/";
 		}
@@ -99,46 +99,60 @@ public class UserController {
 	public String findAll(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
 		Pageable pageable = null;
 		if(page == null || page == 0) {
-			pageable = PageRequest.of(0, 10, Sort.by(Order.asc("username")));
+			pageable = PageRequest.of(0, 10, Sort.by(Order.asc("user.username")));
 		} else {
-			pageable = PageRequest.of(page, 10, Sort.by(Order.asc("username")));
+			pageable = PageRequest.of(page, 10, Sort.by(Order.asc("user.username")));
 		}
 		
-		Page<User> users = userService.findAll(pageable);
-		model.put("users", users.getContent());
-		model.put("totalPages", users.getTotalPages());
-		model.put("currentPage", users.getNumber());
+		Page<Player> players = playerService.findAll(pageable);
+		if (players.getContent().size() >= 1) {
+			model.put("players", players.getContent());
+			model.put("totalPages", players.getTotalPages());
+			model.put("currentPage", players.getNumber());
+		} else {
+			model.put("message", "There are no users registered in the system");
+			model.put("messageType", "info");
+		}
 		return USERS;
 	}
 
 	@GetMapping("/users/{username}/edit")
 	public String editUser(ModelMap model, @PathVariable("username") String username) {
-		User user = userService.findUser(username).get();
-    if (user != null) {
-      model.put("user", user);
+		Player player = playerService.getPlayerByUsername(username);
+    if (player != null) {
+      model.put("player", player);
       return EDIT_USER;
     } else {
-      model.put("message", "The user " + username + " doesn't exist");
+      model.put("message", "The player " + username + " doesn't exist");
       model.put("messageType", "info");
       return "redirect:/user";
     }
 	}
 
 	@PostMapping("/users/{username}/edit")
-	public String saveUser(@PathVariable("username") String username, @Valid User user, BindingResult br, ModelMap model) {
+	public String saveUser(@PathVariable("username") String username, @Valid Player player, BindingResult br, ModelMap model) {
 		if (br.hasErrors()) {
 			model.put("message", "The username cannot be empty");
 			model.put("messageType", "info");
+			return findAll(model, null);
 		} else {
-			User userToUpdate = userService.findUser(username).get();
-			if (userToUpdate != null) {
-				BeanUtils.copyProperties(user, userToUpdate, "username");
-				userService.saveUser(userToUpdate);
-				model.put("message", "Your user information has been updated successfully");
-				return findAll(model, null);
+			Player playerToUpdate = playerService.getPlayerByUsername(username);
+			if (playerToUpdate != null) {
+				BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
+				if(player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
+						br.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+						return EDIT_USER;
+				} else {
+						User userToUpdate = playerToUpdate.getUser();
+						userToUpdate.setPassword(player.getUser().getPassword());
+						userService.saveUser(userToUpdate);
+						playerService.savePlayer(playerToUpdate);
+						model.put("message", "Your player information has been updated successfully");
+						return findAll(model, null);
+				}
 			}
 		}
-		return "redirect:/user";
+		return "redirect:/users";
 	}
 
 	@GetMapping("/users/{username}/delete")
@@ -153,7 +167,7 @@ public class UserController {
     }
     model.put("message", message);
     model.put("messageType", "info");
-    return "redirect:/users";
+    return findAll(model, null);
 	}
 
 

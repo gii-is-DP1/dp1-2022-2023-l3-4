@@ -1,22 +1,9 @@
-/*
- * Copyright 2002-2013 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -26,11 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.samples.petclinic.achievements.Achievement;
+import org.springframework.samples.petclinic.achievements.AchievementService;
 import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -41,10 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * @author Juergen Hoeller
- * @author Ken Krebs
- * @author Arjen Poutsma
- * @author Michael Isvy
+ * @author Francisco Sebastian Benitez Ruis Diaz
+ * @author Jose Maria Garcia Berdejo
  */
 @Controller
 @RequestMapping("/player")
@@ -55,6 +43,8 @@ public class PlayerController {
     private GameService gameService;
     private AuthenticationService authenticationService;
     private FriendService friendService;
+    private AchievementService achievementService;
+    private UserService userService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -63,16 +53,18 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs, UserService userService) {
         this.playerService = ps;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
+        this.achievementService = acs;
+        this.userService = userService;
     }
 
 
     @GetMapping("/me")
-        public String listPlayerStatistics(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
+        public String playerProfile(ModelMap model, @RequestParam(value = "page", required = false) Integer page) {
         Player player = authenticationService.getPlayer();
         Pageable pageable = null;
         if(page == null || page == 0) {
@@ -86,6 +78,7 @@ public class PlayerController {
         Integer numGamesWon = gameService.getNumGamesWon(gp);
         Page<Game> games = gameService.findGamesByGameplayerPaged(gp, pageable);
         Duration totalTimePlayed = games.stream().map(x -> x.getDuration()).reduce((x,y) -> x.plus(y)).orElse(Duration.ZERO);
+        List<Achievement> achievements = achievementService.getPlayerAchievements(player);
        
         model.put("numGamesPlayed",numGamesPlayed);
         model.put("numGamesWon",numGamesWon);
@@ -95,6 +88,7 @@ public class PlayerController {
         model.put("totalPages", games.getTotalPages());
         model.put("currentPage", games.getNumber());
         model.put("totalTimePlayed", gameService.humanReadableDuration(totalTimePlayed));
+        model.put("achievements", achievements);
         return USER_PROFILE;
   }
 
@@ -108,7 +102,7 @@ public class PlayerController {
     }
 
     @PostMapping(value="/me/edit")
-    public String postMethodName(@Valid Player player, BindingResult bindingResult, ModelMap model) {
+    public String savePlayer(@Valid Player player, BindingResult bindingResult, ModelMap model) {
 
         if (bindingResult.hasFieldErrors("firstName")) {
             bindingResult.rejectValue("firstName", "first name cannot be empty.", "first name cannot be empty.");
@@ -119,13 +113,26 @@ public class PlayerController {
         } else {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
-                BeanUtils.copyProperties(player, playerToUpdate, "id", "user");
-                playerService.savePlayer(playerToUpdate);
-                model.put("message", "Your player information has been updated successfully");
-                return listPlayerStatistics(model, null);
+                BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
+                if(player.getUser() == null || player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
+                    bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+                    return EDIT_PROFILE;
+                } else {
+                    User userToUpdate = playerToUpdate.getUser();
+                    userToUpdate.setPassword(player.getUser().getPassword());
+                    userService.saveUser(userToUpdate);
+                    playerService.savePlayer(playerToUpdate);
+                    model.put("message", "Your player information has been updated successfully");
+                    model.put("messageType", "info");
+                    return playerProfile(model, null);
+                }
+                
+            } else {
+                model.put("message", "You need to be logged in to change your player information.");
+                model.put("messageType", "info");
+                return "welcome";
             }
         }
-        return "redirect:/player/me";
     }
 
     @GetMapping("/search")

@@ -109,6 +109,11 @@ public class GameService {
 	}
 
 	@Transactional
+	public void deleteGame(Integer id) {
+		gameRepository.deleteById(id);
+	}
+
+	@Transactional
 	public void save(Game game){
 		gameRepository.save(game);
 
@@ -124,29 +129,26 @@ public class GameService {
 		return gameRepository.findGamePlayerByPlayer(player.getId());
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
-	public void rellenaBaraja(Integer gameId){
-		Optional<Game> currentGame = gameRepository.findById(gameId);
-		if(currentGame.isPresent()){
-			Game g = currentGame.get();
-			List<Card> playedcards = g.discarted();
-			cardService.shuffle(playedcards);
-			g.setCards(cardService.findCards());
-			gameRepository.save(g);
+	public void fillDeck(Game g){
+			List<Card> played_cards = g.discarted();
+			cardService.shuffle(played_cards);
+			List<Card> new_deck = new ArrayList<>();
+			for(Card played_card: played_cards){
+				played_card.setPlayed(false);
+				new_deck.add(played_card);
 			}
-			
+			g.setCards(played_cards);
+			gameRepository.save(g);
 		}
 		
 		//Barajar
-		public void reparteCartas(@PathVariable("gameId") int gameId) {
-			Optional<Game> currentGame = gameRepository.findById(gameId); 
-			if(currentGame.isPresent()){
-				Game game = currentGame.get();
+		public void dealCards(Game game) {
 				List<Card> baraja = game.baraja();
 				for(GamePlayer jugador: game.getGamePlayer()) {
 				List<Card> cartasJugador = jugador.getHand();
 				while(cartasJugador.size()<3){
-					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a rellenaBaraja
-						rellenaBaraja(gameId);
+					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a fillDeck
+						fillDeck(game);
 						baraja = game.baraja();
 					}
 					Card card = baraja.get(0);
@@ -157,8 +159,7 @@ public class GameService {
 				}
 				jugador.setCards(cartasJugador);//Cuando ya tenga 3 cargas se guarda en el jugador
 					gamePlayerService.save(jugador);
-				}
-			}
+				}			
 			
 			}
 
@@ -180,94 +181,89 @@ public class GameService {
 				if(c_organ1.getType().getType().toString()=="ORGAN"
 				&& c_organ2.getType().getType().toString()=="ORGAN"){
 				if(c_organ1.getVaccines().size()<2 && c_organ2.getVaccines().size()<2){
-				if(g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)){
+				if((g1.isThisOrganNotPresent(c_organ2) && g2.isThisOrganNotPresent(c_organ1)) || c_organ1.getType().getColour()==c_organ2.getType().getColour()){
 					cardService.changeGamePlayer(c_organ1, g1, g2);
 					cardService.changeGamePlayer(c_organ2, g2, g1);
-					if(c_organ1.getVaccines().size()==1){
-						Card vaccine1 = c_organ1.getVaccines().get(0);
-						cardService.changeGamePlayer(vaccine1, g1, g2);
-					}
-					else if(c_organ1.getVirus().size()==1){
-						Card virus1 = c_organ1.getVirus().get(0);
-						cardService.changeGamePlayer(virus1, g1, g2);
-					}
-					else if(c_organ2.getVaccines().size()==1){
-						Card vaccine2 = c_organ2.getVaccines().get(0);
-						cardService.changeGamePlayer(vaccine2, g2, g1);
-					}
-					else if(c_organ2.getVirus().size()==1){
-						Card virus2 = c_organ2.getVirus().get(0);
-						cardService.changeGamePlayer(virus2, g2, g1);
-					}			
-				
+												
 			}else{
 				throw new IllegalArgumentException("A body can't have repeated organs.");
 			}
-
 			}else{
 				throw new IllegalArgumentException("You can't exchange immunized organs.");
 				
 			}
-	} else{
+		}else{
 		throw new IllegalArgumentException("You can only exchange organs.");
 	}
 			}
+		
 
 
 		public void changeTurn(Game game)	{
 			if(game.getTurn()==game.getGamePlayer().size()-1){ //Si es el último jugador
 				game.setTurn(0); //Cambiamos el turno a 0
 				game.setRound(game.getRound()+1); //Añadimos una ronda
-				reparteCartas(game.getId());} //Y repartimos cartas
+				dealCards(game);} //Y repartimos cartas
 			else{game.setTurn(game.getTurn()+1); //Sino solo incrementamos el turno en 1
 			}
 			gameRepository.save(game); //Guardamos los cambios de game
 		}
 
+		private void achus(Card virus, Card organ, GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+			cardService.changeGamePlayer(virus, gamePlayer1, gamePlayer2);
+			virus.setCardVirus(organ);
+			organ.getVirus().add(virus);
+		}
+
 
         public void thief(Card thiefCard, GamePlayer thiefPlayer, GamePlayer victimPlayer, Card stolenCard) {
-			// Verificamos que la víctima tenga la carta que se quiere robar
-			if (victimPlayer.getCards().contains(stolenCard)) {
 				// Realizamos el robo de la carta
-				stolenCard.setGamePlayer(thiefPlayer);
-				thiefCard.discard();
-				victimPlayer.getCards().remove(stolenCard);
-				thiefPlayer.getCards().add(stolenCard);
-				thiefPlayer.getCards().remove(thiefCard);
-				cardService.save(stolenCard);
-				cardService.save(thiefCard);
-			}
-	}
-
-	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
-		List<Card> infectedCards = new ArrayList<>();
-		for (Card c : gamePlayer1.getCards()) {
-			if (c.getType().getType() == Type.VIRUS) {
-				infectedCards.add(c);
-			}
+				if(thiefPlayer.isThisOrganNotPresent(stolenCard)){
+					if(stolenCard.getVaccines().size()<2){
+						thiefPlayer.getCards().remove(thiefCard);
+						thiefCard.discard();
+						cardService.changeGamePlayer(stolenCard, victimPlayer, thiefPlayer);
+				}else{
+					throw new IllegalArgumentException("You can't stole an immune organ");
+				}
+				} else{
+					throw new IllegalArgumentException("You can't have repeated organs");
+				}
 		}
+	public void infection(GamePlayer gamePlayer1, GamePlayer gamePlayer2){
+		Card special_used = gamePlayer1.getHand().stream().filter(c->c.getType().getType()==Type.INFECTION).findFirst().get();
+		gamePlayer1.getCards().remove(special_used);
+		special_used.discard();
+		List<Card> virusInTheBody = gamePlayer1.getVirusInTheBody();
+		List<Card> cleanOrgans = gamePlayer2.getCleanOrgans();
 		
+		for (Card virus : virusInTheBody) {
 		//Comprobar si se pueden infectar sus organos
-			List<Card> body = gamePlayer2.getBody();
-			for (Card c : body) {
-				for (Card infectedCard : infectedCards) {
-					if (c.getVaccines().size()==0 && c.getVirus().size()==0) {
-						if (c.getType().getColour() == infectedCard.getType().getColour()) {
-						gamePlayer1.getCards().remove(infectedCard);
-						infectedCard.setGamePlayer(gamePlayer2);
-						gamePlayer2.getCards().add(infectedCard);
-						List<Card> virus = c.getVirus();
-						virus.add(infectedCard);
-						c.setVirus(virus);
-						} else {
-							throw new IllegalArgumentException("You can't infect an already infected organ.");
-						}
-					} else {
-						throw new IllegalArgumentException("You can't infect an immunized organ.");
+			for (Card organ : cleanOrgans) {
+				if (organ.getType().getColour() == virus.getType().getColour()) {
+					achus(virus,organ,gamePlayer1,gamePlayer2);
 				}
 			}
 		}
-	}
+		virusInTheBody = gamePlayer1.getVirusInTheBody();
+		cleanOrgans = gamePlayer2.getCleanOrgans();
+		
+		while(virusInTheBody.size()>0 && cleanOrgans.size()>0 &&(cardService.getColours(virusInTheBody).contains("RAINBOW")
+		|| cardService.getColours(cleanOrgans).contains("RAINBOW"))) {
+				if(cardService.getColours(virusInTheBody).contains("RAINBOW")){
+					Card virus = cardService.getARainBow(virusInTheBody);
+					achus(virus,cleanOrgans.get(0),gamePlayer1,gamePlayer2);
+					virusInTheBody.remove(virus);
+					cleanOrgans.remove(cleanOrgans.get(0));
+				}else if(cardService.getColours(cleanOrgans).contains("RAINBOW")){
+					Card organ = cardService.getARainBow(cleanOrgans);
+					achus(virusInTheBody.get(0),organ,gamePlayer1,gamePlayer2);
+					virusInTheBody.remove(virusInTheBody.get(0));
+					cleanOrgans.remove(organ);
+				}
+			} 
+		}
+	
 
 	public void glove(GamePlayer gamePlayer, Game game) {
 		for (GamePlayer otherGamePlayer : game.getGamePlayer()) {
@@ -297,41 +293,11 @@ public class GameService {
 		gamePlayer2.getCards().addAll(player1Cards);
 	}
 		
-	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
-		Map<Integer,List<GamePlayer>> classification = new HashMap<>();
-		for(GamePlayer gamePlayer : gamePlayers){
-			Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
-			if(healthyOrgans==4){
-				gamePlayer.setWinner(true);
-				classification.put(1, List.of(gamePlayer));
-			} else if(healthyOrgans==3){
-				if(classification.containsKey(2)){
-					classification.get(2).add(gamePlayer);
-				}else{
-					classification.put(2, List.of(gamePlayer));
-						}
-					} else if(healthyOrgans==2){
-						if(classification.containsKey(3)){
-							classification.get(3).add(gamePlayer);
-						}else{
-							classification.put(3, List.of(gamePlayer));
-						}
-					} else if(healthyOrgans==1){
-						if(classification.containsKey(4)){
-							classification.get(4).add(gamePlayer);
-						}else{
-							classification.put(4, List.of(gamePlayer));
-						}
-					} else {
-						if(classification.containsKey(5)){
-							classification.get(5).add(gamePlayer);
-						}else{
-							classification.put(5, List.of(gamePlayer));
-						}
-					} 
-				}
-				return classification;
-		}
+
+	public List<GamePlayer> classificate(List<GamePlayer> gamePlayers){
+		Collections.sort(gamePlayers, Comparator.comparingInt(GamePlayer::getNumHealthyOrgans).reversed());
+		return gamePlayers;
+	}
 	
 	@Transactional(readOnly = false)
 	public Game startGame(Room room) {
@@ -344,7 +310,6 @@ public class GameService {
 		game.setIsRunning(true);
 		List<GamePlayer> gamePlayers = new ArrayList<>();
 		game.setCards(new ArrayList<>());
-		game.setClassification(new HashMap<>());
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
@@ -368,30 +333,26 @@ public class GameService {
 		}
 		Collections.shuffle(game.getCards());
 		save(game);
-		reparteCartas(game.getId());
+		dealCards(game);
 
 		return game;
 	}
 
 	@Transactional(readOnly = false)
 	public void discard(List<Card> cards, GamePlayer gamePlayer) {
-		if(gamePlayer.getCards().containsAll(cards)){
 			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
 					gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
 					card.discard();
 					cardService.save(card);	//Se guarda la carta	
 			}  
-			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
-		}else{
-			
-		}
+			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador	
 	}
 
 	@Transactional(readOnly = false)
-	public void finishGame(Game game) throws WonPlayedGamesException {
+	public void finishGame(Game game){
 		game.endGame();
-		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
-		game.setClassification(classification);
+		List<GamePlayer> classification = classificate(game.getGamePlayer());
+		game.setGamePlayer(classification);
 		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
     	game.getCards().stream().forEach(c -> {
 			c.setGamePlayer(null);

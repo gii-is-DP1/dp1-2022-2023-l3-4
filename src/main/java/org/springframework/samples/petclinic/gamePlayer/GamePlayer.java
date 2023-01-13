@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.OneToOne;
 import org.springframework.samples.petclinic.player.Player;
@@ -42,7 +43,7 @@ public class GamePlayer extends BaseEntity {
     private Player player;
     
 
-    @OneToMany(cascade= CascadeType.ALL, mappedBy = "gamePlayer", orphanRemoval = true)
+    @OneToMany(mappedBy = "gamePlayer")
     @JsonIgnore
     private List<Card> cards;
 
@@ -58,8 +59,6 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        // this.host=false;
-        // this.winner=false;
     }
 
     public List<Card> getBody(){
@@ -75,7 +74,7 @@ public class GamePlayer extends BaseEntity {
 
     public Boolean isWinner(){
        Integer numOrgansNeededToWin = 4; 
-       return  getNumHealthyOrgans()==numOrgansNeededToWin;
+       return  getNumHealthyOrgans()>=numOrgansNeededToWin;
     }
 
     public List<String> getBodyColours(){
@@ -88,4 +87,15 @@ public class GamePlayer extends BaseEntity {
 		cards.add(organ.getType().getColour().name());
 		return cards.size()!=getBodyColours().size();
     }
+
+    public List<Card> getVirusInTheBody(){
+        List<Card> body=  getCards();
+        body.removeAll(getHand());
+        return body.stream().filter(c->c.getType().getType()==Type.VIRUS).collect(Collectors.toList());
+    }
+
+    public List<Card> getCleanOrgans(){
+        return getBody().stream().filter(o-> o.getVaccines().size()==0 && o.getVirus().size()==0).collect(Collectors.toList());
+    }
+
 }

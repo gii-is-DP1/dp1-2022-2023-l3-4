@@ -21,27 +21,6 @@ INSERT INTO authorities(id,username,authority) VALUES (12,'frabenrui1','player')
 INSERT INTO authorities(id,username,authority) VALUES (13,'p','player');
 INSERT INTO authorities(id,username,authority) VALUES (14,'lucperrom','player');
 
--- One vet user, named vet1 with passwor v3t
-INSERT INTO users(username,password,enabled) VALUES ('vet1','v3t',TRUE);
-INSERT INTO authorities(id,username,authority) VALUES (3,'vet1','veterinarian');
-
-INSERT INTO vets(id, first_name,last_name) VALUES (1, 'James', 'Carter');
-INSERT INTO vets(id, first_name,last_name) VALUES (2, 'Helen', 'Leary');
-INSERT INTO vets(id, first_name,last_name) VALUES (3, 'Linda', 'Douglas');
-INSERT INTO vets(id, first_name,last_name) VALUES (4, 'Rafael', 'Ortega');
-INSERT INTO vets(id, first_name,last_name) VALUES (5, 'Henry', 'Stevens');
-INSERT INTO vets(id, first_name,last_name) VALUES (6, 'Sharon', 'Jenkins');
-
-INSERT INTO specialties VALUES (1, 'radiology');
-INSERT INTO specialties VALUES (2, 'surgery');
-INSERT INTO specialties VALUES (3, 'dentistry');
-
-INSERT INTO vet_specialties VALUES (2, 1);
-INSERT INTO vet_specialties VALUES (3, 2);
-INSERT INTO vet_specialties VALUES (3, 3);
-INSERT INTO vet_specialties VALUES (4, 2);
-INSERT INTO vet_specialties VALUES (5, 1);
-
 -- Achievement Type
 
 INSERT INTO achievement_types(id,name) VALUES (1,'Explorador'), (2,'Aprendiz'), (3,'Experimentado'), (4,'Gran Jugador'), (5,'Maestro');
@@ -49,8 +28,8 @@ INSERT INTO achievement_types(id,name) VALUES (1,'Explorador'), (2,'Aprendiz'), 
 -- Achievements
 
 INSERT INTO achievements(id,name,threshold,description,badge_image,type) VALUES 
-(1, 'Viciado', 10.0, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
-(2, 'Triunfador', 20.0, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
+(1, 'Viciado', 1, 'Si juegas <THRESHOLD> partidas o más, consideramos que ya estás enganchado.', 'https://bit.ly/certifiedGamer',1),
+(2, 'Triunfador', 2, 'Si ganas <THRESHOLD> o más partidas es que eres todo un triunfador.', 'https://bit.ly/proGamer',1);
 
 -- Player
 
@@ -108,8 +87,6 @@ INSERT INTO games_game_player VALUES (12,1), (12,2), (12,3);
 
 -- PlayerAchievements
 
-INSERT INTO player_achievements(player_id,achievement_id) VALUES (1,1);
-
 -- Statitics
 
 --Friends
@@ -118,3 +95,8 @@ INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(1,TRUE,1,5);
 INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(2,FALSE,2,1);
 INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(3,TRUE,3,1);
 INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(4,null,1,4);
+
+
+--Invitations
+
+INSERT INTO invitation(id,is_viewer,player_invitation_rec_id,player_invitation_send_id,room_id) VALUES (1,FALSE,1,5,1)

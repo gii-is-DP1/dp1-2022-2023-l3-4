@@ -48,6 +48,11 @@ public class InvitationService {
     }
 
     @Transactional
+    public Invitation findInvitationByPlayersAndRoomId(Integer player1, Integer player2, Integer roomId) throws DataAccessException {
+        return invitationRepository.findByPlayersAndRoomId(player1, player2, roomId);
+    }
+
+    @Transactional
     public void saveInvitation(Invitation invitation) throws DataAccessException {
         invitationRepository.save(invitation);
     }

@@ -10,7 +10,7 @@
             <h2>Friends</h2>
         </div>
         <div class="col-md-2">
-            <a href="/friend/myInvitationRequests">My Invitation Requests</a>
+            <a href="/friend/myInvitationRequests">My Invitations</a>
         </div>
         <div class="col-md-2">
             <a href="/friend/myFriendsRequest">My Friends Request</a>
@@ -36,6 +36,9 @@
                     <c:out value="${friend.user.username}"/>
                 </td>
                 <td>
+                    <a href="/friend/invitation/${friend.id}">
+                        <input type="button" value="Send invitation" class="btn btn-primary" />
+                    </a>
                     <a href="${playerAuth.id}/delete/${friend.id}">
                         <input type="button" value="Delete" class="btn btn-danger" />
                     </a>

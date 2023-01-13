@@ -7,6 +7,7 @@ import org.springframework.samples.petclinic.invitation.Invitation;
 import org.springframework.samples.petclinic.invitation.InvitationService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.player.PlayerService;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -76,7 +77,7 @@ public class FriendController {
         this.friendService.savePlayer(friend);
 		return "redirect:/friend/myFriendsRequest";
 	}
-
+    
     @GetMapping("/myFriendsRequest/{requestId}/denied")
 	public String friendRequestDenied(@PathVariable("requestId") int requestId) {
         Friend friend=friendService.findFriendById(requestId);
@@ -123,6 +124,31 @@ public class FriendController {
             
         }
 		return "redirect:/friend/myFriends";
+	}
+
+    @GetMapping("/invitation/{playerId}")
+	public String invitationRequest(@PathVariable("playerId") int playerId, ModelMap model) {
+        Player playerInvitationSend = authService.getPlayer();
+        Player playerInvitationRec = playerService.findPlayerById(playerId);
+        Room room = playerInvitationSend.getRoom();
+        Invitation repeat = invitationService.findInvitationByPlayersAndRoomId(playerInvitationRec.getId(), playerInvitationSend.getId(), room.getId());
+        if(repeat == null) {
+            if(playerInvitationSend.getRoom() != null) {
+                Invitation invitation = new Invitation();
+                invitation.setIsViewer(false);
+                invitation.setPlayerInvitationSend(playerInvitationSend);
+                invitation.setPlayerInvitationRec(playerInvitationRec);
+                invitation.setRoom(playerInvitationSend.getRoom());
+                this.invitationService.saveInvitation(invitation);
+           } else {
+            model.put("message", "You should be in a room");
+            model.put("messageType", "warning");
+           }
+        } else {
+            model.put("message", "You already sent a invitation to this friend");
+            model.put("messageType", "warning");
+        }
+		return "redirect:/room/myRoom";
 	}
 
 }

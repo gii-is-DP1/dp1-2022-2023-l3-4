@@ -492,19 +492,12 @@ public class GameController {
 	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGame(gameId);
 		if(game.hasAnyWinners() || game.getWinner()!=null){
-
-			try {
 				if(game.getIsRunning()){
 					gameService.finishGame(game);
 				}
-				
 				model.put("classification", game.getGamePlayer());
 				return "games/classification";
-			} catch (Exception e) {
-				model.put("message", e.getMessage());
-				model.put("messageType", "info");
-				return muestraVista(gameId, model);
-			}
+			
 		} else{
 			model.put("message", "The Game has not finished yet.");
 			model.put("messageType", "info");

@@ -13,7 +13,10 @@ import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,6 +46,9 @@ public class StatisticsControllerTests {
 
   @MockBean
   private GamePlayerService gamePlayerService;
+
+  @MockBean
+  private AuthenticationService authenticationService;
 
   @BeforeEach
   void setup() {
@@ -93,7 +99,26 @@ public class StatisticsControllerTests {
     when(gameService.humanReadableDuration(Duration.of(450, ChronoUnit.SECONDS))).thenReturn("maximum duration");
     when(gamePlayerService.findAll()).thenReturn(listGP);
 
+    GrantedAuthority adminAuth = new GrantedAuthority() {
+      
+      @Override
+      public String getAuthority() {
+        return "ADMIN";
+      }
+    };
 
+    GrantedAuthority playerAuth = new GrantedAuthority() {
+      
+      @Override
+      public String getAuthority() {
+        return "PLAYER";
+      }
+    };
+    User admin = new User("admin1", "4dm1n", List.of(adminAuth));
+    when(authenticationService.getUser()).thenReturn(admin);
+
+    User player = new User("frabenrui1", "z3bas", List.of(playerAuth));
+    when(authenticationService.getUser()).thenReturn(player);
 
   }
   

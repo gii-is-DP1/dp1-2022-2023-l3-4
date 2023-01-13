@@ -54,13 +54,11 @@
 				</petclinic:menuItem>
 				</sec:authorize>
 				
-				<sec:authorize access="hasAnyAuthority('player')">
 				<petclinic:menuItem active="${name eq 'globalStatistics'}" url="/statistics/global"
 					title="Main game statistics">
 					<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
 					<span>Statistics</span>
 				</petclinic:menuItem>
-				</sec:authorize>
 
 				<sec:authorize access="hasAnyAuthority('admin')">
 				<li class="dropdown"><a  class="dropdown-toggle"

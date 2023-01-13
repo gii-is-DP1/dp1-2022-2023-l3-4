@@ -4,14 +4,14 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
-<virus:layout pageName="Achievements">
+<virus:layout pageName="Users">
   <jsp:body>
       <h2>
-        INVALID ACHIEVEMENT!
+        INVALID USER!
     </h2>
-      <p>The achievement name is duplicated and that cannot happen.</p>
+      <p>The username already exists in the database.</p>
       <div class="container">
-        <a href="<spring:url value="/statistics/achievements/new" htmlEscape="true" />">Back</a>
+        <a href="<spring:url value="/user/new" htmlEscape="true" />">Back</a>
       </div>
   </jsp:body>
 </virus:layout>

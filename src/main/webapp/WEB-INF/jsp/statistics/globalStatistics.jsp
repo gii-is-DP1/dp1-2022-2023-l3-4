@@ -15,6 +15,9 @@
             <th></th>
             <th>Username</th>
             <th>Num Won Games</th>
+            <c:if test="${isPlayer}">
+              <th></th>
+            </c:if>
           </thead>
           <tbody>
             <c:forEach items="${top3}" var="top">
@@ -33,9 +36,11 @@
                 <td>
                   <c:out value="${top.numWonGames}"/>
                 </td>
-                <td>
-                  <a href="/request/${top.player.id}">Add Friend</a>
-                </td>
+                <c:if test="${isPlayer}">
+                  <td>
+                    <a href="/request/${top.player.id}">Add Friend</a>
+                  </td>
+                </c:if>
               </tr>
             </c:forEach>
             
@@ -57,14 +62,17 @@
                 <td>
                   <c:out value="${rop.numWonGames}"/>
                 </td>
-                <td>
-                  <a href="/request/${top.player.id}">Add Friend</a>
-                </td>
+                <c:if test="${isPlayer}">
+                  <td>
+                    <a href="/request/${top.player.id}">Add Friend</a>
+                  </td>
+                </c:if>
               </tr>
             </c:forEach>
           </tbody>
         </table>
       </td>
+    <c:if test="${isAdmin}">
       <td rowspan="2">
         <table>
           <tr>
@@ -157,6 +165,7 @@
           </tr>
         </table>
       </td>
+    </c:if> 
     </tr>
   </table>
 </virus:layout>

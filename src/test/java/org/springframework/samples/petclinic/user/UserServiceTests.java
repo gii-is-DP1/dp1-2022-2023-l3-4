@@ -14,19 +14,19 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class UserServiceTest {
+public class UserServiceTests {
     @Autowired
     protected UserService userService;
 
     @Test
-    public void shoulFindUser(){
+    public void shouldFindUser(){
         User userPrueba= userService.findUser("frabenrui1");
         assertTrue(userPrueba.getUsername().equals("frabenrui1") , "There should be a user with name = p.");
         
     }
 
     @Test
-    public void shoulSaveUser(){
+    public void shouldSaveUser(){
         User userPrueba= new User();
         userPrueba.setUsername("prueba");
         userService.saveUser(userPrueba);
@@ -36,7 +36,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shoulUpdateUser(){
+    public void shouldUpdateUser(){
         User userPrueba= userService.findUser("p");
         userPrueba.setPassword("pswd");
         userService.saveUser(userPrueba);
@@ -46,10 +46,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shoulDeletedUser(){
+    public void shouldDeleteUser(){
         userService.deleteUser("p");
         assertThrows(NoSuchElementException.class, () -> userService.findUser("p"));
         
     }
-    
+
 }

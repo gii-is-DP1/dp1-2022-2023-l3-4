@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ import org.springframework.ui.ModelMap;
 // classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class GameServiceTest {
+public class GameServiceTests {
 
     @Autowired
     GameService gs;
@@ -124,7 +123,6 @@ public class GameServiceTest {
     @BeforeEach
     void setup(){
         g.setCards(new ArrayList<>());
-        g.setClassification(new HashMap<>());
         g.setIsRunning(true);
         g.setId(0);
         List<GamePlayer> gplayers = new ArrayList<>();

@@ -1,18 +1,3 @@
-/*
- * Copyright 2002-2013 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.springframework.samples.petclinic.player;
 
 import java.time.Duration;
@@ -35,6 +20,7 @@ import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -45,10 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * @author Juergen Hoeller
- * @author Ken Krebs
- * @author Arjen Poutsma
- * @author Michael Isvy
+ * @author Francisco Sebastian Benitez Ruis Diaz
+ * @author Jose Maria Garcia Berdejo
  */
 @Controller
 @RequestMapping("/player")
@@ -60,6 +44,7 @@ public class PlayerController {
     private AuthenticationService authenticationService;
     private FriendService friendService;
     private AchievementService achievementService;
+    private UserService userService;
 
     private static final String USER_PROFILE ="player/playerProfile"; 
     private static final String EDIT_PROFILE = "player/createOrUpdateProfileForm";
@@ -68,12 +53,13 @@ public class PlayerController {
 
 
     @Autowired
-    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs) {
+    public PlayerController(PlayerService ps, AuthenticationService as, FriendService fs, GameService gs, AchievementService acs, UserService userService) {
         this.playerService = ps;
         this.authenticationService = as;
         this.friendService=fs;
         this.gameService = gs;
         this.achievementService = acs;
+        this.userService = userService;
     }
 
 
@@ -128,12 +114,25 @@ public class PlayerController {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
-                playerService.savePlayer(playerToUpdate);
-                model.put("message", "Your player information has been updated successfully");
-                return playerProfile(model, null);
+                if(player.getUser() == null || player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
+                    bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+                    return EDIT_PROFILE;
+                } else {
+                    User userToUpdate = playerToUpdate.getUser();
+                    userToUpdate.setPassword(player.getUser().getPassword());
+                    userService.saveUser(userToUpdate);
+                    playerService.savePlayer(playerToUpdate);
+                    model.put("message", "Your player information has been updated successfully");
+                    model.put("messageType", "info");
+                    return playerProfile(model, null);
+                }
+                
+            } else {
+                model.put("message", "You need to be logged in to change your player information.");
+                model.put("messageType", "info");
+                return "welcome";
             }
         }
-        return "redirect:/player/me";
     }
 
     @GetMapping("/search")

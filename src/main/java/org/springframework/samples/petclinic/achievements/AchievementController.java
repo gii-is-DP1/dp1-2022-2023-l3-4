@@ -96,13 +96,9 @@ public class AchievementController {
       Achievement achievementToUpdate = achievementService.getAchievement(id);
       if (achievementToUpdate != null) {
         BeanUtils.copyProperties(achievement, achievementToUpdate, "id");
-        try {
-          achievementService.saveAchievement(achievementToUpdate);
-          model.put("message", "Achievement " + id + " succesfully updated");
-          return listAllAchievements(model);
-        } catch (DuplicatedAchievementNameException e) {
-          return INVALID_ACH;
-        }
+        achievementService.updateAchievement(achievementToUpdate);
+        model.put("message", "Achievement " + id + " succesfully updated");
+        return listAllAchievements(model);
       } else {
         model.put("message", "Achievement " + id + " doesn't exist");
         model.put("messageType", "info");

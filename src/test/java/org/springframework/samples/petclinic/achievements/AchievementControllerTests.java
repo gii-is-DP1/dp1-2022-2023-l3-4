@@ -135,24 +135,6 @@ public class AchievementControllerTests {
 
     @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
     @Test
-    public void testEditAchievementPostSameName() throws Exception {
-      Achievement viciado = new Achievement();
-      viciado.setName("Viciado");
-      viciado.setThreshold(5);
-      viciado.setType(new AchievementType());
-      when(achievementService.getAchievement(TEST_ACHIEVEMENT_ID)).thenReturn(viciado);
-      when(achievementService.saveAchievement(any())).thenThrow(DuplicatedAchievementNameException.class);
-      mockMvc.perform(post("/statistics/achievements/{id}/edit", TEST_ACHIEVEMENT_ID)
-        .with(csrf())
-        .param("name", "Viciado")
-        .param("description", "New description")
-        .param("threshold", "5"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("achievements/invalidAchievement"));
-    }
-
-    @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
-    @Test
     public void testDeleteAchievement() throws Exception {
         mockMvc.perform(get("/statistics/achievements/{id}/delete", TEST_ACHIEVEMENT_ID))
           .andExpect(status().isOk())

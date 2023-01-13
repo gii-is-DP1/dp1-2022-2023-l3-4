@@ -104,5 +104,3 @@ INSERT INTO FRIEND(ID,STATUS,PLAYER_REC_ID,PLAYER_SEND_ID) VALUES(4,null,1,4);
 
 
 --Invitations
-
-INSERT INTO invitation(id,is_viewer,player_invitation_rec_id,player_invitation_send_id,room_id) VALUES (1,FALSE,1,5,1)

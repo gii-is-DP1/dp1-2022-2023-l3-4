@@ -33,9 +33,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class UserController {
 
-	private static final String CREATE_OR_UPDATE_PLAYER = "player/createOrUpdateProfileForm";
+	private static final String CREATE_OR_UPDATE_PLAYER = "player/createPlayerForm";
 	private static final String USERS = "users/usersListing";
 	private static final String INVALID_USER = "users/invalidUser";
+	private static final String EDIT_USER = "player/createOrUpdateProfileForm";
 	
 
 	private UserService userService;
@@ -74,24 +75,22 @@ public class UserController {
 			return CREATE_OR_UPDATE_PLAYER;
 		}	else {
 			//creating player, gamePlayer, user, and authority
-			try {
-				if (player.getUser().getPassword() == null) {
-					bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
-					return CREATE_OR_UPDATE_PLAYER;
-				} else if (player.getUser().getUsername() == null) {
-					bindingResult.rejectValue("user.username", "User name cannot be empty.", "User name cannot be empty.");
-					return CREATE_OR_UPDATE_PLAYER;
-				} else {
+			if (player.getUser().getPassword() == null) {
+				bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
+				return CREATE_OR_UPDATE_PLAYER;
+			} else {
+				try {
 					this.userService.saveUser(player.getUser());
 					this.playerService.savePlayer(player);
 					this.gamePlayerService.saveGamePlayerForNewPlayer(player);
 					this.authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");			
+				} catch (DuplicatedUserException e) {
+					return INVALID_USER;
 				}
-			} catch (DuplicatedUserException e) {
-				return INVALID_USER;
+				return "redirect:/";
 			}
-			return "redirect:/";
 		}
+
 	}
 
 	@GetMapping("/users")
@@ -120,7 +119,7 @@ public class UserController {
 		Player player = playerService.getPlayerByUsername(username);
     if (player != null) {
       model.put("player", player);
-      return CREATE_OR_UPDATE_PLAYER;
+      return EDIT_USER;
     } else {
       model.put("message", "The player " + username + " doesn't exist");
       model.put("messageType", "info");
@@ -132,17 +131,17 @@ public class UserController {
 	public String saveUser(@PathVariable("username") String username, @Valid Player player, BindingResult bindingResult, ModelMap model) {
 		if (bindingResult.hasFieldErrors("firstName")) {
 			bindingResult.rejectValue("firstName", "First name cannot be empty.", "First name cannot be empty.");
-			return CREATE_OR_UPDATE_PLAYER;
+			return EDIT_USER;
 		} else if (bindingResult.hasFieldErrors("lastName")) {
 			bindingResult.rejectValue("lastName", "Last name cannot be empty.", "Last name cannot be empty.");
-			return CREATE_OR_UPDATE_PLAYER;
+			return EDIT_USER;
 		} else {
 			Player playerToUpdate = playerService.getPlayerByUsername(username);
 			if (playerToUpdate != null) {
 				BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "friendInvitationSend", "friendInvitationRec", "achievements", "room", "gamePlayer");
 				if(player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
 						bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
-						return CREATE_OR_UPDATE_PLAYER;
+						return EDIT_USER;
 				} else {
 						User userToUpdate = playerToUpdate.getUser();
 						userToUpdate.setPassword(player.getUser().getPassword());

@@ -74,7 +74,7 @@ public class UserControllerTests{
         mockMvc.perform(get("/user/new"))
         .andExpect(status().isOk())
         .andExpect(model().attributeExists("player"))
-        .andExpect(view().name("users/createPlayerForm"));
+        .andExpect(view().name("player/createPlayerForm"));
     }
     
     @WithMockUser(value = "spring")
@@ -85,7 +85,7 @@ public class UserControllerTests{
             .param("firstName" ,"Pablo")
             .param("lastName", "Cerezo")
             .param("user.username", "pabpabmar")
-            .param("password", "pwd"))
+            .param("user.password", "pwd"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/"));
     }
@@ -99,7 +99,7 @@ public class UserControllerTests{
             .param("firstName" ,"Pablo")
             .param("lastName", "Cerezo")
             .param("user.username", "frabenrui1")
-            .param("password", "pwd"))
+            .param("user.password", "pwd"))
             .andExpect(status().isOk())
             .andExpect(view().name("users/invalidUser"));
     }

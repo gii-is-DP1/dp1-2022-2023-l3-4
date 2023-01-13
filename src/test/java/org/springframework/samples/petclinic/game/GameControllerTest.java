@@ -10,15 +10,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.Hand;
@@ -33,145 +37,129 @@ import org.springframework.samples.petclinic.room.RoomService;
 import org.springframework.samples.petclinic.statistics.WonPlayedGamesException;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-
-
-public class GameControllerTest {
-	
-	@Mock
-	private GameService gameService;
-	
-	@Mock
-	private RoomService roomService;
-	
-	@Mock
-	private GamePlayerService gamePlayerService;
-	
-	@Mock
-	private CardService cardService;
-	
-	@Mock
-	private AuthenticationService authenticationService;
-	
-	@InjectMocks
-	private GameController gameController;
-	
-	@BeforeEach
-	public void init() {
-		MockitoAnnotations.initMocks(this);
-	}
-	
-	@Test
-	public void testInit() {
-		//given
-		Integer roomId = 1;
-		Room room = new Room();
-		Game runningGame = new Game();
-		Player currentPlayer = new Player();
-		ModelMap model = new ModelMap();
-		
-		//when
-		when(roomService.findRoomById(roomId)).thenReturn(room);
-		when(gameService.getRunningGame(room)).thenReturn(runningGame);
-        when(gameService.startGame(room)).thenReturn(runningGame);
-		when(authenticationService.getPlayer()).thenReturn(currentPlayer);
-		
-		//then
-		String result = gameController.init(roomId, model);
-		assertThat(result).isEqualTo("redirect:/games/"+ runningGame.getId());
-	}
-	
-	@Test
-	public void testListRunningGames() {
-		//given
-		Collection<Game> runningGames = new ArrayList<>();
-		ModelMap model = new ModelMap();
-		
-		//when
-		when(gameService.listRunningGames()).thenReturn(runningGames);
-		
-		//then
-		String result = gameController.listRunningGames(model);
-		assertThat(result).isEqualTo(GameController.RUNNING_GAMES_LISTING);
-		assertThat(model.get("games")).isEqualTo(runningGames);
-	}
-	
-	@Test
-	public void testTerminateRunningGames() {
-		//given
-		Collection<Game> terminateGames = new ArrayList<>();
-		ModelMap model = new ModelMap();
-		
-		//when
-		when(gameService.listTerminateGames()).thenReturn(terminateGames);
-		
-		//then
-		String result = gameController.terminateRunningGames(model);
-		assertThat(result).isEqualTo(GameController.TERMINATE_GAMES_LISTING);
-		assertThat(model.get("games")).isEqualTo(terminateGames);
-	}
-	
-	@Test
-	public void testMuestraVista() {
-		//given
-		int gameId = 1;
-		GamePlayer gp_vista = new GamePlayer();
-		Game game = new Game();
-		ModelMap model = new ModelMap();
-		
-		//when
-		when(gameService.findGame(gameId)).thenReturn(game);
-		when(authenticationService.getGamePlayer()).thenReturn(gp_vista);
-		
-		//then
-		String result = gameController.muestraVista(gameId, model);
-		assertThat(result).isEqualTo("games/game");
-		assertThat(model.get("hand")).isEqualTo(gp_vista.getHand());
-		assertThat(model.get("bodies")).isInstanceOf(Map.class);
-		assertThat(model.get("isYourTurn")).isInstanceOf(Boolean.class);
-		assertThat(model.get("currentTurnGamePlayer")).isInstanceOf(GamePlayer.class);
-	}
-
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.samples.petclinic.card.GenericCardRepository;
-import org.springframework.samples.petclinic.card.GenericCardService;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 
 @WebMvcTest(controllers = GameController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
 classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 public class GameControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc; 
-    
-    @MockBean
-    private GameService gameServ;
+		@MockBean
+		private GameService gameService;
+		
+		@MockBean
+		private RoomService roomService;
+		
+		@MockBean
+		private GamePlayerService gamePlayerService;
+		
+		@MockBean
+		private CardService cardService;
+		
+		@MockBean
+		private AuthenticationService authenticationService;
+		
+		
+		@Autowired
+		private GameController gameController;
+		
 
-    @MockBean
-    private GamePlayerService gamePlayerServ;
+		@BeforeEach
+		public void init() {
+			MockitoAnnotations.initMocks(this);
+		}
+		
+		@Test
+		public void testInit() {
+			//given
+			Integer roomId = 1;
+			Integer gameId = 0;
+			Room room = new Room();
+			Game runningGame = new Game();
+			Player currentPlayer = new Player();
+			GamePlayer gp_vista = new GamePlayer();
+			ModelMap model = new ModelMap();
+			runningGame.setId(0);
+			runningGame.setWinner(null);
+			Card card = new Card();
+			card.setBody(false);
+			gp_vista.setCards(List.of(card));
+			card.setGamePlayer(gp_vista);
+			runningGame.setGamePlayer(List.of(gp_vista));
+			runningGame.setTurn(0);
+			room.setHost(currentPlayer);
+			
+			//when
+			when(authenticationService.getGamePlayer()).thenReturn(gp_vista);
+			when(roomService.findRoomById(roomId)).thenReturn(room);
+			when(gameService.getRunningGame(room)).thenReturn(null);
+			when(gameService.findGame(gameId)).thenReturn(runningGame);
+			when(gameService.startGame(room)).thenReturn(runningGame);
+			when(authenticationService.getPlayer()).thenReturn(currentPlayer);
+			
+			//then
+			String result = gameController.init(roomId, model);
+			assertThat(result).isEqualTo("redirect:/games/"+ runningGame.getId());
+		}
+		
+		@Test
+		public void testListRunningGames() {
+			//given
+			Collection<Game> runningGames = new ArrayList<>();
+			ModelMap model = new ModelMap();
+			
+			//when
+			when(gameService.listRunningGames()).thenReturn(runningGames);
+			
+			//then
+			String result = gameController.listRunningGames(model);
+			assertThat(result).isEqualTo(GameController.RUNNING_GAMES_LISTING);
+			assertThat(model.get("games")).isEqualTo(runningGames);
+		}
+		
+		@Test
+		public void testTerminateRunningGames() {
+			//given
+			Collection<Game> terminateGames = new ArrayList<>();
+			ModelMap model = new ModelMap();
+			
+			//when
+			when(gameService.listTerminateGames()).thenReturn(terminateGames);
+			
+			//then
+			String result = gameController.terminateRunningGames(model);
+			assertThat(result).isEqualTo(GameController.TERMINATE_GAMES_LISTING);
+			assertThat(model.get("games")).isEqualTo(terminateGames);
+		}
+		
+		@Test
+		public void testMuestraVista() {
+			//given
+			int gameId = 1;
+			GamePlayer gp_vista = new GamePlayer();
+			Game game = new Game();
+			ModelMap model = new ModelMap();
+			Card card = new Card();
+			card.setBody(false);
+			gp_vista.setCards(List.of(card));
+			card.setGamePlayer(gp_vista);
+			game.setGamePlayer(List.of(gp_vista));
+			game.setTurn(0);
 
-    @MockBean
-    private CardService cardService;
-
-    @MockBean
-    private GenericCardService gCardService;
-
-    @MockBean
-    private RoomService roomService;
-
-    @MockBean
-    private GenericCardRepository gCardRepo;
-
-    @MockBean
-    private AuthenticationService authService;
-
+			//when
+			when(gameService.findGame(gameId)).thenReturn(game);
+			when(authenticationService.getGamePlayer()).thenReturn(gp_vista);
+			
+			//then
+			String result = gameController.muestraVista(gameId, model);
+			assertThat(result).isEqualTo("games/game");
+			assertThat(model.get("hand")).isEqualTo(gp_vista.getHand());
+			assertThat(model.get("bodies")).isInstanceOf(Map.class);
+			assertThat(model.get("isYourTurn")).isInstanceOf(Boolean.class);
+			assertThat(model.get("currentTurnGamePlayer")).isInstanceOf(GamePlayer.class);
+		}
+		
     @WithMockUser
     @Test
 	public void testGeneraTablero() {
@@ -179,6 +167,7 @@ public class GameControllerTest {
 		GamePlayer gamePlayer = new GamePlayer();
 		Game game = new Game();
         Card card = new Card();
+		card.setBody(false);
         gamePlayer.setCards(List.of(card));
         card.setGamePlayer(gamePlayer);
         game.setGamePlayer(List.of(gamePlayer));
@@ -188,7 +177,6 @@ public class GameControllerTest {
 		assertTrue(result.containsKey("hand"));
 		assertTrue(result.containsKey("bodies"));
 		assertEquals(gamePlayer.getHand(), result.get("hand"));
-		assertEquals(game.getGamePlayer(), result.get("bodies"));
 	}
 	
 	@Test
@@ -196,6 +184,18 @@ public class GameControllerTest {
 		//given
 		int gameId = 1;
 		Game game = new Game();
+		game.setId(1);
+		GamePlayer gamePlayer = new GamePlayer();
+        game.setGamePlayer(List.of(gamePlayer));
+		Card card = new Card();
+        GenericCard genericCard = new GenericCard();
+        genericCard.setId(1);
+        genericCard.setType(Type.ORGAN);
+        genericCard.setColour(Colour.RED);
+		card.setType(genericCard);
+		card.setBody(true);
+		gamePlayer.setCards(List.of(card));
+		card.setGamePlayer(gamePlayer);
 		
 		//when
 		when(gameService.findGame(gameId)).thenReturn(game);
@@ -214,6 +214,15 @@ public class GameControllerTest {
 		GamePlayer gp = new GamePlayer();
 		Game game = new Game();
 		ModelMap model = new ModelMap();
+        GenericCard genericCard = new GenericCard();
+        genericCard.setId(1);
+        genericCard.setType(Type.ORGAN);
+        genericCard.setColour(Colour.RED);
+		card.setType(genericCard);
+		card.setBody(false);
+		gp.setCards(List.of(card));
+		card.setGamePlayer(gp);
+		game.setGamePlayer(List.of(gp));
 		
 		//when
 		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
@@ -229,26 +238,39 @@ public class GameControllerTest {
 		//given
 		Integer gameId = 1;
 		Integer cardId = 1;
-		Integer targetGP = 1;
+		Integer g_id = 1;
+		GamePlayer gp = new GamePlayer();
 		Card card = new Card();
+		Game game = new Game();
+		game.setId(gameId);
         GenericCard genericCard = new GenericCard();
         genericCard.setId(1);
         genericCard.setType(Type.ORGAN);
         genericCard.setColour(Colour.RED);
 		card.setType(genericCard);
+		card.setGamePlayer(gp);
+		gp.setCards(List.of(card));
+		gp.setId(g_id);
+		List<GamePlayer> gps = new ArrayList<>();
+		gps.add(gp);
+		game.setGamePlayer(gps);
 		ModelMap model = new ModelMap();
 		
 		//when
+		when(authenticationService.getGamePlayer()).thenReturn(gp);
+		when(gamePlayerService.findById(g_id)).thenReturn(Optional.of(gp));
 		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
+		when(gameService.findGame(gameId)).thenReturn(game);
 		
 		//then
-		assertEquals("playOrgan", gameController.playOnBody(gameId, cardId, targetGP, model));
+		assertEquals("playOrgan", gameController.playOnBody(gameId, cardId, gp.getId(), model));
 	}
 	
 	@Test
 	public void testPlayOnCard() {
 		//given
-		Integer gameId = 1;
+		Game game = new Game();
+		game.setId(1);
 		Integer cardId = 1;
 		Integer targetC = 1;
 		Card card = new Card();
@@ -263,7 +285,7 @@ public class GameControllerTest {
 		when(cardService.findCard(cardId)).thenReturn(Optional.of(card));
 		
 		//then
-		assertEquals("playVaccine", gameController.playOnCard(gameId, cardId, targetC, model));
+		assertEquals("playVaccine", gameController.playOnCard(game.getId(), cardId, targetC, model));
 	}
 	
 	@Test
@@ -693,8 +715,23 @@ public class GameControllerTest {
 		//Arrange
 		Integer gameId = 1;
 		ModelMap model = new ModelMap();
-		Game game = this.gameService.findGame(gameId);
-		
+		Game game = new Game();
+		GamePlayer gp = new GamePlayer();
+		List<GamePlayer> gps = new ArrayList<>();
+		game.setWinner(gp);
+		gps.add(gp);
+		gp.setWinner(true);
+		GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+    	GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
+    	GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
+		GenericCard generic_bone = new GenericCard(12,Colour.YELLOW, Type.ORGAN);
+		Card organ_heart = new Card(1, true, gp, generic_heart);
+    	Card organ_rainbow = new Card(3, true, gp, generic_rainbow);
+    	Card organ_stomach = new Card(2, true, gp, generic_stomach);
+		Card organ_bone = new Card(13,true,gp,generic_bone);
+		gp.setCards(List.of(organ_heart, organ_rainbow, organ_stomach, organ_bone));
+		game.setGamePlayer(gps);
+		when(gameService.findGame(gameId)).thenReturn(game);
 		//Act
 		String result = gameController.classification(gameId, model);
 		
@@ -703,4 +740,5 @@ public class GameControllerTest {
 		assertEquals(game.getClassification(), model.get("classification"));
 		assertTrue(game.hasAnyWinners());
 	}
+	
 }

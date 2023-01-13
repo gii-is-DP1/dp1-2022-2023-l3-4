@@ -91,6 +91,11 @@ public class GameService {
 		return gameRepository.findGameByRoomId(roomId);
 	}
 
+	@Transactional
+    public void deleteGame(Integer id) {
+        gameRepository.deleteById(id);
+    }
+
 	@Transactional(readOnly = true)
 	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
 		Game game = findGame(gameId);

@@ -5,21 +5,45 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <virus:layout pageName="users">
-  <table id="usersTable" style="width: 40%;">
+  <table id="usersTable" style="width: 60%;">
     <thead>
       <th>
         Username
       </th>
+      <th>
+        Creator
+      </th>
+      <th>
+        Created Date
+      </th>
+      <th>
+        Modifier
+      </th>
+      <th>
+        Last Modified Date
+      </th>
     </thead>
     <tbody>
-      <c:forEach items="${users}" var="user">
+      <c:forEach items="${players}" var="player">
         <tr>
           <td>
-            <c:out value="${user.username}"/>
+            <c:out value="${player.user.username}"/>
           </td>
           <td>
-            <a href="/users/${user.username}/edit"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a href="/users/${user.username}/delete"><span class="glyphicon glyphicon-trash"></span></a>
+            <c:out value="${player.creator}"/>
+          </td>
+          <td>
+            <virus:localDateTime date="${player.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
+          </td>
+          <td>
+            <c:out value="${player.modifier}"/>
+          </td>
+          <td>
+            <virus:localDateTime date="${player.lastModifiedDate}" pattern="dd/MM/yyyy HH:mm:ss"/>
+          </td>
+          <td>
+            <a href="/users/${player.user.username}/edit"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href="/users/${player.user.username}/delete"><span class="glyphicon glyphicon-trash"></span></a>
           </td>
         </tr>
       </c:forEach>

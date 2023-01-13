@@ -2,21 +2,30 @@ package org.springframework.samples.petclinic.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.petclinic.card.Card;
+import org.springframework.samples.petclinic.card.CardRepository;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.player.Player;
+import org.springframework.samples.petclinic.room.Room;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
@@ -32,6 +41,16 @@ public class GameServiceTests {
 
     @Autowired
     CardService cs;
+
+    @MockBean
+    GameRepository gr;
+
+    @MockBean
+    GamePlayerService gps;
+
+    
+    @MockBean
+    CardRepository cr;
 
     //Elementos comunes a addOrgan
     GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
@@ -80,8 +99,24 @@ public class GameServiceTests {
     Card vax_heart2 = new Card(6, false, gp2, generic_HVaccine2);
     Card infection = new Card(8,false,gp3,generic_infection);
 
-    Game g = new Game();
+    //Elementos para testClasificate
+    GamePlayer gp5 = new GamePlayer(4);
+    GamePlayer gp6 = new GamePlayer(5);
+    GamePlayer gp7 = new GamePlayer(6);
+    GenericCard generic_bone = new GenericCard(12,Colour.YELLOW, Type.ORGAN);
+    Card organ_bone = new Card(13,true,gp2,generic_bone);
+    Card organ_heart3 = new Card(17, true, gp3, generic_heart);
+    Card organ_stomach2 = new Card(16, true, gp3, generic_stomach);
+    Card organ_bone2 = new Card(15,true,gp3,generic_bone);
+    Card organ_heart4 = new Card(18, true, gp4, generic_heart);
+    Card organ_stomach3 = new Card(19, true, gp4, generic_stomach);
+    Card organ_bone3 = new Card(20,true,gp5,generic_bone);
+    Card organ_stomach4 = new Card(19, true, gp5, generic_stomach);
+    Card organ_heart5 = new Card(21, true, gp6, generic_heart);
+    Card organ_stomach5 = new Card(19, true, gp7, generic_stomach);
 
+    Game g = new Game();
+    List<GamePlayer> gamePlayers = new ArrayList<>();
     List<Card> cards = new ArrayList<>();
     ModelMap m = new ModelMap();
 
@@ -454,5 +489,170 @@ public class GameServiceTests {
         gs.medicalError(gp1, gp2);
         assertEquals(true, gp1.getBody().size()==1 && gp2.getBody().size()==2);
     }
+
+    public void classificateCommonMethod(Card c, GamePlayer gp){
+        c.setBody(true);
+        c.setGamePlayer(gp);
+        gp.getCards().add(c);
+    }
+
+
+    //Clasifica los jugadores de una partida en primer,segundo,tercer o cuarto puesto
+    @Test
+    public void testClasificate(){
+        //setup
+        gp1.getCards().clear();
+        classificateCommonMethod(organ_brain,gp1);
+        organ_heart1.getVirus().clear();
+        classificateCommonMethod(organ_heart1,gp1);
+        classificateCommonMethod(organ_rainbow,gp1);
+        classificateCommonMethod(organ_stomach,gp1);
+        classificateCommonMethod(organ_brain2,gp2);
+        classificateCommonMethod(organ_heart2,gp2);
+        classificateCommonMethod(organ_bone,gp2);
+        gp3.getCards().clear();
+        classificateCommonMethod(organ_heart3,gp3);
+        classificateCommonMethod(organ_stomach2,gp3);
+        classificateCommonMethod(organ_bone2,gp3);
+        classificateCommonMethod(organ_heart4,gp4);
+        classificateCommonMethod(organ_stomach3,gp4);
+        classificateCommonMethod(organ_bone3,gp5);
+        classificateCommonMethod(organ_stomach4,gp5);
+        classificateCommonMethod(organ_heart5,gp6);
+        classificateCommonMethod(organ_stomach5,gp7);
+
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gp1);
+        gamePlayers.add(gp2);
+        gamePlayers.add(gp3);
+        gamePlayers.add(gp4);
+        gamePlayers.add(gp5);
+        gamePlayers.add(gp6);
+        gamePlayers.add(gp7);
+
+        Map<Integer, List<GamePlayer>> classification = new HashMap<>();
+        classification.put(1, List.of(gp1));
+        classification.put(2, List.of(gp2,gp3));
+        classification.put(3, List.of(gp4,gp5));
+        classification.put(4, List.of(gp6,gp7));
+        //test
+        assertEquals(classification,gs.clasificate(gamePlayers));
+    }
+
+    @Test
+    public void testStartGameAndDealCards(){
+        //setup
+        when(gr.findGamePlayerByPlayer(0)).thenReturn(gp6);
+        when(gr.findGamePlayerByPlayer(1)).thenReturn(gp7);
+        when(gps.save(gp7)).thenReturn(gp7);
+        when(gr.save(any())).thenReturn(g);
+        List<Player> players = new ArrayList<>();
+        Player player1 = new Player();
+        player1.setId(0);
+        Player player2 = new Player();
+        player2.setId(1);
+        players.add(player1);
+        players.add(player2);
+        Room room = new Room();
+        room.setPlayers(players);
+        //test
+        assertEquals(67, gs.startGame(room).getCards().size());
+        assertEquals(2, gs.startGame(room).getGamePlayer().size());
+    }
+
+    @Test
+    public void testDealCardsAndFillDeck(){
+        //setup
+        gamePlayers.add(gp1);
+        organ_heart1.setPlayed(true);
+        organ_heart1.setGamePlayer(null);
+        organ_heart2.setPlayed(true);
+        organ_heart2.setGamePlayer(null);
+        g.getCards().clear();
+        g.setGamePlayer(gamePlayers);
+        g.getCards().add(organ_heart1);
+        g.getCards().add(organ_heart2);
+
+        when(gr.save(g)).thenReturn(g);
+        when(cr.save(any())).thenReturn(organ_heart1);
+        //test
+        gs.dealCards(g);
+        assertEquals(3, gp1.getHand().size());
+        assertEquals(0, g.baraja().size());
+    }
+
+    @Test
+    public void testChangeTurn1(){
+        //setup
+        gamePlayers.add(gp1);
+        gamePlayers.add(gp2);
+        g.setTurn(0);
+        when(gr.save(g)).thenReturn(g);
+        //test
+        gs.changeTurn(g);
+        assertEquals(1, g.getTurn());
+
+    }
+
+    private void changeTurnSetup(Game g, Card c){
+        c.setGamePlayer(null);
+        c.setBody(false);
+        c.setPlayed(false);
+        g.getCards().add(c);
+
+    }
+
+    @Test
+    public void testChangeTurn2(){
+        //setup
+        gamePlayers.add(gp1);
+        gamePlayers.add(gp2);
+        g.setTurn(1);
+        when(gr.save(g)).thenReturn(g);
+        changeTurnSetup(g, organ_bone);
+        changeTurnSetup(g, organ_bone2);
+        changeTurnSetup(g, organ_bone3);
+        changeTurnSetup(g, organ_brain);
+        changeTurnSetup(g, organ_brain2);
+        when(cr.save(any())).thenReturn(organ_heart1);
+        //test
+        g.setTurn(1);
+        g.setRound(0);
+        gs.changeTurn(g);
+        assertEquals(0, g.getTurn());
+        assertEquals(1, g.getRound());
+        assertEquals(3, gp1.getHand().size());
+        assertEquals(3, gp2.getHand().size());
+    }
+
+    @Test
+    public void testDiscard(){
+        //setup
+        cards.clear();
+        cards.add(gp1.getCards().get(0));
+        when(cr.save(any())).thenReturn(vax_heart);
+        gs.discard(cards, gp1);
+        assertEquals(0, gp1.getHand().size());
+    }
+
+    // @Test 
+    // public void testFinishGame(){
+    //     //setup
+    //     gp1.getCards().clear();
+    //     classificateCommonMethod(organ_brain,gp1);
+    //     organ_heart1.getVirus().clear();
+    //     classificateCommonMethod(organ_heart1,gp1);
+    //     classificateCommonMethod(organ_rainbow,gp1);
+    //     classificateCommonMethod(organ_stomach,gp1);
+    //     gamePlayers.add(gp1);
+    //     g.setGamePlayer(gamePlayers);
+    //     when(cr.save(any())).thenReturn(vax_heart);
+    //     when(gr.save(g)).thenReturn(g);
+    //     //test
+    //     gs.finishGame(g);
+    //     assertEquals(false, g.getIsRunning());
+
+    // }
+
 
 }

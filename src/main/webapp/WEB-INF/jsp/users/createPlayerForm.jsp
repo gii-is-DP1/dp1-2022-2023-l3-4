@@ -6,7 +6,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="virus" tagdir="/WEB-INF/tags" %>
 
-<virus:layout pageName="players">
+<virus:layout pageName="users">
     <h2>
         <c:if test="${player['new']}">New </c:if> Player
     </h2>

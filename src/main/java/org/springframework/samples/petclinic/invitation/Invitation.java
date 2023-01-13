@@ -31,7 +31,7 @@ public class Invitation extends BaseEntity {
 	@JoinColumn(name="PlayerInvitationRec_id",referencedColumnName = "id")
 	private Player playerInvitationRec;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id",referencedColumnName = "id")
     private Room room;
 }

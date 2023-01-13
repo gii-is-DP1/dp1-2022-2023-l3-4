@@ -85,16 +85,6 @@
                     <c:out value="${totalTimePlayed}"/>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <h2>Win ratio</h2>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <c:out value="${(numWonGames / numPlayedGames)*100} %"/>
-                  </td>
-                </tr>
               </table>
             </td>
           </tr>

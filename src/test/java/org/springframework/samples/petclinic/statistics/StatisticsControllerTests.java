@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = StatisticsController.class, 
   excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class), 
   excludeAutoConfiguration = SecurityConfiguration.class)
-public class StatisticsControllerTest {
+public class StatisticsControllerTests {
 
   @Autowired
   private MockMvc mockMvc;

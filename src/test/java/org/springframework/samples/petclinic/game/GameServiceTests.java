@@ -26,7 +26,7 @@ import org.springframework.ui.ModelMap;
 // classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class GameServiceTest {
+public class GameServiceTests {
 
     @Autowired
     GameService gs;

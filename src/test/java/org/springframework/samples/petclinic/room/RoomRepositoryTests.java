@@ -14,7 +14,7 @@ import org.springframework.samples.petclinic.player.PlayerRepository;
 
 
 @DataJpaTest
-public class RoomRepositoryTest {
+public class RoomRepositoryTests {
     @Autowired
     RoomRepository roomRepository;
     

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -80,6 +81,16 @@ public class UserControllerTests{
             .andExpect(model().attributeExists("players"))
             .andExpect(model().attributeExists("totalPages"))
             .andExpect(model().attributeExists("currentPage"))
+            .andExpect(view().name("users/usersListing"));
+    }
+
+    @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
+    @Test
+    public void testFindAllUsersNoUsers() throws Exception {
+        when(playerService.findAll(any())).thenReturn(new PageImpl<>(new ArrayList<>()));
+        mockMvc.perform(get("/users"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("message"))
             .andExpect(view().name("users/usersListing"));
     }
 

@@ -24,7 +24,7 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary">Find Room</button>
+                    <button type="submit" class="btn btn-primary">Find Player</button>
                 </div>
             </div>
         </form:form>

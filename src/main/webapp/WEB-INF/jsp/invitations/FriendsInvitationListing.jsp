@@ -12,6 +12,7 @@
         <thead>
         <tr>
             <th>Invitation:</th>
+            <th>Room:</th>
             <th></th>
         </tr>
         </thead>
@@ -20,6 +21,9 @@
             <tr>
                 <td>
                     <c:out value="${invitation.playerInvitationSend.user.username}"/>
+                </td>
+                <td>
+                    <c:out value="${invitation.room.roomName}"/>
                 </td>
                 <td>
                     <a href="/room/${invitation.room.id}">

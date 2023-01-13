@@ -69,7 +69,7 @@
   </div>
 
   <div style="padding-top: 20px;">
-    <a href='<spring:url value="/users/new" htmlEscape="true"/>'>
+    <a href='<spring:url value="/user/new" htmlEscape="true"/>'>
       <button>
         Create new user
       </button>

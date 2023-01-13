@@ -137,7 +137,7 @@ public class GameController {
 		
 	}
 
-	private ModelMap generaTablero(ModelMap model, GamePlayer gamePlayer, Game game) {
+	public ModelMap generaTablero(ModelMap model, GamePlayer gamePlayer, Game game) {
 		Map<GamePlayer, List<Card>> bodies = new HashMap<>(); 
 		for(GamePlayer gp: game.getGamePlayer()){
 			if(gp.equals(gamePlayer)){
@@ -512,4 +512,5 @@ public class GameController {
 		}
 		
 	}
+	
 }

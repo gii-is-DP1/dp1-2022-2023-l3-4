@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 public interface GameRepository extends CrudRepository<Game, Integer> {
 
     List<Game> findAll(); 
-	Optional<Game> findById(int id);
+	Optional<Game> findById(Game game2);
     @Query("SELECT gp FROM GamePlayer gp WHERE gp.player.id = :playerId")
     GamePlayer findGamePlayerByPlayer(@Param(value = "playerId") Integer playerId);
 

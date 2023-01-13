@@ -90,6 +90,11 @@ public class GameService {
 		return gameRepository.findGameByRoomId(roomId);
 	}
 
+	@Transactional
+    public void deleteGame(Integer id) {
+        gameRepository.deleteById(id);
+    }
+
 	@Transactional(readOnly = true)
 	public Boolean isYourTurn(GamePlayer g, Integer gameId) {
 		Game game = findGame(gameId);
@@ -99,18 +104,13 @@ public class GameService {
 	}
 
 	@Transactional(readOnly = true)
-	public Game findGame(Integer i){
-		return gameRepository.findById(i).get();
-	}
+    public Game findGame(Integer i){
+        return gameRepository.findById(i).get();
+    }
 
 	@Transactional(readOnly = true)
 	public Game getRunningGame(Room room) {
 		return gameRepository.findAnyRunningGame(room);
-	}
-
-	@Transactional
-	public void deleteGame(Integer id) {
-		gameRepository.deleteById(id);
 	}
 
 	@Transactional

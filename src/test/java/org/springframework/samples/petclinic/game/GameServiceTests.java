@@ -3,11 +3,11 @@ package org.springframework.samples.petclinic.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,6 @@ import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
 import org.springframework.samples.petclinic.player.Player;
 import org.springframework.samples.petclinic.room.Room;
-import org.springframework.samples.petclinic.statistics.PlayerCount;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
@@ -656,7 +655,7 @@ public class GameServiceTests {
         g.setTurn(0);
         g.setId(0);
         Optional<Game> g_o = Optional.of(g);
-        when(gr.findById(any())).thenReturn(g_o);
+        when(gr.findById(anyInt())).thenReturn(g_o);
         //test
         assertEquals(true, gs.isYourTurn(gp1, 0));
     }

@@ -11,7 +11,7 @@ import org.springframework.samples.petclinic.user.User;
 import org.springframework.samples.petclinic.user.UserRepository;
 
 @DataJpaTest
-public class PlayerRepositoryTest {
+public class PlayerRepositoryTests {
     @Autowired
     PlayerRepository playerRepository;
 

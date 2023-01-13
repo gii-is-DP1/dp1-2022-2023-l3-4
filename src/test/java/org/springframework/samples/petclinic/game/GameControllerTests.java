@@ -43,7 +43,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(controllers = GameController.class, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
 classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
-public class GameControllerTest {
+public class GameControllerTests {
 
 		@MockBean
 		private GameService gameService;
@@ -241,15 +241,23 @@ public class GameControllerTest {
 		Integer g_id = 1;
 		GamePlayer gp = new GamePlayer();
 		Card card = new Card();
+		Card card2 = new Card();
 		Game game = new Game();
 		game.setId(gameId);
         GenericCard genericCard = new GenericCard();
         genericCard.setId(1);
         genericCard.setType(Type.ORGAN);
         genericCard.setColour(Colour.RED);
+		GenericCard genericCard2 = new GenericCard();
+        genericCard2.setId(2);
+        genericCard2.setType(Type.ORGAN);
+        genericCard2.setColour(Colour.BLUE);
 		card.setType(genericCard);
 		card.setGamePlayer(gp);
-		gp.setCards(List.of(card));
+		card2.setType(genericCard2);
+		card2.setGamePlayer(gp);
+		card2.setBody(true);
+		gp.setCards(List.of(card, card2));
 		gp.setId(g_id);
 		List<GamePlayer> gps = new ArrayList<>();
 		gps.add(gp);
@@ -709,36 +717,30 @@ public class GameControllerTest {
 		assertTrue(currentGamePlayer.getCards().containsAll(cards));
 	}
 	
-	//Test method for classification
-	@Test
-	public void classificationTest() throws WonPlayedGamesException{
-		//Arrange
-		Integer gameId = 1;
-		ModelMap model = new ModelMap();
+	@Test 
+	public void classificationTest(){
+		int gameId = 1;
 		Game game = new Game();
-		GamePlayer gp = new GamePlayer();
-		List<GamePlayer> gps = new ArrayList<>();
-		game.setWinner(gp);
-		gps.add(gp);
-		gp.setWinner(true);
+		game.setId(gameId);
+		GamePlayer gamePlayer = new GamePlayer();
 		GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
     	GenericCard generic_stomach =new GenericCard(2,Colour.GREEN, Type.ORGAN);
     	GenericCard generic_rainbow = new GenericCard(3, Colour.RAINBOW, Type.ORGAN);
 		GenericCard generic_bone = new GenericCard(12,Colour.YELLOW, Type.ORGAN);
-		Card organ_heart = new Card(1, true, gp, generic_heart);
-    	Card organ_rainbow = new Card(3, true, gp, generic_rainbow);
-    	Card organ_stomach = new Card(2, true, gp, generic_stomach);
-		Card organ_bone = new Card(13,true,gp,generic_bone);
-		gp.setCards(List.of(organ_heart, organ_rainbow, organ_stomach, organ_bone));
-		game.setGamePlayer(gps);
-		when(gameService.findGame(gameId)).thenReturn(game);
-		//Act
+		Card organ_heart = new Card(1, false, gamePlayer, generic_heart);
+    	Card organ_rainbow = new Card(3, false, gamePlayer, generic_rainbow);
+    	Card organ_stomach = new Card(2, true, gamePlayer, generic_stomach);
+		Card organ_bone = new Card(13,true,gamePlayer,generic_bone);
+		game.setWinner(gamePlayer);
+		gamePlayer.setWinner(true);
+		gamePlayer.setCards(List.of(organ_heart, organ_rainbow, organ_stomach, organ_bone));
+
+		
+		ModelMap model = new ModelMap();
+		
 		String result = gameController.classification(gameId, model);
 		
-		//Assert
-		assertEquals("games/classification", result);
-		assertEquals(game.getClassification(), model.get("classification"));
-		assertTrue(game.hasAnyWinners());
+		assertEquals(result, "games/classification");
+		assertEquals(model.get("classification"), gamePlayer);
 	}
-	
 }

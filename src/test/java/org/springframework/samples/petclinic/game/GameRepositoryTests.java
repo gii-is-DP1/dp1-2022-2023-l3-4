@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
-public class GameRepositoryTest {
+public class GameRepositoryTests {
     @Autowired
     GameRepository gr;
     Game g75 = new Game();

@@ -8,17 +8,15 @@
     <table align="center">
         <tbody>
             <h1>Classification of the game:</h1>
-            <c:forEach items="${classification}" var="position">
+            <c:forEach items="${classification}" var="player">
                 <tr>
                     <td>
-                        <h2><c:out value="${position.key} place:"/></h2>
+                        <h2><c:out value="${classification.indexOf(player) + 1} place:"/></h2>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <c:forEach items="${position.value}" var="player">
-                            <c:out value="${player.player.user.username}"/>
-                        </c:forEach>
+                        <c:out value="${player.player.user.username}"/>
                     </td>
                 </tr>
             </c:forEach>

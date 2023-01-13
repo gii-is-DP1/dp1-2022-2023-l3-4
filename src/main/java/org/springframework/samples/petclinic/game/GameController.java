@@ -123,7 +123,7 @@ public class GameController {
 	public String muestraVista(@PathVariable("gameId") int gameId, ModelMap model){
 		GamePlayer gp_vista= authenticationService.getGamePlayer();
 		Game game = gameService.findGame(gameId);
-		if(game.getWinner()==null){
+		if(game.getWinner() == null) {
 			model = generaTablero(model, gp_vista, game);
 			GamePlayer currentTurnGamePlayer = game.getGamePlayer().get(game.getTurn());
 			Boolean isYourTurn = currentTurnGamePlayer.equals(gp_vista);
@@ -132,7 +132,7 @@ public class GameController {
 
 			return "games/game";
 		} else {
-			return "redirect:/games/" + game.getId() + "/classification";
+			return classification(gameId, model);
 		}
 		
 	}
@@ -489,15 +489,18 @@ public class GameController {
 
 	//Clasificación tras la finalización de la partida
 	@GetMapping(value= "/games/{gameId}/classification")
-	public String classification(@PathVariable("gameId") int gameId, ModelMap model) throws WonPlayedGamesException {
+	public String classification(@PathVariable("gameId") int gameId, ModelMap model) {
 		Game game = this.gameService.findGame(gameId);
-		if(game.hasAnyWinners()){
+		if(game.hasAnyWinners() || game.getWinner()!=null){
 
 			try {
-				gameService.finishGame(game);
-				model.put("classification", game.getClassification());
+				if(game.getIsRunning()){
+					gameService.finishGame(game);
+				}
+				
+				model.put("classification", game.getGamePlayer());
 				return "games/classification";
-			} catch (WonPlayedGamesException e) {
+			} catch (Exception e) {
 				model.put("message", e.getMessage());
 				model.put("messageType", "info");
 				return muestraVista(gameId, model);

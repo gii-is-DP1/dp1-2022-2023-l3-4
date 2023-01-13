@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,6 @@ public class GameServiceTests {
     @BeforeEach
     void setup(){
         g.setCards(new ArrayList<>());
-        g.setClassification(new HashMap<>());
         g.setIsRunning(true);
         g.setId(0);
         List<GamePlayer> gplayers = new ArrayList<>();

@@ -48,9 +48,6 @@ public class Game extends BaseEntity {
 	@ManyToOne(cascade = CascadeType.PERSIST, optional = true)
 	private Room room;
 	
-	@Transient
-	private Map<Integer,List<GamePlayer>> classification = new HashMap<>();
-
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Card> cards;
 

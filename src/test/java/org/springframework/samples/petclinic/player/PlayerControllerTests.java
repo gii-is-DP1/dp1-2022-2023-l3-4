@@ -15,6 +15,8 @@ import org.springframework.samples.petclinic.friendRequest.FriendService;
 import org.springframework.samples.petclinic.game.Game;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
+import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -56,9 +58,14 @@ public class PlayerControllerTests {
     @MockBean
     private AchievementService achievementService;
 
+    @MockBean
+    private UserService userService;
+
     @BeforeEach
     public void setUp() {
         Player mockPlayer = new Player();
+        User mockUser = new User();
+        mockPlayer.setUser(mockUser);
         GamePlayer mockGamePlayer = new GamePlayer();
         Page<Game> mockGames = new PageImpl<>(new ArrayList<>());
         when(authenticationService.getPlayer()).thenReturn(mockPlayer);
@@ -74,6 +81,24 @@ public class PlayerControllerTests {
     @Test
     public void testPlayerProfile() throws Exception {
         mockMvc.perform(get("/player/me"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("player/playerProfile"))
+            .andExpect(model().attributeExists("player"))
+            .andExpect(model().attributeExists("gameplayer"))
+            .andExpect(model().attributeExists("games"))
+            .andExpect(model().attributeExists("currentPage"))
+            .andExpect(model().attributeExists("totalPages"))
+            .andExpect(model().attributeExists("numGamesPlayed"))
+            .andExpect(model().attributeExists("totalTimePlayed"))
+            .andExpect(model().attributeExists("numGamesWon"))
+            .andExpect(model().attributeExists("achievements"));
+
+    }
+
+    @WithMockUser
+    @Test
+    public void testPlayerProfileWithPage() throws Exception {
+        mockMvc.perform(get("/player/me?page=1"))
             .andExpect(status().isOk())
             .andExpect(view().name("player/playerProfile"))
             .andExpect(model().attributeExists("player"))
@@ -123,7 +148,8 @@ public class PlayerControllerTests {
         .param("firstName", "Pedro")
         .param("lastName", "Lopez")
         .param("status", "true")
-        .param("description", "nueva descripcion."))
+        .param("description", "nueva descripcion.")
+        .param("user.password", "pwd"))
         .andExpect(status().isOk())
         .andExpect(view().name("player/playerProfile"))
         .andExpect(model().attributeExists("message"));
@@ -155,6 +181,37 @@ public class PlayerControllerTests {
         .andExpect(status().isOk())
         .andExpect(view().name("player/createOrUpdateProfileForm"))
         .andExpect(model().hasErrors());
+    }
+
+    @WithMockUser
+    @Test
+    public void testPlayerProfileEditEmptyPassword() throws Exception {
+        mockMvc.perform(post("/player/me/edit")
+        .with(csrf())
+        .param("firstName", "Emmanuel")
+        .param("lastName", "Todd")
+        .param("status", "true")
+        .param("description", "nueva descripcion."))
+        .andExpect(status().isOk())
+        .andExpect(view().name("player/createOrUpdateProfileForm"))
+        .andExpect(model().hasErrors());
+    }
+
+    @WithMockUser
+    @Test
+    public void testPlayerProfileEditNotLoggedIn() throws Exception {
+        when(authenticationService.getPlayer()).thenReturn(null);
+
+        mockMvc.perform(post("/player/me/edit")
+        .with(csrf())
+        .param("firstName", "Emmanuel")
+        .param("lastName", "Todd")
+        .param("status", "true")
+        .param("description", "nueva descripcion."))
+        .andExpect(status().isOk())
+        .andExpect(view().name("welcome"))
+        .andExpect(model().attributeExists("message"))
+        .andExpect(model().attribute("message", "You need to be logged in to change your player information."));
     }
 
     @WithMockUser

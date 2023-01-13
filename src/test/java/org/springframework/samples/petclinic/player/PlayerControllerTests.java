@@ -97,6 +97,24 @@ public class PlayerControllerTests {
 
     @WithMockUser
     @Test
+    public void testPlayerProfileWithPage() throws Exception {
+        mockMvc.perform(get("/player/me?page=1"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("player/playerProfile"))
+            .andExpect(model().attributeExists("player"))
+            .andExpect(model().attributeExists("gameplayer"))
+            .andExpect(model().attributeExists("games"))
+            .andExpect(model().attributeExists("currentPage"))
+            .andExpect(model().attributeExists("totalPages"))
+            .andExpect(model().attributeExists("numGamesPlayed"))
+            .andExpect(model().attributeExists("totalTimePlayed"))
+            .andExpect(model().attributeExists("numGamesWon"))
+            .andExpect(model().attributeExists("achievements"));
+
+    }
+
+    @WithMockUser
+    @Test
     public void testPlayerProfileNoAchievements() throws Exception {
         mockMvc.perform(get("/player/me"))
             .andExpect(status().isOk())

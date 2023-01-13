@@ -298,51 +298,11 @@ public class GameService {
 		gamePlayer2.getCards().addAll(player1Cards);
 	}
 		
-	public Map<Integer,List<GamePlayer>> clasificate(List<GamePlayer> gamePlayers){
-		Map<Integer,List<GamePlayer>> classification = new HashMap<>();
-		for(GamePlayer gamePlayer : gamePlayers){
-			Integer healthyOrgans = gamePlayer.getNumHealthyOrgans();
-			if(healthyOrgans==4){
-				gamePlayer.setWinner(true);
-				List<GamePlayer> l = new ArrayList<>();
-				l.add(gamePlayer);
-				classification.put(1, List.of(gamePlayer));
-			} else if(healthyOrgans==3){
-				if(classification.containsKey(2)){
-					classification.get(2).add(gamePlayer);
-				}else{
-					List<GamePlayer> l = new ArrayList<>();
-					l.add(gamePlayer);
-					classification.put(2, l);
-						}
-					} else if(healthyOrgans==2){
-						if(classification.containsKey(3)){
-							classification.get(3).add(gamePlayer);
-						}else{
-							List<GamePlayer> l = new ArrayList<>();
-							l.add(gamePlayer);
-							classification.put(3, l);
-						}
-					} else if(healthyOrgans==1){
-						if(classification.containsKey(4)){
-							classification.get(4).add(gamePlayer);
-						}else{
-							List<GamePlayer> l = new ArrayList<>();
-							l.add(gamePlayer);
-							classification.put(4, l);
-						}
-					} else {
-						if(classification.containsKey(5)){
-							classification.get(5).add(gamePlayer);
-						}else{
-							List<GamePlayer> l = new ArrayList<>();
-							l.add(gamePlayer);
-							classification.put(5, l);
-						}
-					} 
-				}
-				return classification;
-		}
+
+	public List<GamePlayer> classificate(List<GamePlayer> gamePlayers){
+		Collections.sort(gamePlayers, Comparator.comparingInt(GamePlayer::getNumHealthyOrgans).reversed());
+		return gamePlayers;
+	}
 	
 	@Transactional(readOnly = false)
 	public Game startGame(Room room) {
@@ -355,7 +315,6 @@ public class GameService {
 		game.setIsRunning(true);
 		List<GamePlayer> gamePlayers = new ArrayList<>();
 		game.setCards(new ArrayList<>());
-		game.setClassification(new HashMap<>());
 		List<Player> players = new ArrayList<>(room.getPlayers());
 		
 		for(Player p: players) {
@@ -401,8 +360,8 @@ public class GameService {
 	@Transactional(readOnly = false)
 	public void finishGame(Game game) throws WonPlayedGamesException {
 		game.endGame();
-		Map<Integer,List<GamePlayer>> classification = clasificate(game.getGamePlayer());
-		game.setClassification(classification);
+		List<GamePlayer> classification = classificate(game.getGamePlayer());
+		game.setGamePlayer(classification);
 		game.setWinner(game.getGamePlayer().stream().filter(g -> g.isWinner()).findFirst().get());
     	game.getCards().stream().forEach(c -> {
 			c.setGamePlayer(null);

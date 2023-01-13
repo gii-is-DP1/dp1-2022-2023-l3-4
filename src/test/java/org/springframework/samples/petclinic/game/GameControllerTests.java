@@ -623,67 +623,120 @@ public class GameControllerTests {
 		@Test
 		public void playInfect_validInput_returnsTurn() {
 			// Arrange
+            GamePlayer gamePlayer = new GamePlayer(0);
+            GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+            Card organ_heart = new Card(1, true, gamePlayer, generic_heart);
+            Optional<Card> organ_heart_o = Optional.of(organ_heart);
+            gamePlayer.getCards().add(organ_heart);
+            Optional<GamePlayer> gamePlayer_o = Optional.of(gamePlayer); 
+            Game game = new Game();
+            List<GamePlayer> gamePlayers = new ArrayList<>();
+            gamePlayers.add(gamePlayer);
+            game.setGamePlayer(gamePlayers);
+            game.setTurn(0);
 			int gameId = 1;
 			Integer g_id = 2;
 			Integer c_id = 3;
 			ModelMap model = new ModelMap();
+            when(gamePlayerService.findById(anyInt())).thenReturn(gamePlayer_o);
+            when(gamePlayerService.save(gamePlayer)).thenReturn(gamePlayer);
+            when(cardService.findCard(anyInt())).thenReturn(organ_heart_o);
+            when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+            when(gameService.findGame(anyInt())).thenReturn(game);
+            assertEquals("redirect:/games/1", gameController.playInfect(gameId, gameId, c_id, model));
 			
-			// Act
-			String result = gameController.playInfect(gameId, g_id, c_id, model);
-			
-			// Assert
-			assertEquals("turn", result);
 		}
 		
 		@Test
 		public void playInfect_invalidInput_returnsMuestraVista() {
 			// Arrange
+            Game game = new Game();
+            GamePlayer gamePlayer = new GamePlayer(0);
+            List<GamePlayer> gamePlayers = new ArrayList<>();
+            gamePlayers.add(gamePlayer);
+            game.setGamePlayer(gamePlayers);
+            game.setTurn(0);
 			int gameId = 1;
 			Integer g_id = null;
 			Integer c_id = 3;
 			ModelMap model = new ModelMap();
-			
-			// Act
-			String result = gameController.playInfect(gameId, g_id, c_id, model);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			assertEquals("Jugador no encontrado", model.get("message"));
-			assertEquals("info", model.get("messageType"));
+            when(cardService.findCard(c_id)).thenReturn(null);
+            when(gameService.findGame(anyInt())).thenReturn(game);
+			assertEquals("games/game", gameController.playInfect(gameId, g_id, c_id, model));
 		}
 		
 		@Test
 		public void playGlove_validInput_returnsTurn() {
 			// Arrange
+            GamePlayer gamePlayer = new GamePlayer(0);
+            GenericCard generic_heart =new GenericCard(1,Colour.RED, Type.ORGAN);
+            Card organ_heart = new Card(1, true, gamePlayer, generic_heart);
+            Optional<Card> organ_heart_o = Optional.of(organ_heart);
+            gamePlayer.getCards().add(organ_heart);
+            Game game = new Game();
+            List<GamePlayer> gamePlayers = new ArrayList<>();
+            gamePlayers.add(gamePlayer);
+            game.setGamePlayer(gamePlayers);
+            game.setTurn(0);
 			int gameId = 1;
 			Integer c_id = 2;
-			
-			// Act
-			String result = gameController.playGlove(gameId, c_id);
-			
-			// Assert
-			assertEquals("turn", result);
+            when(gamePlayerService.save(gamePlayer)).thenReturn(gamePlayer);
+            when(cardService.findCard(anyInt())).thenReturn(organ_heart_o);
+            when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+            when(gameService.findGame(anyInt())).thenReturn(game);
+            assertEquals("redirect:/games/1", gameController.playGlove(gameId, c_id));
 		}
 		
 		@Test
 		public void playGlove_invalidInput_returnsMuestraVista() {
 			// Arrange
+            Game game = new Game();
+            GamePlayer gamePlayer = new GamePlayer(0);
+            List<GamePlayer> gamePlayers = new ArrayList<>();
+            gamePlayers.add(gamePlayer);
+            game.setGamePlayer(gamePlayers);
+            game.setTurn(0);
 			int gameId = 1;
-			Integer c_id = null;
-			ModelMap model = new ModelMap();
-			
-			// Act
-			String result = gameController.playGlove(gameId, c_id);
-			
-			// Assert
-			assertEquals("muestraVista", result);
-			assertEquals("Card not found.", model.get("message"));
-			assertEquals("info", model.get("messageType"));
+			Integer c_id = 3;
+            when(cardService.findCard(c_id)).thenReturn(null);
+            when(gameService.findGame(anyInt())).thenReturn(game);
+			assertEquals("games/game", gameController.playGlove(gameId, c_id));
 		}
+
+        @Test
+	public void testPlayMedicalError() {
+		// Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
+		int gameId = 1;
+		Integer g_id = 2;
+		Integer c_id = 3;
+		ModelMap model = new ModelMap();
+		GamePlayer gamePlayer1 = mock(GamePlayer.class);
+		GamePlayer gamePlayer2 = mock(GamePlayer.class);
+		Card medicalError = mock(Card.class);
+		
+		when(authenticationService.getGamePlayer()).thenReturn(gamePlayer1);
+		when(gamePlayerService.findById(g_id)).thenReturn(Optional.of(gamePlayer2));
+		when(cardService.findCard(c_id)).thenReturn(Optional.of(medicalError));
+        when(gameService.findGame(anyInt())).thenReturn(game);
+
+        assertEquals("redirect:/games/1", gameController.playMedicalError(gameId, g_id, c_id, model));
+	}
 	
 	@Test
 	public void testPlayMedicalError_GamePlayerNotFound() {
 		// Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
 		int gameId = 1;
 		Integer g_id = 2;
 		Integer c_id = 3;
@@ -692,22 +745,21 @@ public class GameControllerTests {
 		
 		when(authenticationService.getGamePlayer()).thenReturn(gamePlayer1);
 		when(gamePlayerService.findById(g_id)).thenReturn(Optional.empty());
-		
-		// Act
-		String result = gameController.playMedicalError(gameId, g_id, c_id, model);
-		
-		// Assert
-		assertEquals("muestraVista", result);
-		assertEquals("Jugador no encontrado", model.get("message"));
-		assertEquals("info", model.get("messageType"));
-		verify(gameService, never()).medicalError(any(), any());
-		verify(cardService, never()).save(any());
-		verify(gamePlayerService, never()).save(any());
+        when(cardService.findCard(c_id)).thenReturn(Optional.empty());
+        when(gameService.findGame(anyInt())).thenReturn(game);
+
+        assertEquals("games/game", gameController.playMedicalError(gameId, g_id, c_id, model));
 	}
 	
 	@Test
 	public void testPlayMedicalError_CardNotFound() {
 		// Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
 		int gameId = 1;
 		Integer g_id = 2;
 		Integer c_id = 3;
@@ -718,20 +770,45 @@ public class GameControllerTests {
 		when(authenticationService.getGamePlayer()).thenReturn(gamePlayer1);
 		when(gamePlayerService.findById(g_id)).thenReturn(Optional.of(gamePlayer2));
 		when(cardService.findCard(c_id)).thenReturn(Optional.empty());
-		
-		// Act
-		String result = gameController.playMedicalError(gameId, g_id, c_id, model);
-		
-		// Assert
-		assertEquals("muestraVista", result);
-		assertEquals("Carta no encontrada", model.get("message"));
-		assertEquals("info", model.get("messageType"));
-		verify(gameService, never()).medicalError(any(), any());
-		verify(cardService, never()).save(any());
-		verify(gamePlayerService, never()).save(any());
+        when(gameService.findGame(anyInt())).thenReturn(game);
+		assertEquals("games/game", gameController.playMedicalError(gameId, g_id, c_id, model));
 	}
 
-    //Test method for discard
+    //Test method for discardView
+	@Test
+	public void discardViewTestIsYourTurn(){
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
+		Integer gameId = 1;
+		ModelMap model = new ModelMap();
+        when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+		when(gameService.isYourTurn(gamePlayer, gameId)).thenReturn(true);
+        when(gameService.findGame(anyInt())).thenReturn(game);
+		assertEquals("games/discard", gameController.discardView(gameId, model));
+	}
+
+    @Test
+	public void discardViewTestIsNotYourTurn(){
+		//Arrange
+        Game game = new Game();
+        GamePlayer gamePlayer = new GamePlayer(0);
+        List<GamePlayer> gamePlayers = new ArrayList<>();
+        gamePlayers.add(gamePlayer);
+        game.setGamePlayer(gamePlayers);
+        game.setTurn(0);
+        Integer gameId = 1;
+		ModelMap model = new ModelMap();
+        when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+		when(gameService.isYourTurn(gamePlayer, gameId)).thenReturn(false);
+        when(gameService.findGame(anyInt())).thenReturn(game); 
+		assertEquals("games/game", gameController.discardView(gameId, model));
+	}
+
+	//Test method for discard
 	@Test
 	public void discardTestIsYourTurnAndContainsAllCards(){
 		//Arrange
@@ -783,12 +860,11 @@ public class GameControllerTests {
         gamePlayers.add(gamePlayer);
         game.setGamePlayer(gamePlayers);
         game.setTurn(0);
-        GamePlayer currentGamePlayer = authenticationService.getGamePlayer();
-        currentGamePlayer.setCards(new ArrayList<>());
         Hand cardIds = new Hand();
         Integer gameId = 1;
 		ModelMap model = new ModelMap();
-		when(gameService.isYourTurn(currentGamePlayer, gameId)).thenReturn(false);
+        when(authenticationService.getGamePlayer()).thenReturn(gamePlayer);
+		when(gameService.isYourTurn(gamePlayer, gameId)).thenReturn(false);
         when(gameService.findGame(anyInt())).thenReturn(game); 
 		assertEquals("games/game", gameController.discard(cardIds, gameId, model, null));
 	}

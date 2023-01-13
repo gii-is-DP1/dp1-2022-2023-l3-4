@@ -11,7 +11,6 @@ import org.springframework.samples.petclinic.card.Card;
 import org.springframework.samples.petclinic.card.CardService;
 import org.springframework.samples.petclinic.card.GenericCard;
 import org.springframework.samples.petclinic.card.GenericCardService;
-import org.springframework.samples.petclinic.card.GenericCard.Colour;
 import org.springframework.samples.petclinic.card.GenericCard.Type;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayer;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
@@ -130,29 +129,26 @@ public class GameService {
 		return gameRepository.findGamePlayerByPlayer(player.getId());
 	}
 	//Si la baraja se queda sin cartas, se rellena con las ya descartadas
-	public void rellenaBaraja(Integer gameId){
-		Optional<Game> currentGame = gameRepository.findById(gameId);
-		if(currentGame.isPresent()){
-			Game g = currentGame.get();
-			List<Card> playedcards = g.discarted();
-			cardService.shuffle(playedcards);
-			g.setCards(cardService.findCards());
-			gameRepository.save(g);
+	public void fillDeck(Game g){
+			List<Card> played_cards = g.discarted();
+			cardService.shuffle(played_cards);
+			List<Card> new_deck = new ArrayList<>();
+			for(Card played_card: played_cards){
+				played_card.setPlayed(false);
+				new_deck.add(played_card);
 			}
-			
+			g.setCards(played_cards);
+			gameRepository.save(g);
 		}
 		
 		//Barajar
-		public void reparteCartas(@PathVariable("gameId") int gameId) {
-			Optional<Game> currentGame = gameRepository.findById(gameId); 
-			if(currentGame.isPresent()){
-				Game game = currentGame.get();
+		public void dealCards(Game game) {
 				List<Card> baraja = game.baraja();
 				for(GamePlayer jugador: game.getGamePlayer()) {
 				List<Card> cartasJugador = jugador.getHand();
 				while(cartasJugador.size()<3){
-					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a rellenaBaraja
-						rellenaBaraja(gameId);
+					if(baraja.size()==0) { //Si no quedan cartas en la baraja llamamos a fillDeck
+						fillDeck(game);
 						baraja = game.baraja();
 					}
 					Card card = baraja.get(0);
@@ -163,8 +159,7 @@ public class GameService {
 				}
 				jugador.setCards(cartasJugador);//Cuando ya tenga 3 cargas se guarda en el jugador
 					gamePlayerService.save(jugador);
-				}
-			}
+				}			
 			
 			}
 
@@ -208,7 +203,7 @@ public class GameService {
 			if(game.getTurn()==game.getGamePlayer().size()-1){ //Si es el último jugador
 				game.setTurn(0); //Cambiamos el turno a 0
 				game.setRound(game.getRound()+1); //Añadimos una ronda
-				reparteCartas(game.getId());} //Y repartimos cartas
+				dealCards(game);} //Y repartimos cartas
 			else{game.setTurn(game.getTurn()+1); //Sino solo incrementamos el turno en 1
 			}
 			gameRepository.save(game); //Guardamos los cambios de game
@@ -338,23 +333,19 @@ public class GameService {
 		}
 		Collections.shuffle(game.getCards());
 		save(game);
-		reparteCartas(game.getId());
+		dealCards(game);
 
 		return game;
 	}
 
 	@Transactional(readOnly = false)
 	public void discard(List<Card> cards, GamePlayer gamePlayer) {
-		if(gamePlayer.getCards().containsAll(cards)){
 			for(Card card: cards){	//Recorremos las cartas que quiere descartar					
 					gamePlayer.getCards().remove(card); //Cada carta la quitamos de la lista de cartas del jugador
 					card.discard();
 					cardService.save(card);	//Se guarda la carta	
 			}  
-			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador
-		}else{
-			
-		}
+			gamePlayerService.save(gamePlayer); //Cuando ya se han eliminado todas, se guarda el jugador	
 	}
 
 	@Transactional(readOnly = false)

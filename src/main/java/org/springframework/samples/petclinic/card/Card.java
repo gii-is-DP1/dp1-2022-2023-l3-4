@@ -97,7 +97,7 @@ public class Card extends BaseEntity implements Serializable {
 	}
 
 	public Boolean areCompatible(Card virus_or_vaccine){
-		return (getType().getType().name()=="ORGAN") && 
+		return 
 		(virus_or_vaccine.getType().getColour().name()==getType().getColour().name() || getType().getColour().name()=="RAINBOW" ||
 		virus_or_vaccine.getType().getColour().name()=="RAINBOW");
 

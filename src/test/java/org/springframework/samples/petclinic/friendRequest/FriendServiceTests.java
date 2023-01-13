@@ -17,7 +17,7 @@ import org.springframework.samples.petclinic.player.PlayerService;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class FriendServiceTest {
+public class FriendServiceTests {
 
     @Autowired
     FriendRepository friendRepository;

@@ -131,7 +131,7 @@ public class PlayerController {
             Player playerToUpdate = authenticationService.getPlayer();
             if (playerToUpdate != null) {
                 BeanUtils.copyProperties(player, playerToUpdate, "id", "user", "friendRec", "friendSend", "achievements", "room", "gamePlayer");
-                if(player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
+                if(player.getUser() == null || player.getUser().getPassword()==null || player.getUser().getPassword().equals("")) {
                     bindingResult.rejectValue("user.password", "Password cannot be empty.", "Password cannot be empty.");
                     return EDIT_PROFILE;
                 } else {
@@ -140,12 +140,16 @@ public class PlayerController {
                     userService.saveUser(userToUpdate);
                     playerService.savePlayer(playerToUpdate);
                     model.put("message", "Your player information has been updated successfully");
+                    model.put("messageType", "info");
                     return playerProfile(model, null);
                 }
                 
+            } else {
+                model.put("message", "You need to be logged in to change your player information.");
+                model.put("messageType", "info");
+                return "welcome";
             }
         }
-        return "redirect:/player/me";
     }
 
     @GetMapping("/search")

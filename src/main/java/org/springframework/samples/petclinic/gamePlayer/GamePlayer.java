@@ -59,8 +59,6 @@ public class GamePlayer extends BaseEntity {
         this.player=p;
         this.id = id;
         this.cards= new ArrayList<>();
-        // this.host=false;
-        // this.winner=false;
     }
 
     public List<Card> getBody(){
@@ -76,7 +74,7 @@ public class GamePlayer extends BaseEntity {
 
     public Boolean isWinner(){
        Integer numOrgansNeededToWin = 4; 
-       return  getNumHealthyOrgans()==numOrgansNeededToWin;
+       return  getNumHealthyOrgans()>=numOrgansNeededToWin;
     }
 
     public List<String> getBodyColours(){

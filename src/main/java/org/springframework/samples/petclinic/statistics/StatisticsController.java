@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.game.GameService;
 import org.springframework.samples.petclinic.gamePlayer.GamePlayerService;
+import org.springframework.samples.petclinic.util.AuthenticationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +18,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class StatisticsController {
   private GameService gameService;
   private GamePlayerService gamePlayerService;
+  private AuthenticationService authenticationService;
   public static final String STATISTICS_LISTING = "player/playerProfile";
   public static final String EDIT_STATISTICS = "player/updatePlayerStatistics";
   public static final String RANKING = "statistics/globalStatistics";
 
   @Autowired
-  public StatisticsController(GameService gs, GamePlayerService gps) {
+  public StatisticsController(GameService gs, GamePlayerService gps, AuthenticationService auths) {
     this.gameService = gs;
     this.gamePlayerService = gps;
+    this.authenticationService = auths;
   }
 
   @GetMapping("/statistics/global")
   public String getGameStatistics(ModelMap model) {
+
+    Boolean isAdmin = authenticationService.getUser().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("admin"));
+    Boolean isPlayer = authenticationService.getUser().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("player"));
+
+    model.put("isAdmin", isAdmin);
+    model.put("isPlayer", isPlayer);
 
     // Ranking
     List<PlayerCount> stats = gameService.getRanking();
@@ -48,7 +57,7 @@ public class StatisticsController {
 
     // Average duration
     Double average = durations.stream().mapToLong(x -> x.toSeconds()).average().getAsDouble();
-    Duration avgDuration = Duration.ofSeconds(Long.valueOf(average.toString().replace(".0", "")));
+    Duration avgDuration = Duration.ofSeconds(average.intValue());
     model.put("avgDuration", gameService.humanReadableDuration(avgDuration));
 
     // Maximum duration

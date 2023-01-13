@@ -1,7 +1,5 @@
 package org.springframework.samples.petclinic.user;
 
-
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,9 +24,10 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldSaveUser(){
+    public void shouldSaveUser() throws DuplicatedUserException{
         User userPrueba= new User();
         userPrueba.setUsername("prueba");
+        userPrueba.setPassword("pwd");
         userService.saveUser(userPrueba);
         User comprobation= userService.findUser("prueba");
         assertTrue(comprobation.getUsername() == "prueba", "The user was not saved.");
@@ -36,10 +35,18 @@ public class UserServiceTests {
     }
 
     @Test
+    public void shouldNotSaveUser() throws DuplicatedUserException{
+        User userPrueba= new User();
+        userPrueba.setUsername("frabenrui1");
+        assertThrows(DuplicatedUserException.class, () -> userService.saveUser(userPrueba));
+        
+    }
+
+    @Test
     public void shouldUpdateUser(){
         User userPrueba= userService.findUser("p");
         userPrueba.setPassword("pswd");
-        userService.saveUser(userPrueba);
+        userService.updateUser(userPrueba);
         User comprobation= userService.findUser("p");
         assertTrue(comprobation.getPassword() == "pswd", "The user was not updated.");
         

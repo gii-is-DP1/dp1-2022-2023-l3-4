@@ -54,6 +54,12 @@ INSERT INTO room(id,num_max_players,room_name,is_private,player_id) VALUES (1,6,
 --Modificacion de player con la room creada
 UPDATE players Set room_id=1 WHERE id=5;
 
+--Modificacion de player con la room creada
+UPDATE players Set room_id=1 WHERE id=5;
+
+--Modificacion de player con la room creada
+UPDATE players Set room_id=1 WHERE id=5;
+
 -- Games
 
 INSERT INTO games(id, duration, initial_hour, is_running, round, room_id, winner_id) VALUES (1,6000000000,'2022-02-01 15:15:15',FALSE,4,1,1);

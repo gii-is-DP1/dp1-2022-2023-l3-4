@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.samples.petclinic.game.Game;
+import org.springframework.samples.petclinic.invitation.Invitation;
 import org.springframework.samples.petclinic.model.BaseEntity;
 import org.springframework.samples.petclinic.player.Player;
 
@@ -48,6 +50,9 @@ public class Room extends BaseEntity{
 
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "room")
     private Collection<Game> games;
+
+    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Invitation invitation;
 }

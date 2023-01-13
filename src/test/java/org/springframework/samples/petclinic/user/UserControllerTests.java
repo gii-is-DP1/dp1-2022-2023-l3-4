@@ -139,7 +139,10 @@ public class UserControllerTests{
     public void testEditPostUserSuccessful() throws Exception {
         mockMvc.perform(post("/users/{username}/edit", TEST_USERNAME)
             .with(csrf())
-            .param("password", "pepito"))
+            .param("firstName", "pepito")
+            .param("lastName", "pepito2")
+            .param("description", "New description")
+            .param("user.password", "pepito"))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("message"))
             .andExpect(view().name("users/usersListing"));
@@ -147,12 +150,42 @@ public class UserControllerTests{
 
     @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
     @Test
+    public void testEditPostUserNoFirstName() throws Exception {
+        mockMvc.perform(post("/users/{username}/edit", TEST_USERNAME)
+        .with(csrf())
+        .param("firstName", "")
+        .param("lastName", "pepito2")
+        .param("description", "New description")
+        .param("user.password", "pepito"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("player/createOrUpdateProfileForm"))
+        .andExpect(model().hasErrors());
+    }
+    @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
+    @Test
+    public void testEditPostUserNoLastName() throws Exception {
+        mockMvc.perform(post("/users/{username}/edit", TEST_USERNAME)
+        .with(csrf())
+        .param("firstName", "pepito")
+        .param("lastName", "")
+        .param("description", "New description")
+        .param("user.password", "pepito"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("player/createOrUpdateProfileForm"))
+        .andExpect(model().hasErrors());
+    }
+
+    @WithMockUser(value = "admin1", password = "4dm1n", roles = "ADMIN")
+    @Test
     public void testEditPostUserNoPassword() throws Exception {
         mockMvc.perform(post("/users/{username}/edit", TEST_USERNAME)
         .with(csrf())
-        .param("password",""))
+        .param("firstName", "pepito")
+        .param("lastName", "pepito2")
+        .param("description", "New description")
+        .param("user.password",""))
         .andExpect(status().isOk())
-        .andExpect(view().name("users/usersListing"))
+        .andExpect(view().name("player/createOrUpdateProfileForm"))
         .andExpect(model().hasErrors());
     }
     

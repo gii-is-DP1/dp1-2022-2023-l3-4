@@ -57,7 +57,7 @@ public class StatisticsController {
 
     // Average duration
     Double average = durations.stream().mapToLong(x -> x.toSeconds()).average().getAsDouble();
-    Duration avgDuration = Duration.ofSeconds(Long.valueOf(average.toString().replace(".0", "")));
+    Duration avgDuration = Duration.ofSeconds(average.intValue());
     model.put("avgDuration", gameService.humanReadableDuration(avgDuration));
 
     // Maximum duration
